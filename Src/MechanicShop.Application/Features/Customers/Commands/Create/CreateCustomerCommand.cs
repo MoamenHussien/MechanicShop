@@ -15,7 +15,7 @@ public class CreateCustomerCommandValidator : AbstractValidator<CreateCustomerCo
         .Length(3,255).WithMessage("The Name length From 3 to 255 Char");
 
         RuleFor(n=>n.email).MustBeValidEmail();
-        RuleFor(n=>n.PhoneNumber).MustBeValidEmail();
+        RuleFor(n=>n.PhoneNumber).MustBeValidPhone();
         RuleFor(n=>n.Vehicles).NotNull().WithMessage("Vehicle list Cannot Be Null").Must(n=>n.Count>0).WithMessage("Customer Must Have At Least One Vehicle");
         RuleForEach(n=>n.Vehicles).SetValidator(new CreateVehicleCommandValidator());
     }
@@ -50,8 +50,7 @@ public class CreateCustomerCommandHandler(ILogger<CreateCustomerCommandHandler> 
         var customer = Customer.Create(Guid.NewGuid(),request.name,email,request.PhoneNumber,vehicles);
         if (customer.IsError)
         {
-        logger.LogWarning("Error During creating Customer: {@Errors}", customer.Errors);
-
+            logger.LogWarning("Error During creating Customer: {@Errors}", customer.Errors);
             return customer.Errors;
         }
 

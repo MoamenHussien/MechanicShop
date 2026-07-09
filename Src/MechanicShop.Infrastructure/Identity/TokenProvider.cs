@@ -29,30 +29,44 @@ public class TokenProvider(IOptions<JwtSettings> JwtConfigSettings, IAppDbContex
         return tokenResult.Value;
     }
 
-    public ClaimsPrincipal? GetPrincipalFromExpiredToken(string token)
+    public Result<ClaimsPrincipal> GetPrincipalFromExpiredToken(string token)
     {
-        var tokenValidationParameters = new TokenValidationParameters
+        try
         {
-            ValidateIssuerSigningKey = true,
-            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(JwtConfigSettings.Value.SecretKey)),
-            ValidateIssuer = true,
-            ValidIssuer = JwtConfigSettings.Value.Issuer,
-            ValidateAudience = true,
-            ValidAudience = JwtConfigSettings.Value.Audience,
-            ValidateLifetime = false,
-            ClockSkew = TimeSpan.Zero
-        };
+            var tokenValidationParameters = new TokenValidationParameters
+            {
+                ValidateIssuerSigningKey = true,
+                IssuerSigningKey = new SymmetricSecurityKey(
+                    Encoding.UTF8.GetBytes(JwtConfigSettings.Value.SecretKey)),
+                ValidateIssuer = true,
+                ValidIssuer = JwtConfigSettings.Value.Issuer,
+                ValidateAudience = true,
+                ValidAudience = JwtConfigSettings.Value.Audience,
+                ValidateLifetime = false,
+                ClockSkew = TimeSpan.Zero
+            };
 
-        var tokenHandler = new JwtSecurityTokenHandler();
-        var principal = tokenHandler.ValidateToken(token, tokenValidationParameters, out SecurityToken securityToken);
+            var tokenHandler = new JwtSecurityTokenHandler();
 
-        if (securityToken is not JwtSecurityToken jwtSecurityToken ||
-            !jwtSecurityToken.Header.Alg.Equals(SecurityAlgorithms.HmacSha256, StringComparison.InvariantCultureIgnoreCase))
-        {
-            throw new SecurityTokenException("Invalid token.");
+            var principal = tokenHandler.ValidateToken(
+                token,
+                tokenValidationParameters,
+                out SecurityToken securityToken);
+
+            if (securityToken is not JwtSecurityToken jwtSecurityToken ||
+                !jwtSecurityToken.Header.Alg.Equals(
+                    SecurityAlgorithms.HmacSha256,
+                    StringComparison.OrdinalIgnoreCase))
+            {
+                return ApplicationErrors.InvalidAccessToken;
+            }
+
+            return principal;
         }
-
-        return principal;
+        catch (SecurityTokenException)
+        {
+            return ApplicationErrors.InvalidAccessToken;
+        }
     }
 
     private async Task<Result<TokenResponse>> CreateAsync(AppUserDto user, CancellationToken ct = default)

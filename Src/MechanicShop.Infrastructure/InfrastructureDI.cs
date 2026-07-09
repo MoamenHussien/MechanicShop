@@ -11,17 +11,19 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Caching.Hybrid;
+using Microsoft.Extensions.Diagnostics.HealthChecks;
+using MechanicShop.Infrastructure.HealthChecks;
 
 public static class InfrastructureDI
 {
-    public static IServiceCollection AddInfrastructure(this IServiceCollection services, IOptions<JwtSettings> jwt,
-                                                                                           IConfiguration config)
+    public static IServiceCollection AddInfrastructure(this IServiceCollection services, IConfiguration config)
     {
         // System Core
         services.AddSingleton(TimeProvider.System);
         services.AddOptions<AppSettings>().BindConfiguration(AppSettings.Name).ValidateOnStart();
         services.AddOptions<JwtSettings>().BindConfiguration(JwtSettings.Name).ValidateOnStart();
         services.AddOptions<MailSettings>().BindConfiguration(MailSettings.Name).ValidateOnStart();
+        services.AddOptions<HealthCheckSettings>().BindConfiguration(HealthCheckSettings.Name).ValidateOnStart();
         // BackGround Services
         services.AddHostedService<OverdueBookingCleanupService>();
         // Application Services
@@ -31,7 +33,7 @@ public static class InfrastructureDI
         services.AddScoped<IInvoicePdfGenerator, InvoicePdfGenerator>();
         services.AddHttpContextAccessor();
         QuestPDF.Settings.License = QuestPDF.Infrastructure.LicenseType.Community;
-        
+
         // (EF Core & Data Access)
         var connectionString = config.GetConnectionString("DefaultConnection");
         ArgumentNullException.ThrowIfNull(connectionString);
@@ -44,9 +46,44 @@ public static class InfrastructureDI
             options.UseSqlServer(connectionString);
         });
 
+        // Health Checks
+
+        services.AddHealthChecks()
+                // Database
+             .AddDbContextCheck<AppDbContext>(
+                 name: "SQL Server",
+                 failureStatus: HealthStatus.Unhealthy,
+                 tags: ["database", "ready"] )
+                // Redis
+             .AddRedis(
+                 redisConnectionString: config.GetConnectionString("Redis")!,
+                 name: "Redis",
+                 failureStatus: HealthStatus.Unhealthy,
+                 tags: ["cache", "ready"],
+                 timeout: TimeSpan.FromSeconds(2))
+                // Mail
+             .AddCheck<MailHealthCheck>(
+                 name: "SMTP",
+                 failureStatus: HealthStatus.Unhealthy,
+                 tags: ["mail", "ready"],
+                 timeout: TimeSpan.FromSeconds(5))
+                // Memory
+             .AddCheck<MemoryHealthCheck>(
+                 name: "Memory",
+                 failureStatus: HealthStatus.Degraded,
+                 tags: ["system"])
+                // Disk
+             .AddCheck<DiskHealthCheck>(
+                 name: "Disk",
+                 failureStatus: HealthStatus.Degraded,
+                 tags: ["system"]);
+
         // Security & Identity
+
+        var jwtSettings = config.GetSection("JwtSettings");
+
         services.AddScoped<IAuthorizationHandler, LaborAssignedRequirementHandler>();
-        services.AddAuthorizationBuilder().AddPolicy("SelfScopedWorkOrderAccess", policy => 
+        services.AddAuthorizationBuilder().AddPolicy("SelfScopedWorkOrderAccess", policy =>
                                                                   policy.AddRequirements(new LaborAssignedRequirement()));
         services.AddScoped<ITokenProvider, TokenProvider>();
         services.AddTransient<IIdentityService, IdentityService>();
@@ -65,10 +102,10 @@ public static class InfrastructureDI
                 ValidateLifetime = true,
                 ClockSkew = TimeSpan.Zero,
                 ValidateIssuerSigningKey = true,
-                ValidIssuer = jwt.Value.Issuer,
-                ValidAudience = jwt.Value.Audience,
+                ValidIssuer = jwtSettings["Issuer"],
+                ValidAudience = jwtSettings["Audience"],
                 IssuerSigningKey = new SymmetricSecurityKey(
-                Encoding.UTF8.GetBytes(jwt.Value.SecretKey!)),
+                Encoding.UTF8.GetBytes(jwtSettings["SecretKey"]!)),
             };
         });
 
@@ -85,7 +122,14 @@ public static class InfrastructureDI
 
         }).AddRoles<IdentityRole<Guid>>().AddEntityFrameworkStores<AppDbContext>().AddDefaultTokenProviders();
 
-        // Caching
+        // Caching & Rides
+
+        // services.AddStackExchangeRedisCache(options =>
+        // {
+        //     options.Configuration = config.GetConnectionString("Redis");
+        //     options.InstanceName = "MechanicShop:";
+        // });
+
         services.AddHybridCache(options => options.DefaultEntryOptions = new HybridCacheEntryOptions
         {
             Expiration = TimeSpan.FromMinutes(10), // L2, L3

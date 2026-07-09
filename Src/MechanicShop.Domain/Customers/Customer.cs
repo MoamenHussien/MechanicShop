@@ -8,9 +8,9 @@ public sealed class Customer : AuditableEntity
     public string Email { get; private set; }
     public string PhoneNumber { get; private set; }
 
-    private readonly List<Vehicle> _vehicle = [];
+    private readonly List<Vehicle> _vehicles = [];
 
-    public IReadOnlyCollection<Vehicle> vehicles => _vehicle;
+    public IReadOnlyCollection<Vehicle> vehicles => _vehicles;
 
 #pragma warning disable CS8618
     private Customer()
@@ -26,7 +26,7 @@ public sealed class Customer : AuditableEntity
         this.Name =name;
         this.Email= email;
         this.PhoneNumber = phone;
-        this._vehicle = vehicles;
+        this._vehicles = vehicles;
     }
 
     public static Result<Customer> Create (Guid id ,string name,string email,string phone,List<Vehicle> vehicles)
@@ -86,9 +86,9 @@ public sealed class Customer : AuditableEntity
     {
         var vehicleHash = vehicles.Select(n=>n.Id).ToHashSet();
 
-        this._vehicle.RemoveAll(n=> !vehicleHash.Contains(n.Id));
+        this._vehicles.RemoveAll(n=> !vehicleHash.Contains(n.Id));
 
-        var vehicleDire = this._vehicle.ToDictionary(n=>n.Id);
+        var vehicleDire = this._vehicles.ToDictionary(n=>n.Id);
 
         foreach(var UpVec in vehicles)
         {
@@ -103,7 +103,7 @@ public sealed class Customer : AuditableEntity
             }
             else
             {             
-                this._vehicle.Add(UpVec);
+                this._vehicles.Add(UpVec);
             } 
         }
         return Result.Updated;

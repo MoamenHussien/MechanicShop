@@ -14,16 +14,16 @@ public sealed class IssueInvoiceCommandValidator : AbstractValidator<IssueInvoic
     }
 }
 
-public sealed class IssueInvoiceCommandHandler(ILogger<IssueInvoiceCommand> logger,IUser user ,IIdentityService identity, IAppDbContext context, HybridCache cache,TimeProvider time)
+public sealed class IssueInvoiceCommandHandler(ILogger<IssueInvoiceCommand> logger, IAppDbContext context, HybridCache cache,TimeProvider time)
 : IRequestHandler<IssueInvoiceCommand, Result<InvoiceDto>>
 {
     public async Task<Result<InvoiceDto>> Handle(IssueInvoiceCommand request, CancellationToken cancellationToken)
     {
-        if (!await identity.IsInRoleAsync(user.Id!.Value, Role.Manager.ToString()))
-        {
-            logger.LogWarning("Issue Invoice : (Forbidden) , This User {UserId} is not allowed to Issue The Invoice", user.Id);
-            return ApplicationErrors.NotAllowed;
-        }
+        // if (!await identity.IsInRoleAsync(user.Id!.Value, Role.Manager.ToString()))
+        // {
+        //     logger.LogWarning("Issue Invoice : (Forbidden) , This User {UserId} is not allowed to Issue The Invoice", user.Id);
+        //     return ApplicationErrors.NotAllowed;
+        // }
 
         if (await context.Invoices.AnyAsync(n => n.WorkOrderId == request.workOrderId,cancellationToken))
         {

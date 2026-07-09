@@ -7,6 +7,7 @@ public abstract class Entity {
 
     [NotMapped]
     private readonly List<DomainEvents> _DomainEvents = [];
+    [NotMapped]
     public ICollection<DomainEvents> DomainEvents => _DomainEvents.AsReadOnly();
     protected Entity()
     {

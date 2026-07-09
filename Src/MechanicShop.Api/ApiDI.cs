@@ -1,13 +1,14 @@
+using System.IO.Compression;
+using System.Security.Claims;
 using System.Text.Json.Serialization;
 using System.Threading.RateLimiting;
-using MechanicShop.Api.Infrastructure;
+using HealthChecks.UI.Client;
 using MechanicShop.Api.OpenApi.Transformers;
-using MechanicShop.Api.Services;
-using MechanicShop.Application.Common.Interfaces;
-using MechanicShop.Infrastructure.Settings;
+using MechanicShop.Api.OutputCaching;
+using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.RateLimiting;
-
+using Microsoft.AspNetCore.ResponseCompression;
 using OpenTelemetry.Metrics;
 using OpenTelemetry.Resources;
 using OpenTelemetry.Trace;
@@ -25,28 +26,89 @@ public static class ApiDI
                 .AddCustomApiVersioning()
                 .AddApiDocumentation()
                 .AddExceptionHandling()
-                .AddControllerWithJsonConfiguration()
+                .AddControllersWithJsonOptions()
                 .AddValidation()
                 .AddConfiguredCors(configuration)
                 .AddIdentityInfrastructure()
                 .AddAppRateLimiting()
                 .AddAppOutputCaching()
+                .AddResponseCompression()
                 .AddAppOpenTelememrty()
                 .AddSignalR();
+        return services;
+    }
+
+    private static IServiceCollection AddResponseCompression(this IServiceCollection services)
+    {
+        services.AddResponseCompression(options =>
+        {
+            options.EnableForHttps = true;
+            options.Providers.Add<BrotliCompressionProvider>();
+            options.Providers.Add<GzipCompressionProvider>();
+            options.MimeTypes = new[]
+            {
+                "application/json",
+                "text/plain",
+                "text/html",
+                "application/xml",
+                "application/octet-stream", // 👈 مهم جداً لملفات DLLs الخاصة بـ Blazor
+                "application/wasm"          // 👈 مهم جداً لملفات WebAssembly
+            };
+        });
+
+        services.Configure<BrotliCompressionProviderOptions>(options =>
+        {
+            options.Level = CompressionLevel.Fastest;
+        });
+
+        services.Configure<GzipCompressionProviderOptions>(options =>
+        {
+            options.Level = CompressionLevel.Fastest;
+        });
 
         return services;
     }
+
+
 
     private static IServiceCollection AddAppOutputCaching(this IServiceCollection services)
     {
         services.AddOutputCache(options =>
         {
-            options.SizeLimit = 100 * 1024 * 1024;  // 100 mb
-            options.MaximumBodySize = 1024 * 1024 ; // 1   mb 
+            options.SizeLimit = 100 * 1024 * 1024;     // 100 MB
+            options.MaximumBodySize = 1024 * 1024;     // 1 MB
             options.UseCaseSensitivePaths = false;
-            options.AddBasePolicy(policy =>
-                policy.Expire(TimeSpan.FromSeconds(60)));
+
+            // Default cache configuration.
+            options.AddBasePolicy(builder =>
+            {
+                builder.Cache()
+                       .Expire(TimeSpan.FromSeconds((int)DurationInSeconds.TenMinutes));
+            });
+
+            // Shared cache across all authenticated users.
+            options.AddPolicy(nameof(Policies.SharedAuthCache), builder =>
+            {
+                builder.AddPolicy<AuthenticatedRequestCachingPolicy>();
+                builder.Cache()
+                       .Expire(TimeSpan.FromSeconds((int)DurationInSeconds.TenMinutes));
+
+            }, excludeDefaultPolicy: true);
+
+            // Separate cache for each authenticated user.
+            options.AddPolicy(nameof(Policies.PerUserAuthCache), builder =>
+            {
+                builder.AddPolicy<AuthenticatedRequestCachingPolicy>();
+
+                builder.Cache()
+                       .Expire(TimeSpan.FromSeconds((int)DurationInSeconds.FiveMinutes))
+                       .VaryByValue(context =>
+                           new KeyValuePair<string, string>(
+                               "UserId",
+                               context.User.FindFirstValue(ClaimTypes.NameIdentifier) ?? string.Empty));
+            }, excludeDefaultPolicy: true);
         });
+
         return services;
     }
 
@@ -58,7 +120,6 @@ public static class ApiDI
         {
             tracing.AddAspNetCoreInstrumentation().
             AddHttpClientInstrumentation();
-
             tracing.AddOtlpExporter();
         }).
         WithMetrics(metrics =>
@@ -69,16 +130,13 @@ public static class ApiDI
             metrics.AddOtlpExporter().
             AddPrometheusExporter(); // /metrics
         });
-
         return services;
     }
 
-    public static IHostBuilder AddCustomSerilog(this IHostBuilder hostBuilder)
+    public static IHostBuilder AddSerilogLogging(this IHostBuilder hostBuilder)
     {
-        hostBuilder.UseSerilog((context, loggerConfig) =>
+        return hostBuilder.UseSerilog((context, loggerConfig) =>
             loggerConfig.ReadFrom.Configuration(context.Configuration));
-            
-        return hostBuilder;
     }
 
     private static IServiceCollection AddAppRateLimiting(this IServiceCollection services)
@@ -90,10 +148,10 @@ public static class ApiDI
                 partitionKey: "Global",
                 factory: _ => new SlidingWindowRateLimiterOptions
                 {
-                    PermitLimit      = 1000,
-                    Window           = TimeSpan.FromMinutes(1),
+                    PermitLimit = 1000,
+                    Window = TimeSpan.FromMinutes(1),
                     SegmentsPerWindow = 6,
-                    QueueLimit       = 0,
+                    QueueLimit = 0,
                     AutoReplenishment = true
                 })
             );
@@ -125,11 +183,11 @@ public static class ApiDI
         return services;
     }
 
-    public static IServiceCollection AddCustomApiVersioning(this IServiceCollection services)
+    private static IServiceCollection AddCustomApiVersioning(this IServiceCollection services)
     {
         services.AddApiVersioning(options =>
         {
-            options.DefaultApiVersion = new Asp.Versioning.ApiVersion(1,0);
+            options.DefaultApiVersion = new Asp.Versioning.ApiVersion(1, 0);
             options.AssumeDefaultVersionWhenUnspecified = true;
             options.ReportApiVersions = true;
             options.ApiVersionReader = new Asp.Versioning.UrlSegmentApiVersionReader();
@@ -142,7 +200,7 @@ public static class ApiDI
         return services;
     }
 
-    public static IServiceCollection AddApiDocumentation(this IServiceCollection services)
+    private static IServiceCollection AddApiDocumentation(this IServiceCollection services)
     {
         string[] versions = ["v1"];
 
@@ -162,13 +220,13 @@ public static class ApiDI
         return services;
     }
 
-    public static IServiceCollection AddExceptionHandling(this IServiceCollection services)
+    private static IServiceCollection AddExceptionHandling(this IServiceCollection services)
     {
         services.AddExceptionHandler<GlobalExceptionHandler>();
         return services;
     }
 
-    public static IServiceCollection AddControllerWithJsonConfiguration(this IServiceCollection services)
+    private static IServiceCollection AddControllersWithJsonOptions(this IServiceCollection services)
     {
         services.AddControllers().AddJsonOptions(options => options
             .JsonSerializerOptions
@@ -177,19 +235,19 @@ public static class ApiDI
         return services;
     }
 
-    public static IServiceCollection AddValidation(this IServiceCollection services)
+    private static IServiceCollection AddValidation(this IServiceCollection services)
     {
         return services;
     }
 
-    public static IServiceCollection AddIdentityInfrastructure(this IServiceCollection services)
+    private static IServiceCollection AddIdentityInfrastructure(this IServiceCollection services)
     {
         services.AddScoped<IUser, CurrentUser>();
         services.AddHttpContextAccessor();
         return services;
     }
 
-    public static IServiceCollection AddConfiguredCors(this IServiceCollection services, IConfiguration configuration)
+    private static IServiceCollection AddConfiguredCors(this IServiceCollection services, IConfiguration configuration)
     {
         var appSettings = configuration.GetSection("AppSettings").Get<AppSettings>()!;
 
@@ -221,6 +279,10 @@ public static class ApiDI
         // 5. CORS (before authentication/authorization)
         app.UseCors(configuration["AppSettings:CorsPolicyName"]!);
 
+        // 5.5. Response Compression
+        // Compresses eligible responses before they are sent to the client.
+        app.UseResponseCompression();
+
         // 6. Rate limiting (before authentication to protect auth endpoints)
         app.UseRateLimiter();
 
@@ -232,6 +294,21 @@ public static class ApiDI
 
         // 9. Output caching (after auth to cache based on user context)
         app.UseOutputCache();
+
+        return app;
+    }
+
+    public static IEndpointRouteBuilder MapCoreEndpoints(this IEndpointRouteBuilder app)
+    {
+        app.MapControllers();   
+
+        
+        app.MapHealthChecks("/health", new HealthCheckOptions
+        {
+            ResponseWriter = UIResponseWriter.WriteHealthCheckUIResponse
+        })
+        .RequireAuthorization()
+        .RequireHost("localhost");
 
         return app;
     }

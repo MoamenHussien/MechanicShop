@@ -13,36 +13,55 @@ public class CachingBehavior<TRequest, TResponse>
         {
             return await next(cancellationToken);
         }
-
-       var Data = await cache.GetOrCreateAsync<TResponse>(
-                                                          cachedQuery.CacheKey,
-                                                          _=> new ValueTask<TResponse>((TResponse)(object)null!),
-                                                           new HybridCacheEntryOptions
-                                                           {
-                                                               Flags = HybridCacheEntryFlags.DisableUnderlyingData
-                                                           },
-                                                           cancellationToken:cancellationToken) ;
         
+        logger.LogInformation(
+            "🔍 HybridCache CHECK - Evaluating request '{RequestName}' with key '{CacheKey}'.",
+            typeof(TRequest).Name,
+            cachedQuery.CacheKey);
 
-       if (Data is null)
+        var data = await cache.GetOrCreateAsync<TResponse>(
+                                                           cachedQuery.CacheKey,
+                                                           _ => new ValueTask<TResponse>((TResponse)(object)null!),
+                                                            new HybridCacheEntryOptions
+                                                            {
+                                                                Flags = HybridCacheEntryFlags.DisableUnderlyingData
+                                                            },
+                                                            cancellationToken: cancellationToken);
+        if (data is not null)
         {
-            logger.LogInformation("Cache miss for {RequestName} with key {CacheKey}", typeof(TRequest).Name, cachedQuery.CacheKey);
-            Data = await next(cancellationToken);
+            logger.LogInformation(
+                "🚀 HybridCache HIT - Serving cached data for '{RequestName}' with key '{CacheKey}'.",
+                typeof(TRequest).Name,
+                cachedQuery.CacheKey);
 
-            if (Data is IResult result && result.IsSuccess)
-            {
-               await cache.SetAsync(cachedQuery.CacheKey,
-                Data,
+            return data;
+        }
+
+        logger.LogInformation(
+           "❌ HybridCache MISS - Cache entry not found for '{RequestName}' with key '{CacheKey}'.",
+           typeof(TRequest).Name,
+           cachedQuery.CacheKey);
+
+        data = await next(cancellationToken);
+
+        if (data is IResult result && result.IsSuccess)
+        {
+            await cache.SetAsync(
+                cachedQuery.CacheKey,
+                data,
                 new HybridCacheEntryOptions
                 {
                     Expiration = cachedQuery.Expiration
                 },
                 cachedQuery.Tags,
-                cancellationToken
-                );
-                 logger.LogInformation("Data cached for request {RequestName} with key {CacheKey}", typeof(TRequest).Name, cachedQuery.CacheKey);
-            }
+                cancellationToken);
+
+            logger.LogInformation(
+                "💾 HybridCache STORE - Response cached successfully for '{RequestName}' with key '{CacheKey}'.",
+                typeof(TRequest).Name,
+                cachedQuery.CacheKey);
         }
-        return Data;
+
+        return data;
     }
 }

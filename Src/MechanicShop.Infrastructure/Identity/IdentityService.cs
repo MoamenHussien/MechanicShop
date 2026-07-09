@@ -1,10 +1,13 @@
+using System.Data.Common;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 
-public class IdentityService(IHttpContextAccessor httpContextAccessor, UserManager<AppUser> user) : IIdentityService
+public class IdentityService(IHttpContextAccessor httpContextAccessor, UserManager<AppUser> user, AppDbContext context, ILogger<IdentityService> logger) : IIdentityService
 {
-    public async Task<Result<AppUserDto>> AuthenticateAsync(string email, string password)
+    public async Task<Result<AppUserDto>> AuthenticateAsync(string email, string password, CancellationToken ct)
     {
         var userinfo = await user.FindByEmailAsync(email);
 
@@ -31,7 +34,7 @@ public class IdentityService(IHttpContextAccessor httpContextAccessor, UserManag
         return new AppUserDto(userinfo.Id, userinfo.Email!, await user.GetRolesAsync(userinfo), await user.GetClaimsAsync(userinfo));
     }
 
-    public async Task<Result<Guid>> CreateUserAsync(string email, string password, IList<string> roles, IList<Claim> claims)
+    public async Task<Result<Guid>> CreateUserAsync(string email, string password, IList<string> roles, IList<Claim> claims, CancellationToken ct)
     {
         var userinfo = new AppUser
         {
@@ -47,13 +50,17 @@ public class IdentityService(IHttpContextAccessor httpContextAccessor, UserManag
             return Error.Conflict("User_Creation_Failed", string.Join(", ", result.Errors.Select(x => x.Description)));
         }
 
-        var addClaimsResult = await user.AddClaimsAsync(userinfo, claims);
-
-        if (!addClaimsResult.Succeeded)
+        if (claims.Count > 0)
         {
-            await user.DeleteAsync(userinfo);
-            return Error.Conflict("Add_Claims_Failed", string.Join(", ", addClaimsResult.Errors.Select(x => x.Description)));
+            var addClaimsResult = await user.AddClaimsAsync(userinfo, claims);
+
+            if (!addClaimsResult.Succeeded)
+            {
+                await user.DeleteAsync(userinfo);
+                return Error.Conflict("Add_Claims_Failed", string.Join(", ", addClaimsResult.Errors.Select(x => x.Description)));
+            }
         }
+
         var addRolesResult = await user.AddToRolesAsync(userinfo, roles);
 
         if (!addRolesResult.Succeeded)
@@ -75,7 +82,7 @@ public class IdentityService(IHttpContextAccessor httpContextAccessor, UserManag
 
         if (!deleteResult.Succeeded)
         {
-            return Error.Conflict("Delete_User_Failed",string.Join(", ", deleteResult.Errors.Select(x => x.Description)));
+            return Error.Conflict("Delete_User_Failed", string.Join(", ", deleteResult.Errors.Select(x => x.Description)));
         }
 
         return Result.Success;
@@ -88,15 +95,22 @@ public class IdentityService(IHttpContextAccessor httpContextAccessor, UserManag
         return ids;
     }
 
-    public Result<string?> GetRefreshTokenFromCookies()
+    public Result<string> GetRefreshTokenFromCookies()
     {
         var httpContext = httpContextAccessor.HttpContext;
+
         if (httpContext is null)
         {
-            return Error.NotFound("Cookies_Not_Found", "Cookies Not Found");
+            return Error.Failure("Infrastructure.HttpContext.Unavailable","HttpContext is not available.");
         }
 
         var refreshToken = httpContext.Request.Cookies["RefreshToken"];
+
+        if (string.IsNullOrWhiteSpace(refreshToken))
+        {
+            return Error.Unauthorized("Auth.RefreshToken.Missing","Refresh token cookie is missing.");
+        }
+
         return refreshToken;
     }
 
@@ -134,5 +148,65 @@ public class IdentityService(IHttpContextAccessor httpContextAccessor, UserManag
             return false;
         }
         return await user.IsInRoleAsync(userInfo, role);
+    }
+
+
+    public async Task<Result<bool>> UpdateUserPermissionsAsync(Guid userId, IList<string> roles, IList<Claim> claims, CancellationToken ct)
+    {
+        var userExists = await context.Users.AnyAsync(u => u.Id == userId, ct);
+        if (!userExists)
+        {
+            return Error.NotFound("User_Not_Found", "User not found.");
+        }
+
+        await using var transaction = await context.Database.BeginTransactionAsync(ct);
+
+        try
+        {
+            var newRoleIds = await context.Roles
+                .Where(r => roles.Contains(r.Name!))
+                .Select(r => r.Id)
+                .ToListAsync(ct);
+
+            var currentUserRoles = await context.UserRoles.Where(ur => ur.UserId == userId).ToListAsync(ct);
+            var currentUserClaims = await context.UserClaims.Where(uc => uc.UserId == userId).ToListAsync(ct);
+
+            // (Roles)
+
+            var currentUserRoleIds = currentUserRoles.Select(ur => ur.RoleId).ToList();
+
+            var currentUserrolesToRemove = currentUserRoles.Where(ur => !newRoleIds.Contains(ur.RoleId)).ToList();
+            var rolesToAdd = newRoleIds.Except(currentUserRoleIds)
+                .Select(roleId => new IdentityUserRole<Guid> { UserId = userId, RoleId = roleId })
+                .ToList();
+
+            if (currentUserrolesToRemove.Count > 0) context.UserRoles.RemoveRange(currentUserrolesToRemove);
+            if (rolesToAdd.Count > 0) context.UserRoles.AddRange(rolesToAdd);
+
+            //(Claims) 
+
+            var claimsToRemove = currentUserClaims
+                .Where(c => !claims.Any(nc => nc.Type == c.ClaimType && nc.Value == c.ClaimValue))
+                .ToList();
+
+            var claimsToAdd = claims
+                .Where(nc => !currentUserClaims.Any(c => c.ClaimType == nc.Type && c.ClaimValue == nc.Value))
+                .Select(nc => new IdentityUserClaim<Guid> { UserId = userId, ClaimType = nc.Type, ClaimValue = nc.Value })
+                .ToList();
+
+            if (claimsToRemove.Count > 0) context.UserClaims.RemoveRange(claimsToRemove);
+            if (claimsToAdd.Count > 0) context.UserClaims.AddRange(claimsToAdd);
+
+            await context.SaveChangesAsync(ct);
+            await transaction.CommitAsync(ct);
+
+            return true;
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "Failed to update roles and claims for user {UserId}", userId);
+
+            return Error.Failure("Identity.UpdateUserInfo", "An unexpected error occurred while updating the user.");
+        }
     }
 }

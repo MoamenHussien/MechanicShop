@@ -13,10 +13,10 @@ public static class ApplicationDI
         services.AddMediatR(option =>
         {
             option.RegisterServicesFromAssembly(assembly);
-            option.AddBehavior(typeof(ValidationBehavior<,>));
-            option.AddBehavior(typeof(PerformanceBehavior<,>));
-            option.AddBehavior(typeof(UnhandledExceptionBehavior<,>));
-            option.AddBehavior(typeof(CachingBehavior<,>));
+            option.AddOpenBehavior(typeof(ValidationBehavior<,>));
+            option.AddOpenBehavior(typeof(PerformanceBehavior<,>));
+            option.AddOpenBehavior(typeof(UnhandledExceptionBehavior<,>));
+            option.AddOpenBehavior(typeof(CachingBehavior<,>));
         });
 
         return services;

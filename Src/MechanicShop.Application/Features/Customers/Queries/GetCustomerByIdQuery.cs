@@ -25,11 +25,9 @@ public class GetCustomerByIdQueryHandler(ILogger<GetCustomerByIdQueryHandler> lo
 {
     public async Task<Result<CustomerDto>> Handle(GetCustomerByIdQuery request, CancellationToken cancellationToken)
     {
-        var customer = await context.Customers
+        var customer = await context.Customers.AsNoTracking()
             .Where(c => c.Id == request.CustomerId) 
-            .Include(c => c.vehicles)
-            .AsNoTracking()
-            .Select(c => c.ToDto())                  
+            .Include(c => c.vehicles)                 
             .FirstOrDefaultAsync(cancellationToken);  
 
         if (customer is null)
@@ -38,6 +36,6 @@ public class GetCustomerByIdQueryHandler(ILogger<GetCustomerByIdQueryHandler> lo
            return  ApplicationErrors.TheCustomerNotFound;
         }
         logger.LogInformation("The Cache Is Miss And We Return Customer Info With Id : {id}",request.CustomerId);
-        return customer;
+        return customer.ToDto();
     }
 }

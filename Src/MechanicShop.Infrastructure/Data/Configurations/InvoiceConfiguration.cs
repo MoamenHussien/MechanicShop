@@ -14,7 +14,6 @@ public class InvoiceConfiguration : IEntityTypeConfiguration<Invoice>
         builder.Property(n => n.DiscountAmount).HasPrecision(18, 2);
         builder.Property(n => n.PaidAt).IsRequired(false);
         builder.Navigation(n => n.InvoiceLineItems).UsePropertyAccessMode(PropertyAccessMode.Field);
-        builder.HasMany(n => n.InvoiceLineItems).WithOne(n => n.Invoice).HasForeignKey(n => n.InvoiceId).IsRequired();
         builder.OwnsMany(n => n.InvoiceLineItems, items =>
         {
             items.ToTable("Invoice Line Item");

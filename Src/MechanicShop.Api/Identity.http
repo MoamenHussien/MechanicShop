@@ -1,0 +1,28 @@
+@baseUrl = http://localhost:5001/identity
+
+### Login As Manager
+POST {{baseUrl}}/token/generate
+Content-Type: application/json
+
+{
+    "email": "pm@localhost",
+    "password": "pm@localhost"
+}
+
+### Login As Labor
+POST {{baseUrl}}/token/generate
+Content-Type: application/json
+
+{
+    "email": "john.labor@localhost",
+    "password": "john.labor@localhost"
+}
+
+### Refresh Token
+POST {{baseUrl}}/token/refresh-token
+Content-Type: application/json
+Cookie: RefreshToken=zqeJfTe8WfAbRtN4JaD%2FJ7up4g0AsgL2ZCFoK0N5AqE%3D; expires=Wed, 15 Jul 2026 01:24:47 GMT; path=/; secure; samesite=strict; httponly
+
+{
+    "ExpiredAccessToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1laWQiOiJiNjMyNzI0MC0wYWVhLTQ2ZmMtODYzYS03NzdmYzRlNDI1NjAiLCJzdWIiOiJiNjMyNzI0MC0wYWVhLTQ2ZmMtODYzYS03NzdmYzRlNDI1NjAiLCJlbWFpbCI6ImpvaG4ubGFib3JAbG9jYWxob3N0Iiwicm9sZSI6IkxhYm9yIiwibmJmIjoxNzgzNDczODg3LCJleHAiOjE3ODM0Nzc0ODcsImlhdCI6MTc4MzQ3Mzg4NywiaXNzIjoiTXlBcHAiLCJhdWQiOiJNeVVzZXJzIn0.Qe80W0egAxA5S-TapiGJRiEBnC9TOdA7d3RyO2_uHBs"
+}

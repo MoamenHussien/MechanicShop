@@ -33,7 +33,6 @@ public class GetInvoicePdfQueryHandler(ILogger<GetInvoicePdfQueryHandler> logger
             {
                 Content = PdfBytes,
                 FileName = $"Invoice-{request.InvoiceId}.Pdf"
-
             };
         }
         catch(Exception ex)

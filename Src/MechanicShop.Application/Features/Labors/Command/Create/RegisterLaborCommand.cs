@@ -15,6 +15,7 @@ public class RegisterLaborCommandValidator : AbstractValidator<RegisterLaborComm
         RuleFor(n => n.FirstName).NotEmpty().WithMessage("First Name is required").MinimumLength(2).WithMessage("First Name must be at least 2 characters").MaximumLength(50).WithMessage("First Name cannot exceed 50 characters");
         RuleFor(n => n.LastName).NotEmpty().WithMessage("Last Name is required").MinimumLength(2).WithMessage("Last Name must be at least 2 characters").MaximumLength(50).WithMessage("Last Name cannot exceed 50 characters");
         RuleForEach(n => n.Roles).IsInEnum().WithMessage("Roles must be a valid Enum Value");
+        RuleFor(n=>n.Claims).NotNull().WithMessage("The Claims Must Be Not Null");
     }
 }
 
@@ -24,7 +25,7 @@ public class RegisterLaborCommandHandler(ILogger<RegisterLaborCommandHandler> lo
     public async Task<Result<Guid>> Handle(RegisterLaborCommand request, CancellationToken cancellationToken)
     {
 
-        var UserId = await identity.CreateUserAsync(request.email,request.password,request.Roles,request.Claims);
+        var UserId = await identity.CreateUserAsync(request.email,request.password,request.Roles,request.Claims??[],cancellationToken);
 
         if (UserId.IsError)
         {

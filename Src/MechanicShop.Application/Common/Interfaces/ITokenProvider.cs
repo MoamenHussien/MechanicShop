@@ -4,5 +4,5 @@ public interface ITokenProvider
 {
     Task<Result<TokenResponse>> GenerateJwtTokenAsync(AppUserDto user, CancellationToken ct = default);
 
-    ClaimsPrincipal? GetPrincipalFromExpiredToken(string token);
+    Result<ClaimsPrincipal> GetPrincipalFromExpiredToken(string token);
 }

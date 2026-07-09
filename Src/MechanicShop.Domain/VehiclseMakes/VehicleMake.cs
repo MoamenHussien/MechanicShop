@@ -6,8 +6,8 @@ using Microsoft.VisualBasic;
 public sealed class VehicleMake : Entity
 {
     public string Make { get; private set; }
-    private readonly List<VehicleModel> _VehicleModel =[];
-    public IReadOnlyList<VehicleModel> VehicleModels => _VehicleModel;
+    private readonly List<VehicleModel> _VehicleModels =[];
+    public IReadOnlyList<VehicleModel> VehicleModels => _VehicleModels;
 
 #pragma warning disable CS8618
 private VehicleMake()
@@ -19,7 +19,7 @@ private VehicleMake()
     private VehicleMake(Guid id, string Make,List<VehicleModel> vehicleModels) : base(id)
     {
         this.Make = Make;
-        this._VehicleModel = vehicleModels;
+        this._VehicleModels = vehicleModels;
     }
 
     public static Result<VehicleMake> Create(Guid id , string Make, List<VehicleModel> _vehicleModel)
@@ -56,15 +56,15 @@ private VehicleMake()
 
     public Result<Updated> UpSertModels(List<VehicleModel> UpModels)
     {
-        if (UpModels is null || UpModels.Count() < 0)
+        if (UpModels is null || UpModels.Count == 0)
         {
             return VehicleMakeErrors.ModelRequired;
         }
 
         var Hash = UpModels.Select(n=>n.Id).ToHashSet();
-        _VehicleModel.RemoveAll(n=> !Hash.Contains(n.Id));
+        _VehicleModels.RemoveAll(n=> !Hash.Contains(n.Id));
 
-        var Dic = _VehicleModel.ToDictionary(n=>n.Id);
+        var Dic = _VehicleModels.ToDictionary(n=>n.Id);
 
         foreach(var model in UpModels)
         {
@@ -79,7 +79,7 @@ private VehicleMake()
             }
             else
             {
-                _VehicleModel.Add(model);
+                _VehicleModels.Add(model);
             }  
         }
         return Result.Updated;

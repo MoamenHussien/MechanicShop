@@ -4,12 +4,12 @@ using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
-public sealed record RefreshTokenCommand(string AccessToken) : IRequest<Result<TokenResponse>>;
+public sealed record RefreshTokenCommand(string ExpiredAccessToken) : IRequest<Result<TokenResponse>>;
 public class RefreshTokenCommandValidator : AbstractValidator<RefreshTokenCommand>
 {
     public RefreshTokenCommandValidator()
     {
-        RuleFor(n => n.AccessToken).NotEmpty().WithMessage("The Access Token Is Required");
+        RuleFor(n => n.ExpiredAccessToken).NotEmpty().WithMessage("The Expired Access Token Is Required");
     }
 }
 
@@ -18,15 +18,15 @@ public class RefreshTokenCommandHandler(ILogger<RefreshTokenCommandHandler> logg
 {
     public async Task<Result<TokenResponse>> Handle(RefreshTokenCommand request, CancellationToken cancellationToken)
     {
-        var ClaimsPrincipal = token.GetPrincipalFromExpiredToken(request.AccessToken);
+        var ClaimsPrincipal = token.GetPrincipalFromExpiredToken(request.ExpiredAccessToken);
 
-        if (ClaimsPrincipal is null)
+        if (ClaimsPrincipal.IsError)
         {
-            logger.LogWarning("The Expired Access Token Is Invalid : {token}", request.AccessToken);
-            return ApplicationErrors.ExpiredAccessTokenInvalid;
+            logger.LogWarning("The Expired Access Token Is Invalid : {token}", request.ExpiredAccessToken);
+            return ApplicationErrors.InvalidAccessToken;
         }
 
-        var userClaim = ClaimsPrincipal.FindFirst(ClaimTypes.NameIdentifier);
+        var userClaim = ClaimsPrincipal.Value.FindFirst(ClaimTypes.NameIdentifier);
 
         if (userClaim is null)
         {
@@ -48,8 +48,8 @@ public class RefreshTokenCommandHandler(ILogger<RefreshTokenCommandHandler> logg
 
         if (RefreshToken.IsError)
         {
-            logger.LogWarning("The Refresh Token Is Expired");
-            return ApplicationErrors.RefreshTokenExpired;
+            logger.LogWarning("Failed to get refresh token from cookies. Error: {ErrorCode}",RefreshToken.TopError);
+            return RefreshToken.Errors;
         }
 
         var refreshToken = await context.RefreshTokens.FirstOrDefaultAsync(n => n.UserId == UserId && n.Token == RefreshToken.Value);

@@ -11,13 +11,13 @@ public sealed class Invoice : AuditableEntity
     public decimal TaxAmount { get; private set; }
     public decimal DiscountAmount { get; private set; }
     public DateTimeOffset? PaidAt { get; private set; }
-    private readonly List<InvoiceLineItem> _InvoiceLineItem = [];
-    public IEnumerable<InvoiceLineItem> InvoiceLineItems => _InvoiceLineItem.AsReadOnly();
+    private readonly List<InvoiceLineItem> _InvoiceLineItems = [];
+    public IEnumerable<InvoiceLineItem> InvoiceLineItems => _InvoiceLineItems.AsReadOnly();
 
     public WorkOrder WorkOrder { get; init; } = null!;
     public Guid WorkOrderId { get; init; }
 
-    public decimal Subtotal => _InvoiceLineItem.Sum(n => n.LineTotal);
+    public decimal Subtotal => _InvoiceLineItems.Sum(n => n.LineTotal);
 
     public decimal Total => Subtotal + TaxAmount - DiscountAmount;
 
@@ -36,7 +36,7 @@ public sealed class Invoice : AuditableEntity
         this.Status = InvoiceStatus.Unpaid;
         this.TaxAmount = TaxAmount;
         this.DiscountAmount = DiscountAmount;
-        this._InvoiceLineItem = InvoiceLineItems;
+        this._InvoiceLineItems = InvoiceLineItems;
         this.WorkOrderId = workOrderid;
     }
 

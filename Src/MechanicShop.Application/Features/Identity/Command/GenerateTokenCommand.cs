@@ -18,7 +18,7 @@ public class GenerateTokenCommandHandler(ILogger<GenerateTokenCommandHandler> lo
 {
     public async Task<Result<TokenResponse>> Handle(GenerateTokenCommand request, CancellationToken cancellationToken)
     {
-        var UserDto = await identity.AuthenticateAsync(request.email,request.password);
+        var UserDto = await identity.AuthenticateAsync(request.email,request.password,cancellationToken);
 
         if (UserDto.IsError)
         {

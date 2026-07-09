@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 
 public class LaborAssignedRequirement : IAuthorizationRequirement;
-public class LaborAssignedRequirementHandler(AppDbContext contextDb, HttpContextAccessor httpContextAccessor) 
+public class LaborAssignedRequirementHandler(AppDbContext contextDb, IHttpContextAccessor httpContextAccessor) 
                                                 : AuthorizationHandler<LaborAssignedRequirement>
 {
     protected override async Task HandleRequirementAsync(AuthorizationHandlerContext context,LaborAssignedRequirement requirement)

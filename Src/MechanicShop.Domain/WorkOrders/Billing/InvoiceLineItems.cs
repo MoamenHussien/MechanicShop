@@ -5,7 +5,6 @@ public sealed class InvoiceLineItem
     public string Description { get; private set; }
     public int LineNumber { get; private set; }
     public decimal UnitPrice { get; private set; }
-    public Invoice Invoice { get; init; } = null!;
     public Guid InvoiceId { get; init; }
     public int Quantity { get; private set; }
     public decimal LineTotal => Quantity * UnitPrice;
