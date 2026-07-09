@@ -1,0 +1,1 @@
+public sealed record VehicleDto (Guid Id ,int year,string LicensePlate ,Guid VehicleModelId);

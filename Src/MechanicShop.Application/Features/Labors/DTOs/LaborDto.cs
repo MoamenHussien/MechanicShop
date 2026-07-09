@@ -1,0 +1,1 @@
+public sealed record LaborDto(Guid id , string name);

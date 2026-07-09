@@ -1,0 +1,1 @@
+public sealed record PartDto (Guid id ,string name,decimal cost,int Quantity);
