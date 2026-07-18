@@ -18,10 +18,10 @@ public class GetCustomersQueryHandler(ILogger<GetCustomersQueryHandler> logger, 
 {
     public async Task<Result<List<CustomerDto>>> Handle(GetCustomersQuery request, CancellationToken cancellationToken)
     {
-        var customers = await context.Customers.Include(n=>n.vehicles).AsNoTracking().Select(n=>n.ToDto()).ToListAsync(cancellationToken);
-        if (!customers.Any())
+        var customers = await context.Customers.AsNoTracking().Select(CustomerMapper.CustomerProjection).ToListAsync(cancellationToken);
+        if (customers.Count == 0)
         {
-          logger.LogWarning("Not Found Any Of Customers");
+            logger.LogWarning("No customers were found.");
            return ApplicationErrors.NotFoundAnyCustomers;
         }
 

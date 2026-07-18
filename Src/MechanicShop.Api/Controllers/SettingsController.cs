@@ -16,7 +16,7 @@ public sealed class SettingsController(IOptions<AppSettings> options) : ApiContr
     [EndpointSummary("Gets the application's operating hours.")]
     [EndpointDescription("Returns the current configured opening and closing times.")]
     [EndpointName("GetOperatingHours")]
-    [OutputCache(Duration = 3600)] 
+    [OutputCache(Duration = (int)DurationInSeconds.OneDay)]
     public IActionResult GetOperatingHours()
     {
         return Ok(new OperatingHoursResponse(options.Value.OpeningTime, options.Value.ClosingTime));

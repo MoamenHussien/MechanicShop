@@ -18,7 +18,7 @@ public class CustomersController(ISender sender, IOutputCacheStore outputCache) 
 {
     [HttpGet]
     [MapToApiVersion("1.0")]
-    [OutputCache( PolicyName = nameof(Policies.SharedAuthCache) , Duration = (int)DurationInSeconds.FiveMinutes, Tags = ["Customers"])]
+    [OutputCache(PolicyName = nameof(Policies.SharedAuthCache), Tags = ["Customers"])]
     [EndpointName("GetCustomers")]
     [EndpointSummary("Retrieve All Customers")]
     [EndpointDescription("Returns all customers along with their vehicles")]
@@ -32,7 +32,7 @@ public class CustomersController(ISender sender, IOutputCacheStore outputCache) 
 
     [HttpGet("{customerId:guid}", Name = "GetCustomerById")]
     [MapToApiVersion("1.0")]
-    [OutputCache(PolicyName = nameof(Policies.SharedAuthCache) , Duration = (int)DurationInSeconds.FiveMinutes , Tags = ["Customers"], VaryByRouteValueNames = ["customerId"])]
+    [OutputCache(PolicyName = nameof(Policies.SharedAuthCache), Tags = ["Customers"], VaryByRouteValueNames = ["customerId"])]
     [EndpointName("GetCustomerById")]
     [EndpointSummary("Get Customer Info By Id")]
     [EndpointDescription("Get Customer Info By Id With His vehicles, If Found")]
@@ -63,7 +63,7 @@ public class CustomersController(ISender sender, IOutputCacheStore outputCache) 
             await outputCache.EvictByTagAsync("Customers", ct);
         }
 
-        return result.Match(success => CreatedAtRoute("GetCustomerById", new { version = "1.0", customerId = success.Id }, success), Problem);
+        return result.Match(success => CreatedAtRoute("GetCustomerById", new { version = "1.0", customerId = success.CustomerId }, success), Problem);
     }
 
     [HttpPut("{customerId:guid}")]

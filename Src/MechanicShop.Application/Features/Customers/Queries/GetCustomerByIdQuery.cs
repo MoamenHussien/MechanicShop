@@ -16,7 +16,7 @@ public class GetCustomerByIdQueryValidator : AbstractValidator<GetCustomerByIdQu
 {
     public GetCustomerByIdQueryValidator()
     {
-        RuleFor(n=>n.CustomerId).IdRequired("Customer");
+        RuleFor(n => n.CustomerId).IdRequired("Customer");
     }
 }
 
@@ -26,16 +26,17 @@ public class GetCustomerByIdQueryHandler(ILogger<GetCustomerByIdQueryHandler> lo
     public async Task<Result<CustomerDto>> Handle(GetCustomerByIdQuery request, CancellationToken cancellationToken)
     {
         var customer = await context.Customers.AsNoTracking()
-            .Where(c => c.Id == request.CustomerId) 
-            .Include(c => c.vehicles)                 
-            .FirstOrDefaultAsync(cancellationToken);  
+                       .Where(c => c.Id == request.CustomerId)
+                       .Select(CustomerMapper.CustomerProjection)
+                       .FirstOrDefaultAsync(cancellationToken);
 
         if (customer is null)
         {
-          logger.LogWarning("The Customer Is Not Found With ID : {id}",request.CustomerId);
-           return  ApplicationErrors.TheCustomerNotFound;
+            logger.LogWarning("Customer with Id {CustomerId} was not found", request.CustomerId);
+            return ApplicationErrors.TheCustomerNotFound;
         }
-        logger.LogInformation("The Cache Is Miss And We Return Customer Info With Id : {id}",request.CustomerId);
-        return customer.ToDto();
+
+        logger.LogInformation("Cache miss. Returning customer with Id {CustomerId}", request.CustomerId);
+        return customer;
     }
 }

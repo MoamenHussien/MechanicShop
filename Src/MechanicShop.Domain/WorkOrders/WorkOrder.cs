@@ -6,7 +6,7 @@ public class WorkOrder : AuditableEntity
 {
     private readonly List<RepairTask> _RepairTasks = [];
     public IReadOnlyList<RepairTask> RepairTasks => _RepairTasks;
-    public Invoice? Invoice { get; private set; }
+    public Invoice? Invoice { get;  set; }
     public Employee Labor { get; set; } = null!;
     public Guid LaborId { get; private set; }
     public Vehicle Vehicle { get; set; } = null!;
@@ -75,7 +75,7 @@ public class WorkOrder : AuditableEntity
             return WorkOrderErrors.InvalidEndingTiming;
         }
 
-        if (repairTasks is null || !repairTasks.Any())
+        if (repairTasks is null || repairTasks.Count == 0)
         {
             return WorkOrderErrors.RepairTasksRequired;
         }
@@ -85,7 +85,7 @@ public class WorkOrder : AuditableEntity
         workOrder.AddDomainEvent(new WorkOrderCollectionModified());
 
         return workOrder;
-    }
+    } 
 
     public Result<Updated> ReAssignLabor(Guid LaborID)
     {
@@ -99,7 +99,7 @@ public class WorkOrder : AuditableEntity
         {
             return WorkOrderErrors.CantEditWorkOrder(this.State);
         }
-    }
+    } 
 
     public Result<Deleted> MarkAsDeleted()
     {
@@ -162,7 +162,7 @@ public class WorkOrder : AuditableEntity
 
         if (endAt <= startAt)
         {
-            return WorkOrderErrors.InvalidStartingTiming;
+            return WorkOrderErrors.InvalidEndingTiming; 
         }
 
         StartAtUtc = startAt;
@@ -171,7 +171,7 @@ public class WorkOrder : AuditableEntity
         DomainEvents.Add(new WorkOrderCollectionModified());
 
         return Result.Updated;
-    }
+    } 
 
     public Result<Updated> ReLocateWorkOrder(Spot NewSpot, DateTimeOffset NewStartDatetimeUtc, DateTimeOffset NewEndDateTimeUtc)
     {
@@ -189,7 +189,7 @@ public class WorkOrder : AuditableEntity
         }
 
         return Result.Updated;
-    }
+    } 
 
     public Result<Updated> RemoveAndInsertRepairTasks(List<RepairTask> repairTasks)
     {

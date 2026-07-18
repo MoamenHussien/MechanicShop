@@ -38,7 +38,7 @@ public sealed class InvoicesController(ISender sender, IOutputCacheStore outputC
     [EndpointDescription("Returns detailed information about the specified invoice.")]
     [ProducesResponseType(typeof(InvoiceDto), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
-    [OutputCache(Duration = 3600, Tags = ["Invoices"], VaryByRouteValueNames = ["invoiceId"])] 
+    [OutputCache(PolicyName = nameof(Policies.SharedAuthCache),Duration = (int)DurationInSeconds.OneHour, Tags = ["Invoices"], VaryByRouteValueNames = ["invoiceId"])] 
     public async Task<IActionResult> GetInvoice([FromRoute] Guid invoiceId, CancellationToken ct)
     {
         var result = await sender.Send(new GetInvoiceByIdQuery(invoiceId), ct);
@@ -74,7 +74,7 @@ public sealed class InvoicesController(ISender sender, IOutputCacheStore outputC
     [EndpointDescription("Returns the invoice PDF file for the specified invoice ID.")]
     [ProducesResponseType(typeof(FileContentResult), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
-    [OutputCache(Duration = 500 , Tags = ["Invoices"], VaryByRouteValueNames = ["invoiceId"])] 
+    [OutputCache(PolicyName =nameof(Policies.SharedAuthCache),Duration = (int)DurationInSeconds.TenMinutes , Tags = ["Invoices"], VaryByRouteValueNames = ["invoiceId"])] 
     [Produces("application/pdf")] 
     public async Task<IActionResult> GetInvoicePdf([FromRoute] Guid invoiceId, CancellationToken ct)
     {

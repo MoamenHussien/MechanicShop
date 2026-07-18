@@ -51,7 +51,7 @@ public sealed class Customer : AuditableEntity
             return CustomerErrors.PhoneRequired;
         }
 
-        if(vehicles is null || !vehicles.Any())
+        if(vehicles is null || vehicles.Count ==0 )
         {
             return CustomerErrors.VehiclesRequired;
         }
@@ -84,6 +84,11 @@ public sealed class Customer : AuditableEntity
 
     public Result<Updated> UpSertVehicles(List<Vehicle> vehicles)
     {
+        if (vehicles is null || vehicles.Count == 0)
+        {
+            return CustomerErrors.VehiclesRequired;
+        }
+        
         var vehicleHash = vehicles.Select(n=>n.Id).ToHashSet();
 
         this._vehicles.RemoveAll(n=> !vehicleHash.Contains(n.Id));

@@ -16,7 +16,7 @@ public class GetRepairTaskByIdQueryValidator : AbstractValidator<GetRepairTaskBy
 {
     public GetRepairTaskByIdQueryValidator()
     {
-        RuleFor(n=>n.id).IdRequired("Repair Tasks");
+        RuleFor(n => n.id).IdRequired("Repair Tasks");
     }
 }
 
@@ -25,15 +25,32 @@ public class GetRepairTaskByIdQueryHandler(ILogger<GetRepairTaskByIdQueryHandler
 {
     public async Task<Result<RepairTaskDto>> Handle(GetRepairTaskByIdQuery request, CancellationToken cancellationToken)
     {
-        var RepairTask =await context.RepairTasks.AsNoTracking().Where(n=>n.Id==request.id).Include(n=>n.Parts).Select(n=>n.ToDto()).FirstOrDefaultAsync(cancellationToken);
-        if (RepairTask is null)
+        var repairTask = await context.RepairTasks.AsNoTracking()
+                                                                .Where(r => r.Id == request.id)
+                                                                .Select(r => new RepairTaskDto
+                                                                {
+                                                                    RepairTaskId = r.Id,
+                                                                    Name = r.Name,
+                                                                    EstimatedDurationInMins = r.EstimatedDuration,
+                                                                    LaborCost = r.LaborCost,
+                                                                    Parts = r.Parts
+                                                                        .Select(p => new PartDto(
+                                                                            p.Id,
+                                                                            p.Name,
+                                                                            p.Costs,
+                                                                            p.Quantity))
+                                                                        .ToList()
+                                                                })
+                                                                .FirstOrDefaultAsync(cancellationToken);
+
+        if (repairTask is null)
         {
-            logger.LogWarning("The Repair Task Is Not Found , For This Id : {id}",request.id);
+            logger.LogWarning("The Repair Task Is Not Found , For This Id : {id}", request.id);
             return ApplicationErrors.NotFoundThisRepairTaskId;
         }
-            logger.LogInformation("Returning Repair Task Successfully To This Id : {id}",request.id);
+        logger.LogInformation("Returning Repair Task Successfully To This Id : {id}", request.id);
 
-        return RepairTask;
+        return repairTask;
     }
 }
 

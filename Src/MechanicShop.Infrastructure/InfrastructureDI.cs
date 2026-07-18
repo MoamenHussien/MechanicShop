@@ -43,36 +43,40 @@ public static class InfrastructureDI
         services.AddDbContext<AppDbContext>((sp, options) =>
         {
             options.AddInterceptors(sp.GetServices<ISaveChangesInterceptor>());
-            options.UseSqlServer(connectionString);
+            options.UseSqlServer(connectionString,
+                sqlOptions =>
+                {
+                    sqlOptions.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery);
+                });
         });
 
         // Health Checks
 
         services.AddHealthChecks()
-                // Database
+             // Database
              .AddDbContextCheck<AppDbContext>(
                  name: "SQL Server",
                  failureStatus: HealthStatus.Unhealthy,
-                 tags: ["database", "ready"] )
-                // Redis
+                 tags: ["database", "ready"])
+             // Redis
              .AddRedis(
                  redisConnectionString: config.GetConnectionString("Redis")!,
                  name: "Redis",
                  failureStatus: HealthStatus.Unhealthy,
                  tags: ["cache", "ready"],
                  timeout: TimeSpan.FromSeconds(2))
-                // Mail
+             // Mail
              .AddCheck<MailHealthCheck>(
                  name: "SMTP",
                  failureStatus: HealthStatus.Unhealthy,
                  tags: ["mail", "ready"],
                  timeout: TimeSpan.FromSeconds(5))
-                // Memory
+             // Memory
              .AddCheck<MemoryHealthCheck>(
                  name: "Memory",
                  failureStatus: HealthStatus.Degraded,
                  tags: ["system"])
-                // Disk
+             // Disk
              .AddCheck<DiskHealthCheck>(
                  name: "Disk",
                  failureStatus: HealthStatus.Degraded,

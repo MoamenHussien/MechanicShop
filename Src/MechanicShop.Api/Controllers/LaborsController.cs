@@ -20,7 +20,7 @@ public sealed class LaborsController(ISender sender, IOutputCacheStore outputCac
     [EndpointDescription("Returns all labor records associated with the system. Accessible only to authorized users.")] 
     [EndpointName("GetLabors")]
     [MapToApiVersion("1.0")]
-    [OutputCache(Duration = 7200, Tags = ["Labors"])]
+    [OutputCache(PolicyName = nameof(Policies.SharedAuthCache) ,Duration = (int)DurationInSeconds.OneDay , Tags = ["Labors"])]
     public async Task<IActionResult> Get(CancellationToken ct)
     {
         var result = await sender.Send(new GetLaborsQuery(), ct);
@@ -60,8 +60,7 @@ public sealed class LaborsController(ISender sender, IOutputCacheStore outputCac
     [MapToApiVersion("1.0")]
     public async Task<IActionResult> UpdateLaborInfo([FromRoute] Guid laborid, [FromBody] UpdateLaborInfoRequest request, CancellationToken ct)
     {        
-        var result = await sender.Send(new UpdateLaborInfoCommand(laborid, request.FirstName, request.LastName, request.IsActive), ct); // ✅ تمرير الـ CancellationToken
-
+        var result = await sender.Send(new UpdateLaborInfoCommand(laborid, request.FirstName, request.LastName, request.IsActive), ct); 
         if (result.IsSuccess)
         {
             await outputCache.EvictByTagAsync("Labors", ct);

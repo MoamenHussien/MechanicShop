@@ -1,8 +1,8 @@
 public static class LaborMapper
 {
-    public static List<LaborDto> ToDto(this IList<Employee> employee)
+    public static List<LaborDto> ToDto(this IList<Employee> employees)
     {
-        return employee.Select(n=> ToDto(n)).ToList();
+        return employees.Select(ToDto).ToList();
     }
 
     public static LaborDto ToDto(this Employee employee)

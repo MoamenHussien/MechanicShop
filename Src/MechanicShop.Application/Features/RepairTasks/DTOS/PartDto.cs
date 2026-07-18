@@ -1,1 +1,1 @@
-public sealed record PartDto (Guid id ,string name,decimal cost,int Quantity);
+public sealed record PartDto(Guid PartId, string Name, decimal Cost, int Quantity);

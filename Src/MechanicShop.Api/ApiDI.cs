@@ -228,7 +228,12 @@ public static class ApiDI
 
     private static IServiceCollection AddControllersWithJsonOptions(this IServiceCollection services)
     {
-        services.AddControllers().AddJsonOptions(options => options
+        services.AddControllers()
+        // .AddJsonOptions(options =>
+        // {
+        //     options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+        // })
+        .AddJsonOptions(options => options
             .JsonSerializerOptions
             .DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull);
 
@@ -300,9 +305,9 @@ public static class ApiDI
 
     public static IEndpointRouteBuilder MapCoreEndpoints(this IEndpointRouteBuilder app)
     {
-        app.MapControllers();   
+        app.MapControllers();
 
-        
+
         app.MapHealthChecks("/health", new HealthCheckOptions
         {
             ResponseWriter = UIResponseWriter.WriteHealthCheckUIResponse

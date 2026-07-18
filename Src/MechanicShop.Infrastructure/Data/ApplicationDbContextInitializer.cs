@@ -11,7 +11,9 @@ public class ApplicationDbContextInitializer(UserManager<AppUser> user, RoleMana
     {
         try
         {
-            await context.Database.EnsureCreatedAsync();
+            // await context.Database.EnsureCreatedAsync();
+            await context.Database.MigrateAsync();
+
         }
         catch (Exception ex)
         {

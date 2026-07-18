@@ -1,3 +1,4 @@
+using System.Collections.Specialized;
 using Asp.Versioning;
 using MechanicShop.Api.Controllers;
 using MediatR;
@@ -20,7 +21,7 @@ public class DashboardController(ISender sender) : ApiController
     [EndpointSummary("Retrieve daily workshop statistics and KPIs.")] 
     [EndpointDescription("Generates a comprehensive daily statistical report including order statuses, financial metrics (revenue, profit, costs), and operational ratios for the specified date.")] 
     [ProducesResponseType(typeof(TodayWorkOrderStatsDto), StatusCodes.Status200OK)]
-    [OutputCache(Duration = 10, VaryByQueryKeys = ["date"])]
+    [OutputCache(PolicyName = nameof(Policies.SharedAuthCache) ,Duration = (int)DurationInSeconds.OneMinute , VaryByQueryKeys = ["date"])]
     public async Task<IActionResult> GetTodayStats([FromQuery] DateOnly? date, CancellationToken ct)
     {
         var statsDate = date ?? DateOnly.FromDateTime(DateTime.UtcNow); 

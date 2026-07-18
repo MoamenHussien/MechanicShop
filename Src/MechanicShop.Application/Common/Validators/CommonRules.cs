@@ -19,7 +19,7 @@ public static class CommonRules
         return ruleBuilder
             .NotEmpty()
             .WithMessage("Email Is Required")
-            .MaximumLength(256)
+            .Length(3,256)
             .WithMessage("Email Length From 3 To 256 Char")
             .Must(email => EmailRegex.IsMatch(email))
             .WithMessage("Email Not Valid");
@@ -30,6 +30,8 @@ public static class CommonRules
     {
         return ruleBuilder
             .NotEmpty().WithMessage("Phone Is Required")
+            .Length(3,20)
+            .WithMessage("Phone Length From 3 To 20 Char")
             .Must(phone => EgyptPhoneRegex.IsMatch(phone))
             .WithMessage("Phone Is Not Valid");
     }

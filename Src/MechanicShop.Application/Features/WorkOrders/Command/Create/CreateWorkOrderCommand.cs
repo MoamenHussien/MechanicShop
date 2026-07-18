@@ -24,18 +24,18 @@ public class CreateWorkOrderCommandValidator : AbstractValidator<CreateWorkOrder
     }
 }
 
-public class CreateWorkOrderCommandHandler(ILogger<CreateWorkOrderCommandHandler> logger, IAppDbContext context, HybridCache cache, IWorkOrderPolicy policy,IIdentityService identity,IUser user)
+public class CreateWorkOrderCommandHandler(ILogger<CreateWorkOrderCommandHandler> logger, IAppDbContext context, HybridCache cache, IWorkOrderPolicy policy)
 : IRequestHandler<CreateWorkOrderCommand, Result<WorkOrderDto>>
 {
     public async Task<Result<WorkOrderDto>> Handle(CreateWorkOrderCommand request, CancellationToken cancellationToken)
     {
-        if(await identity.IsInRoleAsync(user.Id!.Value,Role.Labor.ToString()))
-        {
-            logger.LogWarning("Create Work Order : (Forbidden) , This User {UserId} is not allowed to Create New Work Order", user.Id);
-            return ApplicationErrors.NotAllowed;
-        }
+        // if(await identity.IsInRoleAsync(user.Id!.Value,Role.Labor.ToString()))
+        // {
+        //     logger.LogWarning("Create Work Order : (Forbidden) , This User {UserId} is not allowed to Create New Work Order", user.Id);
+        //     return ApplicationErrors.NotAllowed;
+        // }
 
-        var Selected_Repair_Tasks = await context.RepairTasks.Where(n => request.repairTasksIds.Contains(n.Id)).ToListAsync(cancellationToken);
+        var Selected_Repair_Tasks = await context.RepairTasks.Where(n => request.repairTasksIds.Contains(n.Id)).Include(n=>n.Parts).ToListAsync(cancellationToken);
         if (!Selected_Repair_Tasks.Any())
         {
             logger.LogError("Not Found Any Repair Tasks For These Ids : {ids}", string.Join(" , ", request.repairTasksIds));
@@ -74,7 +74,7 @@ public class CreateWorkOrderCommandHandler(ILogger<CreateWorkOrderCommandHandler
             return ApplicationErrors.RangeTimeIsAlreadyTakenByAnotherWorkOrderAtThisSpot;
         }
 
-        var VehicleId_exists = await context.Vehicles.Where(n => n.Id == request.VehicleId).Include(n => n.Customer).FirstOrDefaultAsync(cancellationToken);
+        var VehicleId_exists = await context.Vehicles.Where(n => n.Id == request.VehicleId).Include(n=>n.VehicleModel).ThenInclude(n=>n.VehicleMake).Include(n => n.Customer).FirstOrDefaultAsync(cancellationToken);
         if (VehicleId_exists is null)
         {
             logger.LogError("Vehicle with Id '{VehicleId}' does not exist.", request.VehicleId);

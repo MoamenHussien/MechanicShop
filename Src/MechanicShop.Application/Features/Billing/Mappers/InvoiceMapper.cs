@@ -1,10 +1,64 @@
-using System.Runtime.CompilerServices;
+using System.Linq.Expressions;
 
 public static class InvoiceMapper
 {
+    public static readonly Expression<Func<InvoiceLineItem, InvoiceLineItemDto>> InvoiceLineItemProjection =
+        item => new InvoiceLineItemDto
+        {
+            InvoiceId = item.InvoiceId,
+            LineNumber = item.LineNumber,
+            Description = item.Description,
+            Quantity = item.Quantity,
+            UnitPrice = item.UnitPrice,
+            LineTotal = item.LineTotal
+        };
+
+    public static readonly Expression<Func<Invoice, InvoiceDto>> InvoiceProjection =
+        invoice => new InvoiceDto
+        {
+            InvoiceId = invoice.Id,
+            WorkOrderId = invoice.WorkOrderId,
+            IssuedAtUtc = invoice.IssuedAtUtc,
+
+            Vehicle = new VehicleDto(
+                invoice.WorkOrder.Vehicle.Id,
+                invoice.WorkOrder.Vehicle.VehicleModel.VehicleMake.Make,
+                invoice.WorkOrder.Vehicle.VehicleModel.Model,
+                invoice.WorkOrder.Vehicle.Year,
+                invoice.WorkOrder.Vehicle.LicensePlate),
+
+            Customer = new CustomerDto
+            {
+                CustomerId = invoice.WorkOrder.Vehicle.Customer.Id,
+                Name = invoice.WorkOrder.Vehicle.Customer.Name,
+                Email = invoice.WorkOrder.Vehicle.Customer.Email,
+                PhoneNumber = invoice.WorkOrder.Vehicle.Customer.PhoneNumber,
+                Vehicles = new List<VehicleDto>()
+            },
+
+            DiscountAmount = invoice.DiscountAmount,
+            Subtotal = invoice.Subtotal,
+            TaxAmount = invoice.TaxAmount,
+            Total = invoice.Total,
+            PaymentStatus = invoice.Status.ToString(),
+
+            Items = invoice.InvoiceLineItems
+                .Select(item => new InvoiceLineItemDto
+                {
+                    InvoiceId = item.InvoiceId,
+                    LineNumber = item.LineNumber,
+                    Description = item.Description,
+                    Quantity = item.Quantity,
+                    UnitPrice = item.UnitPrice,
+                    LineTotal = item.LineTotal
+                })
+                .ToList()
+        };
+
     public static InvoiceLineItemDto ToDto(this InvoiceLineItem invoiceLine)
     {
         ArgumentNullException.ThrowIfNull(invoiceLine);
+
         return new InvoiceLineItemDto
         {
             InvoiceId = invoiceLine.InvoiceId,
@@ -24,6 +78,7 @@ public static class InvoiceMapper
     public static InvoiceDto ToDto(this Invoice invoice)
     {
         ArgumentNullException.ThrowIfNull(invoice);
+
         return new InvoiceDto
         {
             InvoiceId = invoice.Id,

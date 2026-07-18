@@ -16,7 +16,15 @@ public class GetRepairTasksQueryHandler(ILogger<GetRepairTasksQuery> logger, IAp
 {
     public async Task<Result<List<RepairTaskDto>>> Handle(GetRepairTasksQuery request, CancellationToken cancellationToken)
     {
-        var RepairTasks =await context.RepairTasks.AsNoTracking().Include(n=>n.Parts).Select(n=>n.ToDto()).ToListAsync(cancellationToken);
+        var RepairTasks = await context.RepairTasks.AsNoTracking().Select(r => new RepairTaskDto
+        {
+            RepairTaskId = r.Id,
+            Name = r.Name,
+            EstimatedDurationInMins = r.EstimatedDuration,
+            LaborCost = r.LaborCost,
+            Parts = r.Parts.Select(p => new PartDto(p.Id,p.Name,p.Costs,p.Quantity)).ToList()
+
+        }).ToListAsync(cancellationToken);
 
         if (!RepairTasks.Any())
         {
@@ -24,7 +32,7 @@ public class GetRepairTasksQueryHandler(ILogger<GetRepairTasksQuery> logger, IAp
             return ApplicationErrors.NotFoundAnyRepairTasks;
         }
 
-        logger.LogInformation("Returning All Repair Tasks And Count Is : {count}",RepairTasks.Count());
+        logger.LogInformation("Returning All Repair Tasks And Count Is : {count}", RepairTasks.Count);
 
         return RepairTasks;
     }

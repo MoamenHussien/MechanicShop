@@ -19,8 +19,12 @@ public class GetInvoicePdfQueryHandler(ILogger<GetInvoicePdfQueryHandler> logger
 {
     public async Task<Result<InvoicePdfDto>> Handle(GetInvoicePdfQuery request, CancellationToken cancellationToken)
     {
-        var Invoice = await context.Invoices.Where(n => n.Id == request.InvoiceId).Include(n => n.InvoiceLineItems).FirstOrDefaultAsync(cancellationToken);
-        if (Invoice is null)
+        var invoice = await context.Invoices
+                                            .AsNoTracking()
+                                            .Where(i => i.Id == request.InvoiceId)
+                                            .Include(i => i.InvoiceLineItems)
+                                            .FirstOrDefaultAsync(cancellationToken);
+        if (invoice is null)
         {
             logger.LogWarning("This Invoice Is Not Found  ID : {id}", request.InvoiceId);
             return ApplicationErrors.InvoiceNotFound;
@@ -28,17 +32,17 @@ public class GetInvoicePdfQueryHandler(ILogger<GetInvoicePdfQueryHandler> logger
 
         try
         {
-            var PdfBytes = pdfGenerator.Generate(Invoice);
+            var PdfBytes = pdfGenerator.Generate(invoice);
             return new InvoicePdfDto
             {
                 Content = PdfBytes,
                 FileName = $"Invoice-{request.InvoiceId}.Pdf"
             };
         }
-        catch(Exception ex)
+        catch (Exception ex)
         {
-           logger.LogError(ex,"Failed To Generate PDF For Thi Invoice Id : {invoiceId}",request.InvoiceId);
-           return ApplicationErrors.ErrorDuringGenerateInvoicePdf;
+            logger.LogError(ex, "Failed To Generate PDF For Thi Invoice Id : {invoiceId}", request.InvoiceId);
+            return ApplicationErrors.ErrorDuringGenerateInvoicePdf;
         }
     }
 }

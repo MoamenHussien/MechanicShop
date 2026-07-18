@@ -4,9 +4,9 @@ using System.Net.Http.Headers;
 public sealed class VehicleModel : Entity
 {
     public string Model { get; private set; }
-    public VehicleMake VehicleMake { get;init; } =null!;
+    public VehicleMake VehicleMake { get; init; } = null!;
     public Guid VehicleMakeId { get; init; }
-    private readonly List<Vehicle> _vehicles =[];
+    private readonly List<Vehicle> _vehicles = [];
     public IReadOnlyList<Vehicle> Vehicles => _vehicles;
 
 #pragma warning disable CS8618
@@ -16,36 +16,43 @@ public sealed class VehicleModel : Entity
 
 #pragma warning restore CS8618
 
-    private VehicleModel(Guid id,string Model) : base(id)
+    private VehicleModel(Guid id, string Model) : base(id)
     {
-        this.Model =Model;
+        this.Model = Model;
     }
 
-    public static Result<VehicleModel> Create(Guid id ,string model)
+    public static Result<VehicleModel> Create(Guid id, string model)
     {
         if (id == Guid.Empty)
         {
-            return vehicleModelsErrors.IdRequired;
+            id = Guid.NewGuid();
         }
 
         if (string.IsNullOrWhiteSpace(model))
         {
-            return vehicleModelsErrors.Model;
+            return vehicleModelsErrors.ModelRequired;
         }
 
-        return new VehicleModel(id,model.CapitalizeFirstLetter());
+        return new VehicleModel(id, model.CapitalizeFirstLetter());
     }
 
     public Result<Updated> Update(string model)
     {
         if (string.IsNullOrWhiteSpace(model))
         {
-            return vehicleModelsErrors.Model;
+            return vehicleModelsErrors.ModelRequired;
         }
-        this.Model=model.CapitalizeFirstLetter();
-        
+        this.Model = model.CapitalizeFirstLetter();
+
         return Result.Updated;
     }
+
+    internal void Load(string model, string make)
+    {
+        Model = model;
+        VehicleMake.Load(make);
+    }
+
 }
 
 

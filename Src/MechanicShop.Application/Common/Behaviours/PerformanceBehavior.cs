@@ -3,33 +3,38 @@ using MediatR;
 using Microsoft.Extensions.Logging;
 using Microsoft.VisualBasic;
 
-public class PerformanceBehavior<TRequest, TResponse>(ILogger<TRequest> logger,IUser user,IIdentityService identity) : IPipelineBehavior<TRequest, TResponse>
-    where TRequest : notnull{
-    Stopwatch stopwatch  = new Stopwatch();
-
+public class PerformanceBehavior<TRequest, TResponse>(ILogger<TRequest> logger, IUser user, IIdentityService identity) : IPipelineBehavior<TRequest, TResponse>
+    where TRequest : notnull
+{
     public async Task<TResponse> Handle(TRequest request, RequestHandlerDelegate<TResponse> next, CancellationToken cancellationToken)
     {
-        
+        var stopwatch = Stopwatch.StartNew();
 
-        stopwatch.Start();
-        var response =  await next(cancellationToken);
+        var response = await next(cancellationToken);
+
         stopwatch.Stop();
 
-        var TakenTime = stopwatch.ElapsedMilliseconds;
+        var elapsedMilliseconds = stopwatch.ElapsedMilliseconds;
 
-
-        if (TakenTime > 500)
+        if (elapsedMilliseconds > 500)
         {
-            var username =string.Empty;
+            var userName = string.Empty;
 
             if (user.Id.HasValue && user.Id != Guid.Empty)
             {
-                 username = await identity.GetUserNameAsync(user.Id.Value); 
+                userName = await identity.GetUserNameAsync(user.Id.Value);
             }
 
-            logger.LogWarning("Long Running , This Request {RequestName} Take {Millisecond} Millisecond With Values {@RequestValues} With UserName {username} with Userid {Userid}",typeof(TRequest).Name,TakenTime,request,username,user.Id.ToString()??"No User");
+            logger.LogWarning(
+                "Long running request {RequestName} took {ElapsedMilliseconds} ms. Values: {@RequestValues}. UserName: {UserName}. UserId: {UserId}",
+                typeof(TRequest).Name,
+                elapsedMilliseconds,
+                request,
+                userName,
+                user.Id?.ToString() ?? "No User");
         }
 
         return response;
     }
 }
+

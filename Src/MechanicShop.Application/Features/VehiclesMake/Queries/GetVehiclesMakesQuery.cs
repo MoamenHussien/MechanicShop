@@ -19,7 +19,7 @@ public class GetVehiclesMakesQueriesHandler(IAppDbContext context , ILogger<GetV
     async Task<Result<List<VehicleMakeResponse>>> IRequestHandler<GetVehiclesMakesQuery, Result<List<VehicleMakeResponse>>>.Handle(GetVehiclesMakesQuery request, CancellationToken cancellationToken)
     {
        var makes = await context.VehicleMakes.AsNoTracking().Select(x=> new VehicleMakeResponse(x.Id,x.Make)).ToListAsync(cancellationToken);
-       if (makes.Count > 0 )
+       if (makes.Count == 0 )
         {
            logger.LogWarning("Not Found Any Of Vehicles Makes");
            return  ApplicationErrors.NotFoundAnyMakes; 

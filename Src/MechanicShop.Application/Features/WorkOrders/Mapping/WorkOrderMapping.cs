@@ -14,13 +14,15 @@ public static class WorkOrderMapping
             RepairTasks = workOrder.RepairTasks.ToDto(),
             Labor = workOrder.Labor?.ToDto(),
             State = workOrder.State,
-            TotalPartCost = workOrder.TotalPartsCost,
-            TotalLaborCost = workOrder.TotalLaborCost,
-            TotalCost = workOrder.Total,
-            TotalDurationInMins = (int)(workOrder.EndAtUtc - workOrder.StartAtUtc).TotalMinutes,
             CreatedAt = workOrder.CreatedAtUtc
         };
     }
+    public static List<WorkOrderDto> ToDto(this List<WorkOrder> workOrders)
+    {
+        ArgumentNullException.ThrowIfNull(workOrders);
+        return workOrders.Select(ToDto).ToList();
+    }
+    
 
     public static WorkOrderListItemDto ToListItemDto(this WorkOrder workOrder)
     {

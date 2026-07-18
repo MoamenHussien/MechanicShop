@@ -7,11 +7,11 @@ public class WorkOrderDto
     public DateTimeOffset StartAtUtc { get; set; }
     public DateTimeOffset EndAtUtc { get; set; }
     public List<RepairTaskDto> RepairTasks { get; set; } = [];
-    public LaborDto? Labor { get; set; } 
+    public LaborDto? Labor { get; set; }
     public WorkOrderState State { get; set; }
-    public decimal TotalPartCost { get; set; }
-    public decimal TotalLaborCost { get; set; }
-    public decimal TotalCost { get; set; }
-    public int TotalDurationInMins { get; set; }
+    public decimal TotalPartCost => RepairTasks.SelectMany(rt => rt.Parts).Sum(p => p.Cost * p.Quantity);
+    public decimal TotalLaborCost => RepairTasks.Sum(n => n.LaborCost);
+    public decimal TotalCost => RepairTasks.Sum(n => n.TotalCost);
+    public int TotalDurationInMins => (int)(EndAtUtc - StartAtUtc).TotalMinutes;
     public DateTimeOffset CreatedAt { get; set; }
 }

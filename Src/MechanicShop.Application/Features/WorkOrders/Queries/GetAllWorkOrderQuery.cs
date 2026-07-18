@@ -69,7 +69,12 @@ public class GetAllWorkOrderQueryHandler(IAppDbContext context)
                   Spot = wo.Spot,
                   StartAtUtc = wo.StartAtUtc,
                   EndAtUtc = wo.EndAtUtc,
-                  Vehicle = wo.Vehicle!.ToDto(),
+                  Vehicle = new VehicleDto(
+                                            wo.Vehicle.Id,
+                                            wo.Vehicle.VehicleModel.VehicleMake.Make,
+                                            wo.Vehicle.VehicleModel.Model,
+                                            wo.Vehicle.Year,
+                                            wo.Vehicle.LicensePlate),
                   Customer = wo.Vehicle!.Customer!.Name,
                   Labor = wo.Labor != null
                     ? wo.Labor.FirstName + " " + wo.Labor.LastName

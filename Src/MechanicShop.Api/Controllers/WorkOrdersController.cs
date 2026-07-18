@@ -21,7 +21,7 @@ public sealed class WorkOrdersController(ISender sender, IOutputCacheStore outpu
     [EndpointDescription("Supports filtering by date range, status, vehicle, labor, spot, and searching by term. Pagination and sorting are supported.")]
     [ProducesResponseType(typeof(PaginatedList<WorkOrderListItemDto>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
-    [OutputCache(Duration = 60, Tags = ["WorkOrders"], VaryByQueryKeys = ["*"])]
+    [OutputCache(PolicyName = nameof(Policies.SharedAuthCache) ,Duration = (int)DurationInSeconds.FiveMinutes, Tags = ["WorkOrders"], VaryByQueryKeys = ["*"])]
     public async Task<IActionResult> Get
     ([FromQuery] WorkOrderFilterRequest filters, [FromQuery] PageRequest pageRequest, CancellationToken ct)
     {
@@ -62,7 +62,7 @@ public sealed class WorkOrdersController(ISender sender, IOutputCacheStore outpu
     [EndpointDescription("Returns detailed information about the specified work order if it exists.")]
     [ProducesResponseType(typeof(WorkOrderDto), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
-    [OutputCache(Duration = 60, Tags = ["WorkOrders"], VaryByRouteValueNames = ["workOrderId"])]
+    [OutputCache(PolicyName = nameof(Policies.SharedAuthCache) ,Duration = (int)DurationInSeconds.TenMinutes, Tags = ["WorkOrders"], VaryByRouteValueNames = ["workOrderId"])]
     public async Task<IActionResult> GetById([FromRoute] Guid workOrderId, CancellationToken ct)
     {
         var result = await sender.Send(new GetWorkOrderByIdQuery(workOrderId), ct);
@@ -72,7 +72,7 @@ public sealed class WorkOrdersController(ISender sender, IOutputCacheStore outpu
 
     [HttpPost]
     [MapToApiVersion("1.0")]
-    [Authorize(Policy = nameof(Role.Manager))]
+    [Authorize(Roles = nameof(Role.Manager))]
     [EndpointName("CreateWorkOrder")]
     [EndpointSummary("Creates a new work order.")]
     [EndpointDescription("Creates a new work order for a vehicle, specifying labor, tasks, and other required information.")]
@@ -100,7 +100,7 @@ public sealed class WorkOrdersController(ISender sender, IOutputCacheStore outpu
 
     [HttpPut("{workOrderId:guid}/relocation")]
     [MapToApiVersion("1.0")]
-    [Authorize(Policy = nameof(Role.Manager))]
+    [Authorize(Roles = nameof(Role.Manager))]
     [EndpointName("RescheduleWorkOrder")]
     [EndpointSummary("Relocates a work order to a new time and spot.")]
     [EndpointDescription("Updates the scheduled time and assigned bay for a work order. Only users with the Manager role can perform this action.")]
@@ -126,7 +126,7 @@ public sealed class WorkOrdersController(ISender sender, IOutputCacheStore outpu
 
     [HttpPut("{workOrderId:guid}/labor")]
     [MapToApiVersion("1.0")]
-    [Authorize(Policy = nameof(Role.Manager))]
+    [Authorize(Roles = nameof(Role.Manager))]
     [EndpointName("AssignLaborToWorkOrder")]
     [EndpointSummary("Assigns a labor to a work order.")]
     [EndpointDescription("Associates a labor definition with a specific work order. Only managers can perform this operation.")]
@@ -197,7 +197,7 @@ public sealed class WorkOrdersController(ISender sender, IOutputCacheStore outpu
 
     [HttpDelete("{workOrderId:guid}")]
     [MapToApiVersion("1.0")]
-    [Authorize(Policy = nameof(Role.Manager))]
+    [Authorize(Roles = nameof(Role.Manager))]
     [EndpointName("DeleteWorkOrder")]
     [EndpointSummary("Deletes a work order.")]
     [EndpointDescription("Deletes the specified work order permanently. Only users with the Manager role are authorized.")]
@@ -223,7 +223,7 @@ public sealed class WorkOrdersController(ISender sender, IOutputCacheStore outpu
     [EndpointDescription("Returns a schedule view for the specified date. If no date is provided, today's schedule is returned. You can optionally filter by labor ID.")]
     [ProducesResponseType(typeof(ScheduleDto), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
-    [OutputCache(Duration = 30, Tags = ["WorkOrders"], VaryByRouteValueNames = ["date"], VaryByQueryKeys = ["laborId"], VaryByHeaderNames = ["X-TimeZone"])] 
+    [OutputCache(PolicyName = nameof(Policies.SharedAuthCache) ,Duration = (int)DurationInSeconds.ThreeMinutes, Tags = ["WorkOrders"], VaryByRouteValueNames = ["date"], VaryByQueryKeys = ["laborId"], VaryByHeaderNames = ["X-TimeZone"])] 
        public async Task<IActionResult> GetSchedule([FromRoute] DateOnly? date, [FromQuery] Guid? laborId, [FromHeader(Name = "X-TimeZone")] string? tz, CancellationToken ct)
     {
         if (string.IsNullOrWhiteSpace(tz))

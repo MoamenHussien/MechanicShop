@@ -11,7 +11,7 @@ namespace MechanicShop.Api.Controllers;
 [ApiVersion("1.0")]
 [Tags("RepairTasks")]
 [Authorize]
-[ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status401Unauthorized)] 
+[ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status401Unauthorized)]
 public sealed class RepairTasksController(ISender sender, IOutputCacheStore outputCache) : ApiController
 {
     [HttpGet]
@@ -21,12 +21,12 @@ public sealed class RepairTasksController(ISender sender, IOutputCacheStore outp
     [EndpointDescription("Returns a list of all repair tasks available in the system.")]
     [EndpointName("GetRepairTasks")]
     [MapToApiVersion("1.0")]
-    [OutputCache(Duration = 3600, Tags = ["RepairTasks"])]
+    [OutputCache(PolicyName = nameof(Policies.SharedAuthCache), Duration = (int)DurationInSeconds.OneDay, Tags = ["RepairTasks"])]
     public async Task<IActionResult> Get(CancellationToken ct)
     {
         var result = await sender.Send(new GetRepairTasksQuery(), ct);
 
-        return result.Match(success => Ok(success),Problem);
+        return result.Match(success => Ok(success), Problem);
     }
 
     [HttpGet("{repairTaskId:guid}", Name = "GetById")]
@@ -37,12 +37,12 @@ public sealed class RepairTasksController(ISender sender, IOutputCacheStore outp
     [EndpointDescription("Returns detailed information for the specified repair task if it exists.")]
     [EndpointName("GetRepairTaskById")]
     [MapToApiVersion("1.0")]
-    [OutputCache(Duration = 3600, Tags = ["RepairTasks"], VaryByRouteValueNames = ["repairTaskId"])] 
+    [OutputCache(PolicyName = nameof(Policies.SharedAuthCache), Duration = (int)DurationInSeconds.OneDay, Tags = ["RepairTasks"], VaryByRouteValueNames = ["repairTaskId"])]
     public async Task<IActionResult> GetById(Guid repairTaskId, CancellationToken ct)
     {
         var result = await sender.Send(new GetRepairTaskByIdQuery(repairTaskId), ct);
 
-        return result.Match(success => Ok(success),Problem);
+        return result.Match(success => Ok(success), Problem);
     }
 
     [HttpPost]
@@ -62,7 +62,7 @@ public sealed class RepairTasksController(ISender sender, IOutputCacheStore outp
         var command = new CreateRepairTaskCommand(
             request.Name,
             request.LaborCost,
-            (RepairDurationInMinutes)request.EstimatedDurationInMins!.Value,
+            (RepairDurationInMinutes)(int)request.EstimatedDurationInMins!.Value,
             parts);
 
         var result = await sender.Send(command, ct);
@@ -72,7 +72,7 @@ public sealed class RepairTasksController(ISender sender, IOutputCacheStore outp
             await outputCache.EvictByTagAsync("RepairTasks", ct);
         }
 
-        return result.Match(success => CreatedAtAction(nameof(GetById), new { repairTaskId = success.id }, success), Problem);
+        return result.Match(success => CreatedAtAction(nameof(GetById), new { repairTaskId = success.RepairTaskId }, success), Problem);
     }
 
     [HttpPut("{repairTaskId:guid}")]
@@ -125,6 +125,6 @@ public sealed class RepairTasksController(ISender sender, IOutputCacheStore outp
             await outputCache.EvictByTagAsync("RepairTasks", ct);
         }
 
-        return result.Match(_ => NoContent(),Problem);
+        return result.Match(_ => NoContent(), Problem);
     }
 }

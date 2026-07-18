@@ -1,3 +1,4 @@
+using System.Reflection.Metadata;
 using FluentValidation;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
@@ -14,7 +15,7 @@ public sealed class IssueInvoiceCommandValidator : AbstractValidator<IssueInvoic
     }
 }
 
-public sealed class IssueInvoiceCommandHandler(ILogger<IssueInvoiceCommand> logger, IAppDbContext context, HybridCache cache,TimeProvider time)
+public sealed class IssueInvoiceCommandHandler(ILogger<IssueInvoiceCommand> logger,IMediator mediator , IAppDbContext context, HybridCache cache,TimeProvider time)
 : IRequestHandler<IssueInvoiceCommand, Result<InvoiceDto>>
 {
     public async Task<Result<InvoiceDto>> Handle(IssueInvoiceCommand request, CancellationToken cancellationToken)
@@ -32,8 +33,8 @@ public sealed class IssueInvoiceCommandHandler(ILogger<IssueInvoiceCommand> logg
         }
 
         var WorkOrder = await context.WorkOrders.AsNoTracking()
-                                          .Include(n => n.RepairTasks).ThenInclude(n => n.Parts)
-                                          .Include(n => n.Vehicle).ThenInclude(n => n.Customer).FirstOrDefaultAsync(n => n.Id == request.workOrderId,cancellationToken);
+                                          .Include(n => n.RepairTasks).ThenInclude(n => n.Parts).
+                                           FirstOrDefaultAsync(n => n.Id == request.workOrderId,cancellationToken);
 
         if (WorkOrder is null)
         {
@@ -98,9 +99,7 @@ public sealed class IssueInvoiceCommandHandler(ILogger<IssueInvoiceCommand> logg
 
         logger.LogInformation("Invoice issued successfully for WorkOrder {WorkOrderId}. Cache 'Invoices' was invalidated. InvoiceId: {InvoiceId}",request.workOrderId,invoiceID);
 
-        return invoice.Value.ToDto();
-
-
+        return await mediator.Send(new GetInvoiceByIdQuery(invoice.Value.Id),cancellationToken);
 
     }
 }

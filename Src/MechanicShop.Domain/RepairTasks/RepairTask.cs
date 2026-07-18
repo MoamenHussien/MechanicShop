@@ -24,6 +24,7 @@ public sealed class RepairTask : AuditableEntity
    {
       this.Name = name;
       this.LaborCost = LaborCost;
+      this.EstimatedDuration = repairDuration;
       this._Parts = parts;
    }
 
@@ -83,6 +84,11 @@ public sealed class RepairTask : AuditableEntity
 
    public Result<Updated> UpSert(List<Part> parts)
    {
+      if (parts is null || parts.Count == 0)
+      {
+         return RepairTaskErrors.AtLeastOneRepairTaskPartIsRequired;
+      }
+      
       var ids = parts.Select(n => n.Id).ToHashSet();
 
       _Parts.RemoveAll(n => !ids.Contains(n.Id));
@@ -93,7 +99,7 @@ public sealed class RepairTask : AuditableEntity
       {
          if (Dic.TryGetValue(part.Id, out Part? TempPart))
          {
-            var UpdatePartStatus = TempPart.Updated(part.Costs, part.Name, part.Quantity);
+            var UpdatePartStatus = TempPart.Update(part.Costs, part.Name, part.Quantity);
 
             if (UpdatePartStatus.IsError)
             {

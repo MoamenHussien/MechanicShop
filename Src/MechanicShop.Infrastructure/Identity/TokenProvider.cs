@@ -80,7 +80,7 @@ public class TokenProvider(IOptions<JwtSettings> JwtConfigSettings, IAppDbContex
         {
             new(ClaimTypes.NameIdentifier, user.UserId.ToString()),
             new (JwtRegisteredClaimNames.Sub, user.UserId.ToString()),
-            new (JwtRegisteredClaimNames.Email, user.email!),
+            new (JwtRegisteredClaimNames.Email, user.Email!),
         };
 
         foreach (var role in user.Roles)

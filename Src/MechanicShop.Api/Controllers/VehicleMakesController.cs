@@ -21,7 +21,7 @@ public class VehicleMakesController(ISender sender, IOutputCacheStore outputCach
     [EndpointDescription("Retrieves a complete list of all supported vehicle makes.")]
     [ProducesResponseType(typeof(List<VehicleMakeResponse>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
-    [OutputCache(Duration = 7200, Tags = ["VehicleMakes"])]
+    [OutputCache(PolicyName =nameof(Policies.SharedAuthCache), Duration = (int)DurationInSeconds.OneDay, Tags = ["VehicleMakes"])]
     public async Task<IActionResult> GetVehicleMakes(CancellationToken ct)
     {
         var result = await sender.Send(new GetVehiclesMakesQuery(), ct);
@@ -35,7 +35,7 @@ public class VehicleMakesController(ISender sender, IOutputCacheStore outputCach
     [EndpointDescription("Retrieves a list of all vehicle models associated with a specific vehicle make.")]
     [ProducesResponseType(typeof(List<VehicleModelDto>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
-    [OutputCache(Duration = 7200, Tags = ["VehicleMakes"], VaryByRouteValueNames = ["makeId"])]
+    [OutputCache(PolicyName = nameof(Policies.SharedAuthCache) ,Duration =(int)DurationInSeconds.OneDay, Tags = ["VehicleMakes"], VaryByRouteValueNames = ["makeId"])]
     public async Task<IActionResult> GetVehicleModelsByMakeId([FromRoute] Guid makeId, CancellationToken ct)
     {
         var result = await sender.Send(new GetVehiclesModelsByMakeIdQuery(makeId), ct);

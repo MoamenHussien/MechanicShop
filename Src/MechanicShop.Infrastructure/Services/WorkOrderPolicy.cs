@@ -44,7 +44,8 @@ public class WorkOrderPolicy(AppDbContext context, IOptions<AppSettings> options
 
     public Result<Success> ValidateMinimumRequirement(DateTimeOffset startAt, DateTimeOffset endAt)
     {
-        if ((endAt - startAt) < TimeSpan.FromMinutes(options.Value.MinimumAppointmentDurationInMinutes))
+        var result = endAt - startAt;
+        if ((result) < TimeSpan.FromMinutes(options.Value.MinimumAppointmentDurationInMinutes))
         {
             return Error.Conflict(
                 "WorkOrder_TooShort",

@@ -17,22 +17,22 @@ public class GetLaborsQueryHandler(ILogger<GetLaborsQueryHandler> logger, IAppDb
 {
     public async Task<Result<List<LaborDto>>> Handle(GetLaborsQuery request, CancellationToken cancellationToken)
     {
-        var LaborsIds = await identity.GetIdsOfUsersByRoleTypeAsync(Role.Labor);
-        if (LaborsIds.IsError)
+        var laborIds = await identity.GetIdsOfUsersByRoleTypeAsync(Role.Labor);
+        if (laborIds.IsError)
         {
-            logger.LogWarning("Failed to retrieve labor user IDs. Errors: {@Errors}", LaborsIds.Errors);
-            return LaborsIds.Errors;
+            logger.LogWarning("Failed to retrieve labor user IDs. Errors: {@Errors}", laborIds.Errors);
+            return laborIds.Errors;
         }
 
         var labors = await context.Employees
         .AsNoTracking()
-        .Where(x => x.IsActive && LaborsIds.Value.Contains(x.Id))
+        .Where(x => x.IsActive && laborIds.Value.Contains(x.Id))
         .Select(x => x.ToDto())
         .ToListAsync(cancellationToken);
 
-        if (labors.Any())
+        if (!labors.Any())
         {
-            logger.LogWarning("Not Found Any Of Labors");
+            logger.LogWarning("No active labor employees were found for role '{Role}'.",Role.Labor);
             return ApplicationErrors.NotFoundAnyLabors;
         }
 
