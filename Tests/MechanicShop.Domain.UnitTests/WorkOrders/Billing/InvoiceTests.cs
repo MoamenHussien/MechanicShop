@@ -52,7 +52,7 @@ public class InvoiceTests
     public void CreateInvoice_ShouldSucceed_WithEmptyId()
     {
         // Act
-        var result = InvoiceFactory.CreateInvoice(id: Guid.Empty);
+        var result = Invoice.Create(id : Guid.Empty,time : TimeProvider.System, TaxAmount : 0,DiscountAmount : 0 , InvoiceLineItems : [InvoiceLineItem.Create(Guid.NewGuid(), "Oil Change", 1, 50, 2).Value],WorkOrderid: Guid.NewGuid());
 
         // Assert
         Assert.True(result.IsSuccess);
@@ -63,8 +63,8 @@ public class InvoiceTests
     public void CreateInvoice_ShouldFail_WithInvalidWorkOrderId()
     {
         // Act
-        var result = InvoiceFactory.CreateInvoice(
-            workOrderId: Guid.Empty);
+        var result = Invoice.Create(id : Guid.NewGuid(),time : TimeProvider.System, TaxAmount : 0,DiscountAmount : 0 , InvoiceLineItems : [InvoiceLineItem.Create(Guid.NewGuid(), "Oil Change", 1, 50, 2).Value],WorkOrderid: Guid.Empty);
+
 
         // Assert
         Assert.True(result.IsError);
@@ -77,8 +77,8 @@ public class InvoiceTests
     public void CreateInvoice_ShouldFail_WithInvalidInvoiceLineItems()
     {
         // Act
-        var result = InvoiceFactory.CreateInvoice(
-            items: null);
+        var result = Invoice.Create(id : Guid.NewGuid(),time : TimeProvider.System, TaxAmount : 0,DiscountAmount : 0 , InvoiceLineItems : null!,WorkOrderid: Guid.NewGuid());
+
 
         // Assert
         Assert.True(result.IsError);

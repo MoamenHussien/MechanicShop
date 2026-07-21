@@ -44,7 +44,12 @@ public class RepairTaskTests
     public void CreateRepairTask_ShouldSucceed_WithEmptyId()
     {
         // Act
-        var result = RepairTaskFactory.CreateRepairTask(id: Guid.Empty);
+        var result = RepairTask.Create(
+            id  :Guid.Empty,
+            name : "Brake Inspection",
+            LaborCost : 100,
+            repairDuration : RepairDurationInMinutes.Min30,
+            parts : [PartFactory.CreatePart(name:"Brake pads",cost:50,quantity:1).Value]);
 
         // Assert
         Assert.True(result.IsSuccess);
@@ -59,7 +64,12 @@ public class RepairTaskTests
     public void CreateRepairTask_ShouldFail_WithInvalidName(string? value)
     {
         // Act
-        var result = RepairTaskFactory.CreateRepairTask(name: value);
+        var result = RepairTask.Create(
+            id  :Guid.NewGuid(),
+            name : value!,
+            LaborCost : 100,
+            repairDuration : RepairDurationInMinutes.Min30,
+            parts : [PartFactory.CreatePart(name:"Brake pads",cost:50,quantity:1).Value]);
 
         // Assert
         Assert.True(result.IsError);
@@ -95,7 +105,12 @@ public class RepairTaskTests
     public void CreateRepairTask_ShouldFail_WithInvalidParts()
     {
         // Act
-        var result = RepairTaskFactory.CreateRepairTask(parts: null);
+        var result = RepairTask.Create(
+            id  :Guid.Empty,
+            name : "Brake Inspection",
+            LaborCost : 100,
+            repairDuration : RepairDurationInMinutes.Min30,
+            parts : null!);
 
         // Assert
         Assert.True(result.IsError);

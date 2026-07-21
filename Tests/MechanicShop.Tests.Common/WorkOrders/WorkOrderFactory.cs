@@ -1,4 +1,4 @@
-﻿
+
 using MechanicShop.Tests.Common.RepaireTasks;
 
 namespace MechanicShop.Tests.Common.WorkOrders;
@@ -19,8 +19,8 @@ public static class WorkOrderFactory
             laborId ?? Guid.NewGuid(),
             vehicleId ?? Guid.NewGuid(),
             spot ?? Spot.A,
-            startAt ?? DateTimeOffset.UtcNow,
-            endAt ?? DateTimeOffset.UtcNow.AddHours(1),
+            startAt ?? DateTimeOffset.UtcNow.AddDays(1),
+            endAt ?? DateTimeOffset.UtcNow.AddDays(1).AddHours(1),
             repairTasks ?? [RepairTaskFactory.CreateRepairTask().Value]);
     }
 }

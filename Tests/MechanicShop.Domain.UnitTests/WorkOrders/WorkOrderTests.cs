@@ -210,7 +210,14 @@ public class WorkOrderTests
     public void CreateWorkOrder_ShouldSucceed_WithEmptyId()
     {
         // Act
-        var result = WorkOrderFactory.CreateWorkOrder(id: Guid.Empty);
+        var result = WorkOrder.Create(
+            id : Guid.Empty,
+            LaborId : Guid.NewGuid(),
+            VehicleId : Guid.NewGuid(),
+            spot : Spot.A,
+            StartAtUtc : DateTimeOffset.UtcNow.AddDays(1),
+            EndAt : DateTimeOffset.UtcNow.AddDays(1).AddHours(1),
+            repairTasks : [RepairTaskFactory.CreateRepairTask().Value]);
 
         // Assert
         Assert.True(result.IsSuccess);
@@ -221,8 +228,14 @@ public class WorkOrderTests
     public void CreateWorkOrder_ShouldFail_WithInvalidVehicleId()
     {
         // Act
-        var result = WorkOrderFactory.CreateWorkOrder(
-            vehicleId: Guid.Empty);
+        var result = WorkOrder.Create(
+            id : Guid.NewGuid(),
+            LaborId : Guid.NewGuid(),
+            VehicleId : Guid.Empty,
+            spot : Spot.A,
+            StartAtUtc : DateTimeOffset.UtcNow.AddDays(1),
+            EndAt : DateTimeOffset.UtcNow.AddDays(1).AddHours(1),
+            repairTasks : [RepairTaskFactory.CreateRepairTask().Value]);
 
         // Assert
         Assert.True(result.IsError);
@@ -235,8 +248,14 @@ public class WorkOrderTests
     public void CreateWorkOrder_ShouldFail_WithInvalidLaborId()
     {
         // Act
-        var result = WorkOrderFactory.CreateWorkOrder(
-            laborId: Guid.Empty);
+        var result = WorkOrder.Create(
+            id : Guid.NewGuid(),
+            LaborId : Guid.Empty,
+            VehicleId : Guid.NewGuid(),
+            spot : Spot.A,
+            StartAtUtc : DateTimeOffset.UtcNow.AddDays(1),
+            EndAt : DateTimeOffset.UtcNow.AddDays(1).AddHours(1),
+            repairTasks : [RepairTaskFactory.CreateRepairTask().Value]);
 
         // Assert
         Assert.True(result.IsError);
@@ -301,8 +320,14 @@ public class WorkOrderTests
     public void CreateWorkOrder_ShouldFail_WithInvalidRepairTasks()
     {
         // Act
-        var result = WorkOrderFactory.CreateWorkOrder(
-            repairTasks: null);
+        var result = WorkOrder.Create(
+            id : Guid.NewGuid(),
+            LaborId : Guid.NewGuid(),
+            VehicleId : Guid.NewGuid(),
+            spot : Spot.A,
+            StartAtUtc : DateTimeOffset.UtcNow.AddDays(1),
+            EndAt : DateTimeOffset.UtcNow.AddDays(1).AddHours(1),
+            repairTasks : null!);
 
         // Assert
         Assert.True(result.IsError);

@@ -15,7 +15,7 @@ public sealed class UpdateRepairTaskCommandValidator : AbstractValidator<UpdateR
         RuleFor(n => n.name).NotEmpty().WithMessage("Repair Task Name Is Required").Must(n => !string.IsNullOrWhiteSpace(n)).WithMessage("You Must Enter Valid Repair Task Name").MaximumLength(50).WithMessage("The Maximum Length For Repair Task Name Is 50 Char");
         RuleFor(n => n.LaborCost).NotEmpty().WithMessage("Labor Costs Is Required").GreaterThan(0).WithMessage("The Labor Cost Must Be Greater Than 0");
         RuleFor(n => n.duration).IsInEnum().WithMessage("You Must Enter Valid Enum Duration");
-        RuleFor(n => n.Parts).NotNull().WithMessage("Repair Task Parts Is Required").Must(n => n.Count > 0).WithMessage("At least one part is required");
+        RuleFor(n => n.Parts).NotNull().WithMessage("Repair Task Parts Is Required").Must(n => n != null && n.Count > 0).WithMessage("At least one part is required");
         RuleForEach(n => n.Parts).SetValidator(new UpdatePartCommandValidator());
     }
 }

@@ -19,7 +19,7 @@ public class DashboardController(ISender sender) : ApiController
     [MapToApiVersion("1.0")]
     [EndpointName("GetTodayStats")] 
     [EndpointSummary("Retrieve daily workshop statistics and KPIs.")] 
-    [EndpointDescription("Generates a comprehensive daily statistical report including order statuses, financial metrics (revenue, profit, costs), and operational ratios for the specified date.")] 
+    [EndpointDescription("Generates a comlrehensive daily statistical report including order statuses, financial metrics (revenue, profit, costs), and operational ratios for the specified date.")] 
     [ProducesResponseType(typeof(TodayWorkOrderStatsDto), StatusCodes.Status200OK)]
     [OutputCache(PolicyName = nameof(Policies.SharedAuthCache) ,Duration = (int)DurationInSeconds.OneMinute , VaryByQueryKeys = ["date"])]
     public async Task<IActionResult> GetTodayStats([FromQuery] DateOnly? date, CancellationToken ct)

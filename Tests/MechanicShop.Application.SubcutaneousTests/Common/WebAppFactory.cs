@@ -15,6 +15,11 @@ using Xunit;
 
 namespace MechanicShop.Application.SubcutaneousTests.Common;
 
+public class TestUser : IUser
+{
+    public Guid? Id { get; set; } = Guid.NewGuid();
+}
+
 public class WebAppFactory : WebApplicationFactory<IAssemblyMarker>, IAsyncLifetime
 {
 private readonly MsSqlContainer _dbContainer = new MsSqlBuilder("mcr.microsoft.com/mssql/server:2022-latest").Build();
@@ -61,13 +66,16 @@ private readonly MsSqlContainer _dbContainer = new MsSqlBuilder("mcr.microsoft.c
                 options.UseSqlServer(_dbContainer.GetConnectionString());
             });
 
+            services.RemoveAll<IUser>();
+            services.AddScoped<IUser, TestUser>();
+
             services.RemoveAll<AppSettings>();
 
-            // Explicit override AFTER Configure
             services.PostConfigure<AppSettings>(opts =>
             {
                 opts.OpeningTime = new TimeOnly(9, 0);
                 opts.ClosingTime = new TimeOnly(18, 0);
+                opts.MinimumAppointmentDurationInMinutes = 30;
             });
         });
     }

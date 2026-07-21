@@ -20,13 +20,13 @@ public static class TestUsers
         EmailConfirmed = true
     };
 
-    // public static AppUser Labor02 => new()
-    // {
-    //     Id = "8104ab20-26c2-4651-b1de-c0baf04dbbd9",
-    //     Email = "peter.labor@localhost",
-    //     UserName = "peter.labor@localhost",
-    //     EmailConfirmed = true
-    // };
+    public static AppUser Labor02 => new()
+    {
+        Id = "8104AB20-26C2-4651-B1DE-C0BAF04DBBD9".ToGuid().Value,
+        Email = "peter.labor@localhost",
+        UserName = "peter.labor@localhost",
+        EmailConfirmed = true
+    };
 
     // public static AppUser Labor03 => new()
     // {

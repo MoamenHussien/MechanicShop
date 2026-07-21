@@ -22,8 +22,11 @@ public class CreateWorkOrderCommandHandlerTests(WebAppFactory factory)
     public async Task CreateWorkOrderHandler_WithValidData_ShouldSucceed()
     {
         // Arrange
-        var vehicleModel = await _context.VehicleModels.FirstAsync();
-        var repairTask = await _context.RepairTasks.FirstAsync();
+        var vehicleMake = VehicleMakeFactory.CreateVehicleMake().Value;
+        var vehicleModel = vehicleMake.VehicleModels.First();
+        var repairTask = RepairTaskFactory.CreateRepairTask().Value;
+        await _context.VehicleMakes.AddAsync(vehicleMake);
+        await _context.RepairTasks.AddAsync(repairTask);
 
         var customer = CustomerFactory.CreateCustomer(
             vehicles:
@@ -39,8 +42,8 @@ public class CreateWorkOrderCommandHandlerTests(WebAppFactory factory)
 
         await _context.SaveChangesAsync(default);
 
-        var scheduledAt = DateTimeOffset.UtcNow.Date
-            .AddDays(1)
+        var scheduledAt = new DateTimeOffset(DateTime.UtcNow.Date)
+            .AddDays(61)
             .AddHours(10);
 
         var command = new CreateWorkOrderCommand(
@@ -81,7 +84,9 @@ public class CreateWorkOrderCommandHandlerTests(WebAppFactory factory)
     public async Task CreateWorkOrderHandler_WithMissingRepairTask_ShouldFail()
     {
         // Arrange
-        var vehicleModel = await _context.VehicleModels.FirstAsync();
+        var vehicleMake = VehicleMakeFactory.CreateVehicleMake().Value;
+        var vehicleModel = vehicleMake.VehicleModels.First();
+        await _context.VehicleMakes.AddAsync(vehicleMake);
 
         var customer = CustomerFactory.CreateCustomer(
             vehicles:
@@ -97,8 +102,8 @@ public class CreateWorkOrderCommandHandlerTests(WebAppFactory factory)
 
         await _context.SaveChangesAsync(default);
 
-        var scheduledAt = DateTimeOffset.UtcNow.Date
-            .AddDays(1)
+        var scheduledAt = new DateTimeOffset(DateTime.UtcNow.Date)
+            .AddDays(62)
             .AddHours(11);
 
         var command = new CreateWorkOrderCommand(
@@ -122,8 +127,11 @@ public class CreateWorkOrderCommandHandlerTests(WebAppFactory factory)
     public async Task CreateWorkOrderHandler_WithOutsideOperatingHours_ShouldFail()
     {
         // Arrange
-        var vehicleModel = await _context.VehicleModels.FirstAsync();
-        var repairTask = await _context.RepairTasks.FirstAsync();
+        var vehicleMake = VehicleMakeFactory.CreateVehicleMake().Value;
+        var vehicleModel = vehicleMake.VehicleModels.First();
+        var repairTask = RepairTaskFactory.CreateRepairTask().Value;
+        await _context.VehicleMakes.AddAsync(vehicleMake);
+        await _context.RepairTasks.AddAsync(repairTask);
 
         var customer = CustomerFactory.CreateCustomer(
             vehicles:
@@ -141,8 +149,8 @@ public class CreateWorkOrderCommandHandlerTests(WebAppFactory factory)
 
         await _context.SaveChangesAsync(default);
 
-        var scheduledAt = DateTimeOffset.UtcNow.Date
-            .AddDays(1)
+        var scheduledAt = new DateTimeOffset(DateTime.UtcNow.Date)
+            .AddDays(63)
             .AddHours(4);
 
         var command = new CreateWorkOrderCommand(
@@ -166,8 +174,11 @@ public class CreateWorkOrderCommandHandlerTests(WebAppFactory factory)
     public async Task CreateWorkOrderHandler_WithShortDuration_ShouldFail()
     {
         // Arrange
-        var vehicleModel = await _context.VehicleModels.FirstAsync();
-        var repairTask = await _context.RepairTasks.FirstAsync();
+        var vehicleMake = VehicleMakeFactory.CreateVehicleMake().Value;
+        var vehicleModel = vehicleMake.VehicleModels.First();
+        var repairTask = RepairTaskFactory.CreateRepairTask(repairDurationInMinutes: RepairDurationInMinutes.Min15).Value;
+        await _context.VehicleMakes.AddAsync(vehicleMake);
+        await _context.RepairTasks.AddAsync(repairTask);
 
 
         var customer = CustomerFactory.CreateCustomer(
@@ -187,8 +198,8 @@ public class CreateWorkOrderCommandHandlerTests(WebAppFactory factory)
 
         await _context.SaveChangesAsync(default);
 
-        var scheduledAt = DateTimeOffset.UtcNow.Date
-            .AddDays(1)
+        var scheduledAt = new DateTimeOffset(DateTime.UtcNow.Date)
+            .AddDays(64)
             .AddHours(12);
 
         var command = new CreateWorkOrderCommand(
@@ -258,8 +269,8 @@ public class CreateWorkOrderCommandHandlerTests(WebAppFactory factory)
         await _context.Customers.AddAsync(customer);
         await _context.SaveChangesAsync(default);
 
-        var scheduledAt = DateTimeOffset.UtcNow.Date
-            .AddDays(1)
+        var scheduledAt = new DateTimeOffset(DateTime.UtcNow.Date)
+            .AddDays(66)
             .AddHours(14);
 
         var command = new CreateWorkOrderCommand(
@@ -301,9 +312,9 @@ public class CreateWorkOrderCommandHandlerTests(WebAppFactory factory)
         await _context.Employees.AddAsync(employee2);
         await _context.SaveChangesAsync(default);
 
-        var scheduledAt = DateTimeOffset.UtcNow.Date
-            .AddDays(1)
-            .AddHours(15);
+        var scheduledAt = new DateTimeOffset(DateTime.UtcNow.Date)
+            .AddDays(67)
+            .AddHours(11);
 
         var command1 = new CreateWorkOrderCommand(
             LaborId: employee1.Id,
@@ -315,7 +326,7 @@ public class CreateWorkOrderCommandHandlerTests(WebAppFactory factory)
         var command2 = new CreateWorkOrderCommand(
             LaborId: employee2.Id,
             VehicleId: vehicle.Id,
-            spot: Spot.B,
+            spot: Spot.C,
             StartAtUtc: scheduledAt,
             repairTasksIds: [repairTask.Id]);
 
@@ -359,9 +370,9 @@ public class CreateWorkOrderCommandHandlerTests(WebAppFactory factory)
         await _context.Employees.AddAsync(employee);
         await _context.SaveChangesAsync(default);
 
-        var scheduledAt = DateTimeOffset.UtcNow.Date
-            .AddDays(1)
-            .AddHours(16);
+        var scheduledAt = new DateTimeOffset(DateTime.UtcNow.Date)
+            .AddDays(68)
+            .AddHours(12);
 
         var command1 = new CreateWorkOrderCommand(
             LaborId: employee.Id,
@@ -373,7 +384,7 @@ public class CreateWorkOrderCommandHandlerTests(WebAppFactory factory)
         var command2 = new CreateWorkOrderCommand(
             LaborId: employee.Id,
             VehicleId: vehicle2.Id,
-            spot: Spot.B,
+            spot: Spot.C,
             StartAtUtc: scheduledAt,
             repairTasksIds: [repairTask.Id]);
 
@@ -393,8 +404,11 @@ public class CreateWorkOrderCommandHandlerTests(WebAppFactory factory)
     public async Task CreateWorkOrderHandler_WithUnavailableSpot_ShouldFail()
     {
         // Arrange
-        var vehicleModel = await _context.VehicleModels.FirstAsync();
-        var repairTask = await _context.RepairTasks.FirstAsync();
+        var vehicleMake = VehicleMakeFactory.CreateVehicleMake().Value;
+        var vehicleModel = vehicleMake.VehicleModels.First();
+        var repairTask = RepairTaskFactory.CreateRepairTask().Value;
+        await _context.VehicleMakes.AddAsync(vehicleMake);
+        await _context.RepairTasks.AddAsync(repairTask);
 
         var customer1 = CustomerFactory.CreateCustomer(
             vehicles:
@@ -422,8 +436,8 @@ public class CreateWorkOrderCommandHandlerTests(WebAppFactory factory)
 
         await _context.SaveChangesAsync(default);
 
-        var scheduledAt = DateTimeOffset.UtcNow.Date
-            .AddDays(1)
+        var scheduledAt = new DateTimeOffset(DateTime.UtcNow.Date)
+            .AddDays(69)
             .AddHours(13);
 
         var command1 = new CreateWorkOrderCommand(

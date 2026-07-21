@@ -12,7 +12,7 @@ public class UpdateLaborPermissionsCommandValidator : AbstractValidator<UpdateLa
     {
         RuleFor(x => x.LaborId).IdRequired("Labor");
         RuleFor(x => x.Roles).NotEmpty().WithMessage("At least one role is required");
-        RuleForEach(x => x.Roles).IsInEnum().WithMessage("Role must be a valid enum value");
+        RuleForEach(x => x.Roles).IsEnumName(typeof(Role), caseSensitive: false).WithMessage("Role must be a valid enum value");
         RuleFor(x => x.Claims).NotNull().WithMessage("The Claims Must Be Not Null");
     }
 }

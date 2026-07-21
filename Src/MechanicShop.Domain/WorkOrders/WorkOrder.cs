@@ -168,7 +168,7 @@ public class WorkOrder : AuditableEntity
         StartAtUtc = startAt;
         EndAtUtc = endAt;
 
-        DomainEvents.Add(new WorkOrderCollectionModified());
+        this.AddDomainEvent(new WorkOrderCollectionModified());
 
         return Result.Updated;
     } 

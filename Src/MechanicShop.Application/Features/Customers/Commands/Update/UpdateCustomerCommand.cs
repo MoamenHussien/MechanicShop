@@ -17,7 +17,7 @@ public class UpdateCustomerCommandValidator : AbstractValidator<UpdateCustomerCo
 
         RuleFor(n => n.email).MustBeValidEmail();
         RuleFor(n => n.PhoneNumber).MustBeValidPhone();
-        RuleFor(n => n.Vehicles).NotNull().WithMessage("Vehicles List Cannot Be Null").Must(n => n.Count > 0).WithMessage("Customer Must Have At Least One Vehicle");
+        RuleFor(n => n.Vehicles).NotNull().WithMessage("Vehicles List Cannot Be Null").Must(n => n != null && n.Count > 0).WithMessage("Customer Must Have At Least One Vehicle");
         RuleForEach(n => n.Vehicles).SetValidator(new UpdateVehicleCommandValidator());
     }
 }
@@ -41,6 +41,16 @@ public class UpdateCustomerCommandHandler(ILogger<UpdateCustomerCommandHandler> 
         {
             logger.LogWarning("Customer creation aborted. Email already exists : {email}", Email);
             return ApplicationErrors.CustomerExists;
+        }
+
+        var vehicleModelIds = request.Vehicles.Select(v => v.VehicleModelId).Distinct().ToList();
+        var existingModelsCount = await context.VehicleModels
+            .CountAsync(m => vehicleModelIds.Contains(m.Id), cancellationToken);
+
+        if (existingModelsCount != vehicleModelIds.Count)
+        {
+            logger.LogWarning("Some vehicle models were not found.");
+            return ApplicationErrors.NotFoundTheVehicleModel;
         }
 
         List<Vehicle> vehicles = new List<Vehicle>();

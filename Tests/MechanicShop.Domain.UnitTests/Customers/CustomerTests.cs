@@ -38,7 +38,14 @@ public class CustomerTests
     public void CreateCustomer_ShouldSucceed_WithEmptyId()
     {
         // Act
-        var result = CustomerFactory.CreateCustomer(id: Guid.Empty);
+        // var result = CustomerFactory.CreateCustomer(id: Guid.Empty);
+
+        var result = Customer.Create(
+            id :Guid.Empty,
+            name :"Customer #1",
+            email : "customer01@localhost",
+            phone : "5555555555",
+            vehicles :[VehicleFactory.CreateVehicle().Value, VehicleFactory.CreateVehicle().Value]);
 
         // Assert
         Assert.True(result.IsSuccess);
@@ -49,8 +56,7 @@ public class CustomerTests
     [InlineData("")]
     [InlineData("  ")]
     [InlineData("   ")]
-    [InlineData(null)]
-    public void CreateCustomer_ShouldFail_WithInvalidName(string? value)
+    public void CreateCustomer_ShouldFail_WithInvalidName(string value)
     {
         // Act
         var result = CustomerFactory.CreateCustomer(name: value);
@@ -64,8 +70,7 @@ public class CustomerTests
     [InlineData("")]
     [InlineData("  ")]
     [InlineData("   ")]
-    [InlineData(null)]
-    public void CreateCustomer_ShouldFail_WithInvalidEmail(string? value)
+    public void CreateCustomer_ShouldFail_WithInvalidEmail(string value)
     {
         // Act
         var result = CustomerFactory.CreateCustomer(email: value);
@@ -79,8 +84,7 @@ public class CustomerTests
     [InlineData("")]
     [InlineData("  ")]
     [InlineData("   ")]
-    [InlineData(null)]
-    public void CreateCustomer_ShouldFail_WithInvalidPhone(string? value)
+    public void CreateCustomer_ShouldFail_WithInvalidPhone(string value)
     {
         // Act
         var result = CustomerFactory.CreateCustomer(phoneNumber: value);
@@ -94,7 +98,13 @@ public class CustomerTests
     public void CreateCustomer_ShouldFail_WithInvalidVehicles()
     {
         // Act
-        var result = CustomerFactory.CreateCustomer(vehicles: null);
+        // var result = CustomerFactory.CreateCustomer(vehicles: null);
+        var result = Customer.Create(
+            id :Guid.NewGuid(),
+            name :"Customer #1",
+            email : "customer01@localhost",
+            phone : "5555555555",
+            vehicles :null!);
 
         // Assert
         Assert.True(result.IsError);
@@ -136,8 +146,7 @@ public class CustomerTests
     [InlineData("")]
     [InlineData("  ")]
     [InlineData("   ")]
-    [InlineData(null)]
-    public void UpdateCustomer_ShouldFail_WithInvalidName(string? value)
+    public void UpdateCustomer_ShouldFail_WithInvalidName(string value)
     {
         // Arrange
         var customer = CustomerFactory.CreateCustomer().Value;

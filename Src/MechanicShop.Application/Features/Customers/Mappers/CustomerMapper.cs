@@ -50,7 +50,7 @@ public static class CustomerMapper
         return new VehicleDto(
             vehicle.Id,
             vehicle.VehicleModel.VehicleMake.Make,
-            vehicle.VehicleModel.Model,
+            vehicle.VehicleModel.Model ,
             vehicle.Year,
             vehicle.LicensePlate);
     }

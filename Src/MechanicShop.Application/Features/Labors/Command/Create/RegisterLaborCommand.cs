@@ -3,7 +3,6 @@ using FluentValidation;
 using MediatR;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.Extensions.Logging;
-
 public sealed record RegisterLaborCommand(string email,string password,string FirstName,string LastName,List<string> Roles,List<Claim> Claims):IRequest<Result<Guid>>;
 
 public class RegisterLaborCommandValidator : AbstractValidator<RegisterLaborCommand>
@@ -14,7 +13,7 @@ public class RegisterLaborCommandValidator : AbstractValidator<RegisterLaborComm
         RuleFor(n=>n.password).NotEmpty().WithMessage("Password Is Required").Must(n=>!string.IsNullOrWhiteSpace(n)).WithMessage("Enter Valid Password").Length(8,30).WithMessage("Password must be between 8 and 30 characters");
         RuleFor(n => n.FirstName).NotEmpty().WithMessage("First Name is required").MinimumLength(2).WithMessage("First Name must be at least 2 characters").MaximumLength(50).WithMessage("First Name cannot exceed 50 characters");
         RuleFor(n => n.LastName).NotEmpty().WithMessage("Last Name is required").MinimumLength(2).WithMessage("Last Name must be at least 2 characters").MaximumLength(50).WithMessage("Last Name cannot exceed 50 characters");
-        RuleForEach(n => n.Roles).IsInEnum().WithMessage("Roles must be a valid Enum Value");
+        RuleForEach(n => n.Roles).IsEnumName(typeof(Role), caseSensitive: false).WithMessage("Roles must be a valid Enum Value");
         RuleFor(n=>n.Claims).NotNull().WithMessage("The Claims Must Be Not Null");
     }
 }

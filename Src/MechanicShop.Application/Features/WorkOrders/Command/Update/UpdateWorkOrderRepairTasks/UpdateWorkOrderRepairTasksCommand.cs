@@ -12,7 +12,7 @@ public class UpdateWorkOrderRepairTasksCommandValidator : AbstractValidator<Upda
     public UpdateWorkOrderRepairTasksCommandValidator()
     {
         RuleFor(n => n.WorkOrderid).IdRequired("Work Order");
-        RuleFor(n => n.RepairTasksIds).NotNull().WithMessage("Repair Tasks Is Required").Must(n => n.Count() > 0).WithMessage("You Must Select At Least One Repair Task");
+        RuleFor(n => n.RepairTasksIds).NotNull().WithMessage("Repair Tasks Is Required").Must(n => n != null && n.Count() > 0).WithMessage("You Must Select At Least One Repair Task");
     }
 }
 

@@ -28,7 +28,7 @@ public class CreateCustomerCommandValidator : AbstractValidator<CreateCustomerCo
 
         RuleFor(n => n.Vehicles)
             .NotNull().WithMessage("Vehicle list Cannot Be Null")
-            .Must(n => n.Count > 0).WithMessage("Customer Must Have At Least One Vehicle");
+            .Must(n => n != null && n.Count > 0).WithMessage("Customer Must Have At Least One Vehicle");
 
         RuleForEach(n => n.Vehicles)
             .SetValidator(new CreateVehicleCommandValidator());
@@ -37,7 +37,6 @@ public class CreateCustomerCommandValidator : AbstractValidator<CreateCustomerCo
 
 public class CreateCustomerCommandHandler(
     ILogger<CreateCustomerCommandHandler> logger,
-    IMediator mediator,
     HybridCache cache,
     IAppDbContext context) : IRequestHandler<CreateCustomerCommand, Result<CustomerDto>>
 {
@@ -55,6 +54,16 @@ public class CreateCustomerCommandHandler(
                 email);
 
             return ApplicationErrors.CustomerExists;
+        }
+
+        var vehicleModelIds = request.Vehicles.Select(v => v.VehicleModelId).Distinct().ToList();
+        var existingModelsCount = await context.VehicleModels
+            .CountAsync(m => vehicleModelIds.Contains(m.Id), cancellationToken);
+
+        if (existingModelsCount != vehicleModelIds.Count)
+        {
+            logger.LogWarning("Some vehicle models were not found.");
+            return ApplicationErrors.NotFoundTheVehicleModel;
         }
 
         var vehicles = new List<Vehicle>(request.Vehicles.Count);
@@ -98,8 +107,18 @@ public class CreateCustomerCommandHandler(
             "Successfully created customer with Id {CustomerId}. Removed Customers cache tag.",
             customer.Value.Id);
 
-        return await mediator.Send(
-            new GetCustomerByIdQuery(customer.Value.Id),
-            cancellationToken);
+      
+        var vehicleIds = customer.Value.vehicles
+            .Select(v => v.Id)
+            .ToList();
+
+        await context.Vehicles
+            .Where(v => vehicleIds.Contains(v.Id))
+            .Include(v => v.VehicleModel)
+                .ThenInclude(m => m.VehicleMake)
+            .LoadAsync(cancellationToken);
+
+        return customer.Value.ToDto();
+
     }
 }

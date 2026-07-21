@@ -1,4 +1,4 @@
-﻿using FluentValidation.TestHelper;
+using FluentValidation.TestHelper;
 using Xunit;
 
 public class IssueInvoiceCommandValidatorTests
@@ -14,8 +14,8 @@ public class IssueInvoiceCommandValidatorTests
         // Act & Assert
         var result = _validator.TestValidate(command);
         result.ShouldHaveValidationErrorFor(c => c.workOrderId)
-              .WithErrorCode("WorkOrderId_Is_Required")
-              .WithErrorMessage("WorkOrderId is required.");
+              .WithErrorCode("Work Order_Id_Is_Required")
+              .WithErrorMessage("Work Order Id Is Required");
     }
 
     [Fact]

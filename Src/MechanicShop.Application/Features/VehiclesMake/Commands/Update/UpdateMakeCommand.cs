@@ -13,7 +13,7 @@ public class UpdateMakeCommandValidator : AbstractValidator<UpdateMakeCommand>
     {
         RuleFor(n=>n.id).IdRequired("Make");
         RuleFor(n=>n.Make).NotEmpty().Must(x=> !string.IsNullOrWhiteSpace(x)).WithMessage("You Must Enter Vehicle Make");
-        RuleFor(n=>n.Models).NotNull().Must(n=> n.Count()>0).WithMessage("You Must Enter At Least One Model");
+        RuleFor(n=>n.Models).NotNull().Must(n=> n != null && n.Count()>0).WithMessage("You Must Enter At Least One Model");
         RuleForEach(n=> n.Models).SetValidator(new UpdateModelCommandValidator());
     }
 }

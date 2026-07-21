@@ -77,11 +77,27 @@ public class ApplicationDbContextInitializer(UserManager<AppUser> user, RoleMana
             await user.AddToRolesAsync(Labor1, [LaborRole.Name!]);
         }
 
+         var Labor2 = new AppUser
+        {
+            Id = "8104AB20-26C2-4651-B1DE-C0BAF04DBBD9".ToGuid().Value,
+            Email = "peter.labor@localhost",
+            UserName = "peter.labor@localhost",
+            EmailConfirmed = true
+        };
+
+        if (!await user.Users.AnyAsync(n => n.Email == Labor2.Email))
+        {
+            await user.CreateAsync(Labor2, Labor2.Email);
+            await user.AddToRolesAsync(Labor2, [LaborRole.Name!]);
+        }
+
+
         if (!await context.Employees.AnyAsync())
         {
             await context.Employees.AddRangeAsync([
                 Employee.Create(SystemManager.Id, "Admin", "Manager").Value,
-                Employee.Create(Labor1.Id, "john", "M.").Value
+                Employee.Create(Labor1.Id, "john", "M.").Value,
+                Employee.Create(Labor2.Id, "Peter", "R.").Value
             ]);
         }
 
@@ -120,6 +136,25 @@ public class ApplicationDbContextInitializer(UserManager<AppUser> user, RoleMana
                 RepairTask.Create(Guid.Parse("ffffffff-ffff-ffff-ffff-000000000010"), "Transmission Fluid Change", 100.00m, RepairDurationInMinutes.Min45, [Part.Create(Guid.Parse("ffffffff-ffff-ffff-ffff-a00000000001"), 60.00m, "Transmission Fluid", 1).Value]).Value
             ]);
         }
+
+        if (!context.Customers.Any())
+        {
+            List<Vehicle> vehiclesCustomer1 = [
+                        Vehicle.Create(id: Guid.Parse("61401e63-007b-4b1c-8914-9eb6e9bd95c5"), VehicleModelId:Guid.Parse("33333333-3333-3333-3333-444444444444") , Year: 2020, LicensePlate: "ABC123").Value,
+                        Vehicle.Create(id: Guid.Parse("13c80914-41ad-4d46-b7bb-60f6c89ad01e"), VehicleModelId:Guid.Parse("33333333-3333-3333-3333-444444444441") , Year: 2020, LicensePlate: "ABC321").Value,
+                    ];
+            List<Vehicle> vehiclesCustomer2 = [
+                        Vehicle.Create(id: Guid.Parse("a04f329d-0f5a-46a0-beae-699c034ae401"), VehicleModelId:Guid.Parse("11111111-1111-1111-1111-222222222221") , Year: 2021, LicensePlate: "DEF789").Value,
+                        Vehicle.Create(id: Guid.Parse("cf60e95b-5752-4c26-aa07-31a34164606c"), VehicleModelId:Guid.Parse("eeeeeeee-eeee-eeee-eeee-fffffffffff1") , Year: 2019, LicensePlate: "GHI012").Value,
+                    ];
+
+            context.Customers.AddRange(
+            [
+                Customer.Create(id: Guid.Parse("f522bbe5-e3b1-4e2c-a8a3-c41550dcf39d"), name: "John Doe", phone: "123456789", email: "john.doe@localhost", vehicles: vehiclesCustomer1).Value,
+                Customer.Create(id: Guid.Parse("73a04dd3-c81a-4a54-9882-ef1017eb192d"), name: "Sarah Peter", phone: "987654321", email: "sarah.peter@localhost", vehicles: vehiclesCustomer2).Value,
+            ]);
+        }
+
 
         await context.SaveChangesAsync();
     }

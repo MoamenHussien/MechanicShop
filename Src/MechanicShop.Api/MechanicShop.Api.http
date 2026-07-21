@@ -8,6 +8,7 @@
 
 @customerMoamenId = 88021b0f-6b10-45dc-a57e-19f7f2ce1b3f
 @customerSarahId = 73A04DD3-C81A-4A54-9882-EF1017EB192D
+@invoiceId = 73A04DD3-C81A-4A54-9882-EF1017EB392D
 
 @labor01Id = b6327240-0aea-46fc-863a-777fc4e42560
 
@@ -24,9 +25,7 @@
 @tireRotationServiceId = A376B5D1-6B2D-4DD8-883E-D3D1721C1316
 @brakeReplacementServiceId = 4FA0BE55-06F6-4616-B086-E1F0C9354CD8
 
-@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1laWQiOiIxOWE1OTEyOS02YzIwLTQxN2EtODM0ZC0xMWEyMDhkMzJkOTYiLCJzdWIiOiIxOWE1OTEyOS02YzIwLTQxN2EtODM0ZC0xMWEyMDhkMzJkOTYiLCJlbWFpbCI6InBtQGxvY2FsaG9zdCIsInJvbGUiOiJNYW5hZ2VyIiwibmJmIjoxNzg0MzU1MzkwLCJleHAiOjE3ODQzNjI1OTAsImlhdCI6MTc4NDM1NTM5MCwiaXNzIjoiTXlBcHAiLCJhdWQiOiJNeVVzZXJzIn0.mAPKS-bxvxrpcbUMo9DmonQTxvWq-7PndvJm0A9DiWE
-@invoiceId = "test"
-
+@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1laWQiOiIxOWE1OTEyOS02YzIwLTQxN2EtODM0ZC0xMWEyMDhkMzJkOTYiLCJzdWIiOiIxOWE1OTEyOS02YzIwLTQxN2EtODM0ZC0xMWEyMDhkMzJkOTYiLCJlbWFpbCI6InBtQGxvY2FsaG9zdCIsInJvbGUiOiJNYW5hZ2VyIiwibmJmIjoxNzg0NTEzOTg2LCJleHAiOjE3ODQ1MjExODYsImlhdCI6MTc4NDUxMzk4NiwiaXNzIjoiTXlBcHAiLCJhdWQiOiJNeVVzZXJzIn0.h79F-KZbiyx_qWaih0ZCELyWWpjWAjP7sQkPRwIgHWo
 ### Get OpenAPI document
 
 GET https://localhost:7007/openapi/v1.json
@@ -37,22 +36,26 @@ Authorization: Bearer {{token}}
 Content-Type: application/json
 
 {
-  "name": "Ahmed Mohamed",
-  "phoneNumber": "+201012445268",
-  "email": "MoamenHussien012@gmail.com",
+  "name": "Moamen",
+  "phoneNumber": "+201012443368",
+  "email": "MoamenHussien25@gmail.com",
   "vehicles": [
     {
       "modelId": "11111111-1111-1111-1111-222222222222",
-      "year": 2023,
-      "licensePlate": "ABC-1238"
+      "year": 2026,
+      "licensePlate": "ABC-1232"
     },
     {
       "modelId": "11111111-1111-1111-1111-222222222223",
-      "year": 2024,
+      "year": 2021,
       "licensePlate": "XYZ-5634"
     }
   ]
 }
+### Post New customer
+
+
+
 
 ### Get all customers
 GET {{baseUrl}}/api/v1/customers

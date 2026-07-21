@@ -7,9 +7,9 @@ public class UpdateLaborPermissionsRequest
     public List<Claim> Claims { get;  set; } =null!;
 }
 
-public class UpdateLaborPermissionsCommandValidator : AbstractValidator<UpdateLaborPermissionsRequest>
+public class UpdateLaborPermissionsCommandValidatorContract : AbstractValidator<UpdateLaborPermissionsRequest>
 {
-    public UpdateLaborPermissionsCommandValidator()
+    public UpdateLaborPermissionsCommandValidatorContract()
     {
         RuleForEach(n=>n.Roles).Must(n=> n.Count() > 0).WithMessage("At least one role is required");
         RuleForEach(x => x.Roles).IsInEnum().WithMessage("Role must be a valid enum value");

@@ -135,7 +135,7 @@ public sealed class WorkOrdersController(ISender sender, IOutputCacheStore outpu
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> ReAssignLabor([FromRoute] Guid workOrderId, [FromBody] AssignLaborRequest request, CancellationToken ct)
     {
-        var command = new ReAssignLaborCommand(workOrderId, request.LaborId.ToGuid().Value);
+        var command = new ReAssignLaborCommand(workOrderId, request.LaborId);
 
         var result = await sender.Send(command, ct);
 

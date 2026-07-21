@@ -10,6 +10,15 @@ namespace MechanicShop.Application.UnitTests.Mappers;
 
 public class WorkOrderMapperTests
 {
+    private static VehicleModel CreateVehicleModelWithMake()
+    {
+        var make = VehicleMakeFactory.CreateVehicleMake(Make: "Toyota").Value;
+        var model = VehicleModelFactory.CreateVehiclModel(
+            model: "Corolla",
+            vehicleMake: make).Value;
+        return model;
+    }
+
     private static WorkOrder CreateWorkOrder(
         decimal laborCost = 100m,
         decimal partCost = 50m,
@@ -17,7 +26,10 @@ public class WorkOrderMapperTests
         string repairTaskName = "Brake Inspection",
         bool withInvoice = false)
     {
-        var customer = CustomerFactory.CreateCustomer().Value;
+        var vehicleModel = CreateVehicleModelWithMake();
+
+        var customer = CustomerFactory.CreateCustomer(
+            vehicles: [VehicleFactory.CreateVehicle(vehicleModel: vehicleModel).Value]).Value;
         var labor = EmployeeFactory.CreateEmployee().Value;
         var vehicle = customer.vehicles.First();
 

@@ -30,7 +30,11 @@ public class RefreshTokenTests
    [Fact]
    public void CreateRefreshToken_ShouldGenerateId_WhenIdIsEmpty()
    {
-      var result = RefreshTokenFactory.CreateRefreshToken(id: Guid.Empty);
+      var result = RefreshToken.Create(
+            id : Guid.Empty,
+            token : "sometoken",
+            userid : Guid.NewGuid(),
+            ExpirationOnUtc : DateTime.UtcNow.AddDays(7));
 
       Assert.True(result.IsSuccess);
       Assert.NotEqual(Guid.Empty, result.Value.Id);
@@ -44,8 +48,13 @@ public class RefreshTokenTests
    public void CreateRefreshToken_ShouldFail_WhenTokenIsInvalid(string? tokenValue)
    {
       // Act
-      var result = RefreshTokenFactory.CreateRefreshToken(token: tokenValue);
+      var result = RefreshToken.Create(
+            id : Guid.Empty,
+            token : tokenValue!,
+            userid : Guid.NewGuid(),
+            ExpirationOnUtc : DateTime.UtcNow.AddDays(7));      
       // Assert
+
       Assert.True(result.IsError);
       Assert.Equal(RefreshTokenErrors.TokenRequired.Code, result.TopError.Code);
    }
@@ -54,7 +63,12 @@ public class RefreshTokenTests
    public void CreateRefreshToken_ShouldFail_WhenEnterInvalidUserId()
    {
       // Act
-      var result = RefreshTokenFactory.CreateRefreshToken(userId: Guid.Empty);
+       var result = RefreshToken.Create(
+            id : Guid.Empty,
+            token : "sometoken",
+            userid : Guid.Empty,
+            ExpirationOnUtc : DateTime.UtcNow.AddDays(7));
+
       // Assert
       Assert.True(result.IsError);
       Assert.Equal(RefreshTokenErrors.UserIdRequired.Code, result.TopError.Code);

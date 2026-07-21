@@ -33,7 +33,7 @@ public class EmployeeTests
     public void CreateEmployee_ShouldSucceed_WithEmptyId()
     {
         // Act
-        var result = EmployeeFactory.CreateEmployee(id: Guid.Empty);
+        var result = Employee.Create(id :Guid.Empty,FirstName : "John",LastName :"Doe");
 
         // Assert
         Assert.True(result.IsSuccess);
@@ -48,7 +48,8 @@ public class EmployeeTests
     public void CreateEmployee_ShouldFail_WithInvalidFirstName(string? value)
     {
         // Act
-        var result = EmployeeFactory.CreateEmployee(firstName: value);
+        var result = Employee.Create(id :Guid.Empty,FirstName : value!,LastName :"Doe");
+
 
         // Assert
         Assert.True(result.IsError);
@@ -63,7 +64,7 @@ public class EmployeeTests
     public void CreateEmployee_ShouldFail_WithInvalidLastName(string? value)
     {
         // Act
-        var result = EmployeeFactory.CreateEmployee(lastName: value);
+         var result = Employee.Create(id :Guid.Empty,FirstName : "John",LastName :value!);
 
         // Assert
         Assert.True(result.IsError);

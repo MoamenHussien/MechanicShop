@@ -19,6 +19,7 @@ public static class ApplicationErrors
     public static readonly Error NotFoundAnyRepairTasks = Error.NotFound("Not Found Any Repair Tasks", "The Repair Tasks Not Found");
     public static readonly Error SomeRepairTaskIdsNotfound = Error.NotFound("Some RepairTaskIds not found", "Not found Some RepairTaskIds");
     public static readonly Error NotFoundThisVehicleInfo = Error.NotFound("Not Found This Vehicle Info", "This Vehicle Not Found");
+    public static readonly Error NotFoundTheVehicleModel = Error.NotFound("The Vehicle Model Not Found", "Vehicle Model Not Found");
     public static readonly Error RangeTimeIsAlreadyTakenByAnotherWorkOrderAtThisSpot = Error.Conflict("This time range is already booked by another Work Order At This Spot", "Time range conflict");
     public static readonly Error VehicleSchedulingConflict = Error.Conflict("Vehicle_Overlapping_WorkOrder", "The vehicle already has an overlapping WorkOrder.");
     public static readonly Error ThisLaborHasAnotherWorkOrderAtThisRangeTime = Error.Conflict("The labor is already occupied during the requested time", "Labor not available at this time range");

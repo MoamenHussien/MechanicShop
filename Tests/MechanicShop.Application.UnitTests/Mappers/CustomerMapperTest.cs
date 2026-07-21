@@ -3,16 +3,27 @@ using Xunit;
 
 public class CustomerMapperTests
 {
+    private static VehicleModel CreateVehicleModelWithMake()
+    {
+        var make = VehicleMakeFactory.CreateVehicleMake(Make: "Toyota").Value;
+        var model = VehicleModelFactory.CreateVehiclModel(
+            model: "Corolla",
+            vehicleMake: make).Value;
+        return model;
+    }
+
     [Fact]
     public void SingleToDto_WhenCustomerIsValid_ShouldMapAllProperties()
     {
         // Arrange
+        var vehicleModel = CreateVehicleModelWithMake();
+
         var sourceCustomer = CustomerFactory.CreateCustomer(
             Guid.NewGuid(),
             "Moamen",
             "+201014245762",
             "MoamenHussien25@gmail.com",
-            [VehicleFactory.CreateVehicle().Value]).Value;
+            [VehicleFactory.CreateVehicle(vehicleModel: vehicleModel).Value]).Value;
 
         // Act
         var customerDto = sourceCustomer.ToDto();
@@ -33,8 +44,12 @@ public class CustomerMapperTests
     public void GroupToDto_WhenCustomersAreValid_ShouldMapAllCustomers()
     {
         // Arrange
-        var firstCustomer = CustomerFactory.CreateCustomer().Value;
-        var secondCustomer = CustomerFactory.CreateCustomer().Value;
+        var vehicleModel = CreateVehicleModelWithMake();
+
+        var firstCustomer = CustomerFactory.CreateCustomer(
+            vehicles: [VehicleFactory.CreateVehicle(vehicleModel: vehicleModel).Value]).Value;
+        var secondCustomer = CustomerFactory.CreateCustomer(
+            vehicles: [VehicleFactory.CreateVehicle(vehicleModel: vehicleModel).Value]).Value;
 
         List<Customer> sourceCustomers =
         [
@@ -51,4 +66,4 @@ public class CustomerMapperTests
         Assert.Contains(customerDtos, dto => dto.CustomerId == firstCustomer.Id);
         Assert.Contains(customerDtos, dto => dto.CustomerId == secondCustomer.Id);
     }
-}
+}

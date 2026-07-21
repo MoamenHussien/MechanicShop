@@ -94,7 +94,7 @@ public class PerformanceBehaviourTests
             LogLevel.Warning,
             Arg.Any<EventId>(),
             Arg.Is<object>(state =>
-                state!.ToString()!.Contains("Long Running Request") &&
+                state!.ToString()!.Contains("Long running request") &&
                 state.ToString()!.Contains(nameof(TestRequest)) &&
                 state.ToString()!.Contains(currentUserId.ToString()) &&
                 state.ToString()!.Contains(currentUserName)),
@@ -137,7 +137,7 @@ public class PerformanceBehaviourTests
             LogLevel.Warning,
             Arg.Any<EventId>(),
             Arg.Is<object>(state =>
-                state!.ToString()!.Contains("Long Running Request") &&
+                state!.ToString()!.Contains("Long running request") &&
                 state.ToString()!.Contains(nameof(TestRequest))),
             null,
             Arg.Any<Func<object, Exception?, string>>());
@@ -181,7 +181,7 @@ public class PerformanceBehaviourTests
             LogLevel.Warning,
             Arg.Any<EventId>(),
             Arg.Is<object>(state =>
-                state!.ToString()!.Contains("Long Running Request") &&
+                state!.ToString()!.Contains("Long running request") &&
                 state.ToString()!.Contains(nameof(TestRequest))),
             null,
             Arg.Any<Func<object, Exception?, string>>());

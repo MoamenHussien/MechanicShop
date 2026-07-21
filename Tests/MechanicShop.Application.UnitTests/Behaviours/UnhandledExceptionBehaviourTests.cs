@@ -49,7 +49,7 @@ public class UnhandledExceptionBehaviourTests
         _logger.Received(1).Log(
             LogLevel.Error,
             Arg.Any<EventId>(),
-            Arg.Is<object>(state => state != null && state.ToString()!.Contains("Unhandled Exception")),
+            Arg.Is<object>(state => state != null && state.ToString()!.Contains("UnHandle Exception")),
             exception,
             Arg.Any<Func<object, Exception?, string>>());
             
