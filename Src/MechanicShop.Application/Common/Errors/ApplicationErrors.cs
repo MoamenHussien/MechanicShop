@@ -12,7 +12,7 @@ public static class ApplicationErrors
     public static readonly Error CustomerExists = Error.Conflict("Customer_Email_Exists", "A customer with this email already exists");
     public static readonly Error InvalidAccessToken = Error.Unauthorized("Auth.ExpiredAccessToken.Invalid", "Expired access token is not valid.");
     public static readonly Error UserIdClaimInvalid = Error.Conflict(code: "Auth.UserIdClaim.Invalid", "Invalid userId claim.");
-    public static readonly Error RefreshTokenExpired = Error.Unauthorized("Auth.RefreshToken.Expired", "Refresh token is invalid or has expired.");
+    public static readonly Error RefreshTokenExpiredOrInvalid = Error.Unauthorized("Auth.RefreshToken.Expired", "Refresh token is invalid or has expired.");
     public static readonly Error NotFoundAnyLabors = Error.NotFound("Not Found Any Of Labors", "Labors Is Empty");
     public static readonly Error NotFoundTheLabor = Error.NotFound("Not Found The Labor", "Labor Is Not Found");
     public static readonly Error NotFoundThisRepairTaskId = Error.NotFound("Not Found Any Repair Task With This Id", "The Repair Task Not Found");

@@ -71,6 +71,11 @@ public class IdentityService(IHttpContextAccessor httpContextAccessor, UserManag
         return userinfo.Id;
     }
 
+    public void DeleteRefreshTokenCookie()
+    {
+        httpContextAccessor.HttpContext?.Response.Cookies.Delete("RefreshToken");
+    }
+
     public async Task<Result<Success>> DeleteUserAsync(Guid userid)
     {
         var result = await user.FindByIdAsync(userid.ToString());
@@ -101,14 +106,14 @@ public class IdentityService(IHttpContextAccessor httpContextAccessor, UserManag
 
         if (httpContext is null)
         {
-            return Error.Failure("Infrastructure.HttpContext.Unavailable","HttpContext is not available.");
+            return Error.Failure("Infrastructure.HttpContext.Unavailable", "HttpContext is not available.");
         }
 
         var refreshToken = httpContext.Request.Cookies["RefreshToken"];
 
         if (string.IsNullOrWhiteSpace(refreshToken))
         {
-            return Error.Unauthorized("Auth.RefreshToken.Missing","Refresh token cookie is missing.");
+            return Error.Unauthorized("Auth.RefreshToken.Missing", "Refresh token cookie is missing.");
         }
 
         return refreshToken;

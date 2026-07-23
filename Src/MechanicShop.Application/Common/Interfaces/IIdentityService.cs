@@ -11,4 +11,6 @@ public interface IIdentityService
     Task<Result<bool>> UpdateUserPermissionsAsync(Guid userid, IList<string> roles, IList<Claim> claims,CancellationToken ct);
     Task<Result<Success>> DeleteUserAsync(Guid userid);
     Result<string> GetRefreshTokenFromCookies();
+    void DeleteRefreshTokenCookie();
+
 }

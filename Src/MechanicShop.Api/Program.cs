@@ -1,4 +1,5 @@
 using MechanicShop.Client;
+using MechanicShop.Api.Components;
 using Scalar.AspNetCore;
 
 using Serilog;
@@ -50,13 +51,13 @@ app.UseCoreMiddlewares(builder.Configuration);
 
 app.MapCoreEndpoints(); // { Health Cheack , Map Controller }dotn
 
-// app.UseAntiforgery();
+app.UseAntiforgery();
 
-// app.MapStaticAssets();
+app.MapStaticAssets();
 
-// app.MapRazorComponents<App>().AllowAnonymous()
-//     .AddInteractiveWebAssemblyRenderMode()
-//     .AddAdditionalAssemblies(typeof(MechanicShop.Client._Imports).Assembly);
+app.MapRazorComponents<App>().AllowAnonymous()
+    .AddInteractiveWebAssemblyRenderMode()
+    .AddAdditionalAssemblies(typeof(MechanicShop.Client._Imports).Assembly);
 
 app.MapHub<WorkOrderHub>("/hubs/workorders");
 

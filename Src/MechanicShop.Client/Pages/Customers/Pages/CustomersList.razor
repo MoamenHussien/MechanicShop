@@ -1,0 +1,719 @@
+@page "/customers"
+@using MechanicShop.Client.Models
+@attribute [Authorize]
+
+<div class="container-fluid py-4">
+    <!-- Header Section -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="h3 mb-1 text-body-emphasis">
+                <i class="bi bi-people me-2"></i>Customers
+            </h1>
+            <p class="text-muted mb-0">Manage customers and their vehicles</p>
+        </div>
+        <button class="btn btn-primary btn-lg" @onclick="ShowCreateModal">
+            <i class="bi bi-plus-lg me-1"></i>
+            New Customer
+        </button>
+    </div>
+
+    <!-- Search and Filter -->
+    <div class="card border mb-4">
+        <div class="card-body">
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <div class="input-group">
+                        <span class="input-group-text bg-transparent border-end-0">
+                            <i class="bi bi-search text-muted"></i>
+                        </span>
+                        <input type="text" class="form-control border-start-0 ps-0" placeholder="Search customers..."
+                               @bind="searchTerm" @oninput="OnSearchChanged">
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <select class="form-select" @bind="sortBy" @bind:after="ApplyFilters">
+                        <option value="name">Sort by Name</option>
+                        <option value="email">Sort by Email</option>
+                        <option value="phone">Sort by Phone</option>
+                        <option value="vehicles">Sort by Vehicle Count</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <div class="btn-group w-100" role="group">
+                        <input type="radio" class="btn-check" id="asc" @onchange="() => SetSortDirection(true)"
+                               checked="@sortAscending">
+                        <label class="btn btn-outline-secondary" for="asc">
+                            <i class="bi bi-sort-up"></i>
+                        </label>
+                        <input type="radio" class="btn-check" id="desc" @onchange="() => SetSortDirection(false)"
+                               checked="@(!sortAscending)">
+                        <label class="btn btn-outline-secondary" for="desc">
+                            <i class="bi bi-sort-down"></i>
+                        </label>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Customers List -->
+    <div class="row g-4">
+        @if (filteredCustomers.Any())
+        {
+            @foreach (var customer in filteredCustomers)
+            {
+                <div class="col-xl-4 col-lg-6">
+                    <div class="card border-0 shadow-sm bg-body-secondary h-100 customer-card">
+                        <div
+                            class="card-header bg-transparent border-bottom-0 d-flex justify-content-between align-items-start">
+                            <div class="flex-grow-1">
+                                <h5 class="card-title mb-1 text-truncate">@customer.Name</h5>
+                                <div class="d-flex align-items-center text-muted small">
+                                    <i class="bi bi-envelope me-1"></i>
+                                    @customer.Email
+                                </div>
+                            </div>
+                            <div class="dropdown">
+                                <button class="btn btn-link text-muted p-1" data-bs-toggle="dropdown">
+                                    <i class="bi bi-three-dots-vertical"></i>
+                                </button>
+                                <ul class="dropdown-menu dropdown-menu-end">
+                                    <li>
+                                        <a class="dropdown-item" href="#" @onclick="() => ShowEditModal(customer)"
+                                           @onclick:preventDefault="true">
+                                            <i class="bi bi-pencil me-2"></i>Edit
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <hr class="dropdown-divider">
+                                    </li>
+                                    <li>
+                                        <a class="dropdown-item text-danger" href="#" @onclick="() => ShowDeleteModal(customer)"
+                                           @onclick:preventDefault="true">
+                                            <i class="bi bi-trash me-2"></i>Delete
+                                        </a>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="card-body pt-0">
+                            <div class="row g-3 mb-3">
+                                <div class="col-12">
+                                    <div class="d-flex align-items-center">
+                                        <i class="bi bi-phone me-2 text-muted"></i>
+                                        <span>@customer.PhoneNumber</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="border-top pt-3">
+                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                    <span class="text-muted small">Vehicles (@customer.Vehicles.Count)</span>
+                                    <span class="badge bg-secondary">@customer.Vehicles.Count</span>
+                                </div>
+
+                                @if (customer.Vehicles.Any())
+                                {
+                                    <div class="vehicles-preview">
+                                        @foreach (var vehicle in customer.Vehicles.Take(3))
+                                        {
+                                            <div class="d-flex justify-content-between align-items-center py-1">
+                                                <span class="text-truncate small">@vehicle.Year @vehicle.Make @vehicle.Model</span>
+                                                <span class="text-muted small">@vehicle.LicensePlate</span>
+                                            </div>
+                                        }
+                                        @if (customer.Vehicles.Count > 3)
+                                        {
+                                            <div class="text-muted small text-center mt-1">
+                                                +@(customer.Vehicles.Count - 3) more vehicles
+                                            </div>
+                                        }
+                                    </div>
+                                }
+                                else
+                                {
+                                    <div class="text-muted small text-center py-2">No vehicles added</div>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        }
+        else
+        {
+            <div class="col-12">
+                <div class="text-center py-5">
+                    <div class="mb-3">
+                        <i class="bi bi-search display-1 text-muted opacity-50"></i>
+                    </div>
+                    <h4 class="text-muted">No customers found</h4>
+                    <p class="text-muted">@(string.IsNullOrEmpty(searchTerm) ? "Start by creating your first customer." :
+                             "Try adjusting your search criteria.")</p>
+                        @if (string.IsNullOrEmpty(searchTerm))
+                        {
+                            <button class="btn btn-primary" @onclick="ShowCreateModal">
+                                <i class="bi bi-plus-lg me-1"></i>Create Customer
+                            </button>
+                        }
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+
+    <TemplatedDialog Show="_showDialog" OnClose="HideDialog" Title="_dialogTitle">
+        @if (!isEditMode)
+        {
+            <EditForm Model="newCustomerRequest" OnValidSubmit="SaveCustomer">
+                <ObjectGraphDataAnnotationsValidator />
+                <div class="row g-3">
+                    <div class="col-12">
+                        <label class="form-label">Customer Name <span class="text-danger">*</span></label>
+                        <InputText class="form-control" @bind-Value="newCustomerRequest.Name" />
+                        <ValidationMessage For="@(() => newCustomerRequest.Name)" class="text-danger small" />
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">Phone Number <span class="text-danger">*</span></label>
+                        <InputText class="form-control" @bind-Value="newCustomerRequest.PhoneNumber" />
+                        <ValidationMessage For="@(() => newCustomerRequest.PhoneNumber)" class="text-danger small" />
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">Email <span class="text-danger">*</span></label>
+                        <InputText class="form-control" @bind-Value="newCustomerRequest.Email" type="email" />
+                        <ValidationMessage For="@(() => newCustomerRequest.Email)" class="text-danger small" />
+                    </div>
+                </div>
+
+                <div class="border-top pt-4 mt-4">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h6 class="mb-0">Vehicles</h6>
+                        <button type="button" class="btn btn-outline-primary btn-sm" @onclick="AddVehicle">
+                            <i class="bi bi-plus me-1"></i>Add Vehicle
+                        </button>
+                    </div>
+
+                    @if (newCustomerRequest.Vehicles.Any())
+                    {
+                        <div class="row g-3 mb-2">
+                            <div class="col-md-3">
+                                <label class="form-label">Make</label>
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label">Model</label>
+                            </div>
+                            <div class="col-md-2">
+                                <label class="form-label">Year</label>
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label">License Plate</label>
+                            </div>
+                            <div class="col-md-1">
+                            </div>
+                        </div>
+                        @for (int i = 0; i < newCustomerRequest.Vehicles.Count; i++)
+                        {
+                            var index = i;
+                            <div class="row g-3 mb-2">
+                                <div class="col-md-3">
+                                    @{
+                                        var selectedMakeId = GetMakeId(index, false);
+                                    }
+                                    <InputSelect class="form-select" Value="@selectedMakeId" ValueExpression="@(() => selectedMakeId)"
+                                                 ValueChanged="@((Guid val) => OnMakeIdSelected(index, false, val))">
+                                        <option value="@Guid.Empty">-- Select Make --</option>
+                                        @foreach (var make in _vehicleMakes.OrderBy(k => k.VehicleMake))
+                                        {
+                                            <option value="@make.MakeId">@make.VehicleMake</option>
+                                        }
+                                    </InputSelect>
+                                </div>
+                                <div class="col-md-3">
+                                    <InputSelect class="form-select" @bind-Value="newCustomerRequest.Vehicles[index].ModelId"
+                                                 disabled="@(GetMakeId(index, false) == Guid.Empty)">
+                                        <option value="@Guid.Empty">-- Select Model --</option>
+                                        @foreach (var model in GetModelsForMake(GetMakeId(index, false)).OrderBy(m => m.Model))
+                                        {
+                                            <option value="@model.Id">@model.Model</option>
+                                        }
+                                    </InputSelect>
+                                    <ValidationMessage For="@(() => newCustomerRequest.Vehicles[index].ModelId)"
+                                                       class="text-danger small" />
+                                </div>
+                                <div class="col-md-2">
+                                    <InputNumber class="form-control" @bind-Value="newCustomerRequest.Vehicles[index].Year" min="1900"
+                                                 max="@DateTime.Now.Year" />
+                                    <ValidationMessage For="@(() => newCustomerRequest.Vehicles[index].Year)"
+                                                       class="text-danger small" />
+                                </div>
+                                <div class="col-md-3">
+                                    <InputText class="form-control" @bind-Value="newCustomerRequest.Vehicles[index].LicensePlate" />
+                                    <ValidationMessage For="@(() => newCustomerRequest.Vehicles[index].LicensePlate)"
+                                                       class="text-danger small" />
+                                </div>
+                                <div class="col-md-1">
+                                    <button type="button" class="btn btn-link link-danger btn-sm" @onclick="() => RemoveVehicle(index)">
+                                        <i class="bi bi-trash"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        }
+                    }
+                </div>
+
+                <div class="modal-footer mt-3">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="bi bi-plus-lg me-1"></i>
+                        Create Customer
+                    </button>
+                    <button type="button" class="btn btn-secondary" @onclick="HideDialog">Cancel</button>
+                </div>
+            </EditForm>
+
+            @if (errorMessage != null)
+            {
+                <div class="alert alert-danger mt-3">
+                    <strong>Error:</strong> @errorMessage
+                </div>
+            }
+        }
+        else
+        {
+            <EditForm Model="updateCustomerRequest" OnValidSubmit="SaveCustomer">
+                <ObjectGraphDataAnnotationsValidator />
+                <div class="row g-3">
+                    <div class="col-12">
+                        <label class="form-label">Customer Name <span class="text-danger">*</span></label>
+                        <InputText class="form-control" @bind-Value="updateCustomerRequest.Name" />
+                        <ValidationMessage For="@(() => updateCustomerRequest.Name)" class="text-danger small" />
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">Phone Number <span class="text-danger">*</span></label>
+                        <InputText class="form-control" @bind-Value="updateCustomerRequest.PhoneNumber" />
+                        <ValidationMessage For="@(() => updateCustomerRequest.PhoneNumber)" class="text-danger small" />
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">Email <span class="text-danger">*</span></label>
+                        <InputText class="form-control" @bind-Value="updateCustomerRequest.Email" type="email" />
+                        <ValidationMessage For="@(() => updateCustomerRequest.Email)" class="text-danger small" />
+                    </div>
+                </div>
+
+                <div class="border-top pt-4 mt-4">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h6 class="mb-0">Vehicles</h6>
+                    </div>
+
+                    @if (updateCustomerRequest.Vehicles.Any())
+                    {
+                        <div class="row g-3 mb-2">
+                            <div class="col-md-3">
+                                <label class="form-label">Make</label>
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label">Model</label>
+                            </div>
+                            <div class="col-md-2">
+                                <label class="form-label">Year</label>
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label">License Plate</label>
+                            </div>
+                            <div class="col-md-1">
+                            </div>
+                        </div>
+                        @for (int i = 0; i < updateCustomerRequest.Vehicles.Count; i++)
+                        {
+                            var index = i;
+                            <div class="row g-3 mb-2">
+                                <div class="col-md-3">
+                                    @{
+                                        var selectedMakeId = GetMakeId(index, true);
+                                    }
+                                    <InputSelect class="form-select" Value="@selectedMakeId" ValueExpression="@(() => selectedMakeId)"
+                                                 ValueChanged="@((Guid val) => OnMakeIdSelected(index, true, val))">
+                                        <option value="@Guid.Empty">-- Select Make --</option>
+                                        @foreach (var make in _vehicleMakes.OrderBy(k => k.VehicleMake))
+                                        {
+                                            <option value="@make.MakeId">@make.VehicleMake</option>
+                                        }
+                                    </InputSelect>
+                                </div>
+                                <div class="col-md-3">
+                                    <InputSelect class="form-select" @bind-Value="updateCustomerRequest.Vehicles[index].ModelId"
+                                                 disabled="@(GetMakeId(index, true) == Guid.Empty)">
+                                        <option value="@Guid.Empty">-- Select Model --</option>
+                                        @foreach (var model in GetModelsForMake(GetMakeId(index, true)).OrderBy(m => m.Model))
+                                        {
+                                            <option value="@model.Id">@model.Model</option>
+                                        }
+                                    </InputSelect>
+                                    <ValidationMessage For="@(() => updateCustomerRequest.Vehicles[index].ModelId)"
+                                                       class="text-danger small" />
+                                </div>
+                                <div class="col-md-2">
+                                    <InputNumber class="form-control" @bind-Value="updateCustomerRequest.Vehicles[index].Year"
+                                                 min="1900" max="@DateTime.Now.Year" />
+                                    <ValidationMessage For="@(() => updateCustomerRequest.Vehicles[index].Year)"
+                                                       class="text-danger small" />
+                                </div>
+                                <div class="col-md-3">
+                                    <InputText class="form-control" @bind-Value="updateCustomerRequest.Vehicles[index].LicensePlate" />
+                                    <ValidationMessage For="@(() => updateCustomerRequest.Vehicles[index].LicensePlate)"
+                                                       class="text-danger small" />
+                                </div>
+                                <div class="col-md-1">
+                                    <button type="button" class="btn btn-link link-danger btn-sm" @onclick="() => RemoveVehicle(index)">
+                                        <i class="bi bi-trash"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        }
+                    }
+                    <button type="button" class="btn btn-outline-primary btn-sm" @onclick="AddVehicle">
+                        <i class="bi bi-plus me-1"></i>Add Vehicle
+                    </button>
+                </div>
+
+                <div class="modal-footer mt-3 d-flex gap-2 mt-3 pt-2">
+                    <button type="submit" class="btn btn-primary me-1">
+                        <i class="bi bi-check-lg me-1"></i>
+                        Update Customer
+                    </button>
+                    <button type="button" class="btn btn-secondary me-1" @onclick="HideDialog">Cancel</button>
+                </div>
+            </EditForm>
+
+            @if (errorMessage != null)
+            {
+                <div class="alert alert-danger mt-3">
+                    <strong>Error:</strong> @errorMessage
+                </div>
+            }
+        }
+    </TemplatedDialog>
+
+@code {
+    [Inject] private ServiceApi serviceApi { get; set; } = default!;
+    [Inject] private IJSRuntime JSRuntime { get; set; } = default!;
+
+    private List<VehicleMakeResponse> _vehicleMakes = [];
+    private Dictionary<Guid, List<VehicleModelResponse>> _modelsByMakeCache = new();
+    private List<Guid> _newVehicleMakeIds = [];
+    private List<Guid> _updateVehicleMakeIds = [];
+
+    private List<CustomerModel> customers = new();
+    private List<CustomerModel> filteredCustomers = new();
+
+    private CreateCustomerRequest newCustomerRequest = new();
+    private UpdateCustomerRequest updateCustomerRequest = new();
+
+    private bool isEditMode = false;
+    private Guid editingCustomerId;
+    private string searchTerm = "";
+    private string sortBy = "name";
+    private bool sortAscending = true;
+
+    private bool _showDialog = false;
+    private RenderFragment? _dialogTitle;
+
+    private string? errorMessage;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadCustomers();
+        await LoadVehicleMakes();
+        ApplyFilters();
+    }
+
+    private async Task LoadCustomers()
+    {
+        var customerResult = await serviceApi.GetCustomersAsync();
+
+        if (customerResult.IsSuccess)
+        {
+            customers = customerResult.Data!;
+        }
+    }
+
+    private async Task LoadVehicleMakes()
+    {
+        var makesResult = await serviceApi.GetVehicleMakesAsync();
+        if (makesResult.IsSuccess)
+        {
+            _vehicleMakes = makesResult.Data!;
+        }
+    }
+
+    private List<VehicleModelResponse> GetModelsForMake(Guid makeId)
+    {
+        return _modelsByMakeCache.TryGetValue(makeId, out var list) ? list : [];
+    }
+
+    private async Task EnsureModelsLoadedAsync(Guid makeId)
+    {
+        if (makeId != Guid.Empty && !_modelsByMakeCache.ContainsKey(makeId))
+        {
+            var result = await serviceApi.GetVehicleModelsByMakeIdAsync(makeId);
+            if (result.IsSuccess)
+            {
+                _modelsByMakeCache[makeId] = result.Data!;
+            }
+        }
+    }
+
+    private Guid GetMakeId(int index, bool isEdit)
+    {
+        var list = isEdit ? _updateVehicleMakeIds : _newVehicleMakeIds;
+        return (index >= 0 && index < list.Count) ? list[index] : Guid.Empty;
+    }
+
+    private async Task OnMakeIdSelected(int index, bool isEdit, Guid makeId)
+    {
+        var list = isEdit ? _updateVehicleMakeIds : _newVehicleMakeIds;
+        if (index >= 0 && index < list.Count)
+        {
+            list[index] = makeId;
+        }
+
+        if (isEdit)
+        {
+            if (index >= 0 && index < updateCustomerRequest.Vehicles.Count)
+            {
+                updateCustomerRequest.Vehicles[index].ModelId = Guid.Empty;
+            }
+        }
+        else
+        {
+            if (index >= 0 && index < newCustomerRequest.Vehicles.Count)
+            {
+                newCustomerRequest.Vehicles[index].ModelId = Guid.Empty;
+            }
+        }
+
+        await EnsureModelsLoadedAsync(makeId);
+    }
+
+    private void OnSearchChanged(ChangeEventArgs e)
+    {
+        searchTerm = e.Value?.ToString() ?? "";
+        ApplyFilters();
+    }
+
+    private void SetSortDirection(bool ascending)
+    {
+        sortAscending = ascending;
+        ApplyFilters();
+    }
+
+    private void ApplyFilters()
+    {
+        var filtered = customers.AsEnumerable();
+
+        if (!string.IsNullOrEmpty(searchTerm))
+        {
+            filtered = filtered.Where(c =>
+                c.Name!.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ||
+                c.Email!.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ||
+                c.PhoneNumber!.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ||
+                c.Vehicles.Any(v => v.Make.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ||
+                               v.Model.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ||
+                               v.LicensePlate.Contains(searchTerm, StringComparison.OrdinalIgnoreCase)));
+        }
+
+        filtered = sortBy switch
+        {
+            "email" => sortAscending ? filtered.OrderBy(c => c.Email) : filtered.OrderByDescending(c => c.Email),
+            "phone" => sortAscending ? filtered.OrderBy(c => c.PhoneNumber) : filtered.OrderByDescending(c => c.PhoneNumber),
+            "vehicles" => sortAscending ? filtered.OrderBy(c => c.Vehicles.Count) : filtered.OrderByDescending(c =>
+c.Vehicles.Count),
+            _ => sortAscending ? filtered.OrderBy(c => c.Name) : filtered.OrderByDescending(c => c.Name)
+        };
+
+        filteredCustomers = filtered.ToList();
+    }
+
+    private void ShowCreateModal()
+    {
+        isEditMode = false;
+        errorMessage = null;
+        newCustomerRequest = new();
+        _newVehicleMakeIds.Clear();
+        AddVehicle();
+        _dialogTitle = builder => builder.AddContent(0, "Create New Customer");
+        _showDialog = true;
+    }
+
+    private async Task ShowEditModal(CustomerModel customer)
+    {
+        isEditMode = true;
+        errorMessage = null;
+        editingCustomerId = customer.CustomerId;
+        _updateVehicleMakeIds.Clear();
+
+        var updateVehicles = new List<UpdateVehicleRequest>();
+        foreach (var v in customer.Vehicles)
+        {
+            var make = _vehicleMakes.FirstOrDefault(m => string.Equals(m.VehicleMake, v.Make, StringComparison.OrdinalIgnoreCase));
+            Guid makeId = make?.MakeId ?? Guid.Empty;
+            Guid modelId = Guid.Empty;
+
+            if (makeId != Guid.Empty)
+            {
+                await EnsureModelsLoadedAsync(makeId);
+                var models = GetModelsForMake(makeId);
+                var model = models.FirstOrDefault(m => string.Equals(m.Model, v.Model, StringComparison.OrdinalIgnoreCase));
+                if (model != null)
+                {
+                    modelId = model.Id;
+                }
+            }
+
+            _updateVehicleMakeIds.Add(makeId);
+            updateVehicles.Add(new UpdateVehicleRequest
+            {
+                VehicleId = v.Id,
+                ModelId = modelId,
+                Year = v.Year,
+                LicensePlate = v.LicensePlate
+            });
+        }
+
+        updateCustomerRequest = new UpdateCustomerRequest
+        {
+            Name = customer.Name!,
+            Email = customer.Email!,
+            PhoneNumber = customer.PhoneNumber!,
+            Vehicles = updateVehicles
+        };
+        _dialogTitle = builder => builder.AddContent(0, "Edit Customer");
+        _showDialog = true;
+    }
+
+    private void HideDialog()
+    {
+        _showDialog = false;
+    }
+
+    private void AddVehicle()
+    {
+        if (!isEditMode)
+        {
+            newCustomerRequest.Vehicles.Add(new CreateVehicleRequest
+            {
+                ModelId = Guid.Empty,
+                Year = DateTime.Now.Year,
+                LicensePlate
+= ""
+            });
+            _newVehicleMakeIds.Add(Guid.Empty);
+        }
+        else
+        {
+            updateCustomerRequest.Vehicles.Add(new UpdateVehicleRequest
+            {
+                ModelId = Guid.Empty,
+                Year = DateTime.Now.Year,
+                LicensePlate = ""
+            });
+            _updateVehicleMakeIds.Add(Guid.Empty);
+        }
+    }
+
+    private void RemoveVehicle(int index)
+    {
+        if (!isEditMode)
+        {
+            if (index >= 0 && index < newCustomerRequest.Vehicles.Count)
+            {
+                newCustomerRequest.Vehicles.RemoveAt(index);
+                if (index < _newVehicleMakeIds.Count)
+                    _newVehicleMakeIds.RemoveAt(index);
+            }
+        }
+        else
+        {
+            if (index >= 0 && index < updateCustomerRequest.Vehicles.Count)
+            {
+                updateCustomerRequest.Vehicles.RemoveAt(index);
+                if (index < _updateVehicleMakeIds.Count)
+                    _updateVehicleMakeIds.RemoveAt(index);
+            }
+        }
+    }
+
+
+
+    private async Task SaveCustomer()
+    {
+        errorMessage = null;
+
+        if (!isEditMode)
+        {
+            var result = await serviceApi.CreateCustomerAsync(newCustomerRequest);
+            if (result.IsSuccess)
+            {
+                await LoadCustomers();
+                ApplyFilters();
+                HideDialog();
+            }
+            else
+            {
+                errorMessage = result.FirstErrorMessage ?? "Failed to create customer.";
+            }
+        }
+        else
+        {
+            var result = await serviceApi.UpdateCustomerAsync(editingCustomerId, updateCustomerRequest);
+            if (result.IsSuccess)
+            {
+                await LoadCustomers();
+                ApplyFilters();
+                HideDialog();
+            }
+            else
+            {
+                errorMessage = result.FirstErrorMessage ?? "Failed to update customer.";
+            }
+        }
+    }
+
+    private async Task ShowDeleteModal(CustomerModel customer)
+    {
+        var message = $"Delete customer?\n\n" +
+                      $"👤 Name: {customer.Name}\n" +
+                      $"📧 Email: {customer.Email}\n" +
+                      $"📞 Phone: {customer.PhoneNumber}\n" +
+                      $"🚗 Vehicles: {customer.Vehicles.Count}";
+
+        var confirmed = await JSRuntime.InvokeAsync<bool>("confirm", message);
+
+        if (confirmed)
+        {
+            var result = await serviceApi.DeleteCustomerAsync(customer.CustomerId);
+            if (result.IsSuccess)
+            {
+                await LoadCustomers();
+                ApplyFilters();
+            }
+            else
+            {
+                await JSRuntime.InvokeVoidAsync("alert", "Failed to delete customer.");
+            }
+        }
+    }
+
+    private async Task DeleteCustomer(Guid customerId)
+    {
+        var result = await serviceApi.DeleteCustomerAsync(customerId);
+        if (result.IsSuccess)
+        {
+            await LoadCustomers();
+            ApplyFilters();
+        }
+        else
+        {
+            await JSRuntime.InvokeVoidAsync("alert", "Failed to delete customer.");
+        }
+    }
+}

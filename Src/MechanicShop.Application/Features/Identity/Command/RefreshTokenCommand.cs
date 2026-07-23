@@ -48,7 +48,7 @@ public class RefreshTokenCommandHandler(ILogger<RefreshTokenCommandHandler> logg
 
         if (RefreshToken.IsError)
         {
-            logger.LogWarning("Failed to get refresh token from cookies. Error: {ErrorCode}",RefreshToken.TopError);
+            logger.LogWarning("Failed to get refresh token from cookies. Error: {ErrorCode}", RefreshToken.TopError);
             return RefreshToken.Errors;
         }
 
@@ -57,7 +57,7 @@ public class RefreshTokenCommandHandler(ILogger<RefreshTokenCommandHandler> logg
         if (refreshToken is null || refreshToken.IsExpired())
         {
             logger.LogWarning("The Refresh Token Is Expired");
-            return ApplicationErrors.RefreshTokenExpired;
+            return ApplicationErrors.RefreshTokenExpiredOrInvalid;
         }
 
         var UserInfo = await identity.GetUserByIdAsync(UserId);

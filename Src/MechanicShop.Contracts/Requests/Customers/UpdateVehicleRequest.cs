@@ -1,13 +1,10 @@
-﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations;
 
 namespace MechanicShop.Contracts.Requests.Customers;
 
 public class UpdateVehicleRequest
 {
     public Guid? VehicleId { get; set; }
-
-    // [Required(ErrorMessage = "Make is required.")]
-    // public string Make { get; set; } = string.Empty;
 
     [Required(ErrorMessage = "Model is required.")]
     public Guid ModelId { get; set; } = Guid.Empty;
