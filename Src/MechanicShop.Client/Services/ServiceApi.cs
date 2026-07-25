@@ -5,6 +5,7 @@ using System.Text.Json;
 using MechanicShop.Client.Extensions;
 using MechanicShop.Client.Models;
 using MechanicShop.Contracts.Requests.Customers;
+using MechanicShop.Contracts.Requests.Labors;
 using MechanicShop.Contracts.Requests.RepairTasks;
 using MechanicShop.Contracts.Requests.WorkOrders;
 using MechanicShop.Contracts.Responses;
@@ -751,7 +752,7 @@ public class ServiceApi(IHttpClientFactory httpClientFactory, TimeZoneService ti
     }
 
     // Vehicle Makes and Models methods
-    public async Task<ApiResult<List<VehicleMakeResponse>>> GetVehicleMakesAsync()
+    public async Task<ApiResult<List<VehicleMakeModel>>> GetVehicleMakesAsync()
     {
         try
         {
@@ -759,19 +760,25 @@ public class ServiceApi(IHttpClientFactory httpClientFactory, TimeZoneService ti
 
             if (response.IsSuccessStatusCode)
             {
-                var makes = await response.Content.ReadFromJsonAsync<List<VehicleMakeResponse>>();
-                return ApiResult<List<VehicleMakeResponse>>.Success(makes ?? []);
+                var dtos = await response.Content.ReadFromJsonAsync<List<VehicleMakeResponseDto>>();
+                var models = dtos?.Select(dto => new VehicleMakeModel
+                {
+                    MakeId = dto.MakeId,
+                    VehicleMake = dto.VehicleMake
+                }).ToList() ?? [];
+
+                return ApiResult<List<VehicleMakeModel>>.Success(models);
             }
 
-            return await HandleErrorResponseAsync<List<VehicleMakeResponse>>(response);
+            return await HandleErrorResponseAsync<List<VehicleMakeModel>>(response);
         }
         catch (Exception ex)
         {
-            return await HandleExceptionAsync<List<VehicleMakeResponse>>(ex, "Failed to retrieve vehicle makes");
+            return await HandleExceptionAsync<List<VehicleMakeModel>>(ex, "Failed to retrieve vehicle makes");
         }
     }
 
-    public async Task<ApiResult<List<VehicleModelResponse>>> GetVehicleModelsByMakeIdAsync(Guid makeId)
+    public async Task<ApiResult<List<VehicleModelItemModel>>> GetVehicleModelsByMakeIdAsync(Guid makeId)
     {
         try
         {
@@ -779,15 +786,221 @@ public class ServiceApi(IHttpClientFactory httpClientFactory, TimeZoneService ti
 
             if (response.IsSuccessStatusCode)
             {
-                var models = await response.Content.ReadFromJsonAsync<List<VehicleModelResponse>>();
-                return ApiResult<List<VehicleModelResponse>>.Success(models ?? []);
+                var dtos = await response.Content.ReadFromJsonAsync<List<VehicleModelResponseDto>>();
+                var models = dtos?.Select(dto => new VehicleModelItemModel
+                {
+                    ModelId = dto.Id,
+                    Model = dto.Model
+                }).ToList() ?? [];
+
+                return ApiResult<List<VehicleModelItemModel>>.Success(models);
             }
 
-            return await HandleErrorResponseAsync<List<VehicleModelResponse>>(response);
+            return await HandleErrorResponseAsync<List<VehicleModelItemModel>>(response);
         }
         catch (Exception ex)
         {
-            return await HandleExceptionAsync<List<VehicleModelResponse>>(ex, $"Failed to retrieve vehicle models for make {makeId}");
+            return await HandleExceptionAsync<List<VehicleModelItemModel>>(ex, $"Failed to retrieve vehicle models for make {makeId}");
+        }
+    }
+
+    private record VehicleMakeResponseDto(Guid MakeId, string VehicleMake);
+    private record VehicleModelResponseDto(Guid Id, string Model);
+
+    public async Task<ApiResult<Guid>> CreateVehicleMakeAsync(string make, List<string> models)
+    {
+        try
+        {
+            var request = new CreateMakeRequest
+            {
+                Make = make,
+                Models = models.Select(m => new CreateModelRequest { Model = m }).ToList()
+            };
+
+            var response = await _httpClient.PostAsJsonAsync("api/v1/makes", request);
+
+            if (response.IsSuccessStatusCode)
+            {
+                var makeId = await response.Content.ReadFromJsonAsync<Guid>();
+                return ApiResult<Guid>.Success(makeId);
+            }
+
+            return await HandleErrorResponseAsync<Guid>(response);
+        }
+        catch (Exception ex)
+        {
+            return await HandleExceptionAsync<Guid>(ex, "Failed to create vehicle make");
+        }
+    }
+
+    public async Task<ApiResult<bool>> UpdateVehicleMakeAsync(Guid makeId, string make, List<VehicleModelItemModel> models)
+    {
+        try
+        {
+            var request = new UpdateMakeRequest
+            {
+                Make = make,
+                Models = models.Select(m => new UpdateModelRequest { ModelId = m.ModelId, Model = m.Model }).ToList()
+            };
+
+            var response = await _httpClient.PutAsJsonAsync($"api/v1/makes/{makeId}", request);
+
+            if (response.IsSuccessStatusCode)
+            {
+                return ApiResult<bool>.Success(true);
+            }
+
+            return await HandleErrorResponseAsync<bool>(response);
+        }
+        catch (Exception ex)
+        {
+            return await HandleExceptionAsync<bool>(ex, $"Failed to update vehicle make {makeId}");
+        }
+    }
+
+    public async Task<ApiResult<bool>> UpdateUserPasswordAsync(UpdateLaborPasswordRequest request)
+    {
+        try
+        {
+            var response = await _httpClient.PutAsJsonAsync("api/v1/labors/update-password", request);
+
+            if (response.IsSuccessStatusCode)
+            {
+                return ApiResult<bool>.Success(true);
+            }
+
+            return await HandleErrorResponseAsync<bool>(response);
+        }
+        catch (Exception ex)
+        {
+            return await HandleExceptionAsync<bool>(ex, "Failed to update password");
+        }
+    }
+
+    public async Task<ApiResult<Guid>> CreateLaborAsync(RegisterLaborRequestContract request)
+    {
+        try
+        {
+            var response = await _httpClient.PostAsJsonAsync("api/v1/labors", request);
+
+            if (response.IsSuccessStatusCode)
+            {
+                var id = await response.Content.ReadFromJsonAsync<Guid>();
+                return ApiResult<Guid>.Success(id);
+            }
+
+            return await HandleErrorResponseAsync<Guid>(response);
+        }
+        catch (Exception ex)
+        {
+            return await HandleExceptionAsync<Guid>(ex, "Failed to create labor");
+        }
+    }
+
+    public async Task<ApiResult<bool>> UpdateLaborInfoAsync(Guid laborId, UpdateLaborInfoRequest request)
+    {
+        try
+        {
+            var response = await _httpClient.PutAsJsonAsync($"api/v1/labors/{laborId}/info", request);
+
+            if (response.IsSuccessStatusCode)
+            {
+                return ApiResult<bool>.Success(true);
+            }
+
+            return await HandleErrorResponseAsync<bool>(response);
+        }
+        catch (Exception ex)
+        {
+            return await HandleExceptionAsync<bool>(ex, $"Failed to update info for labor {laborId}");
+        }
+    }
+
+    public async Task<ApiResult<bool>> UpdateLaborPermissionsAsync(Guid laborId, UpdateLaborPermissionsRequest request)
+    {
+        try
+        {
+            var response = await _httpClient.PutAsJsonAsync($"api/v1/labors/{laborId}/permissions", request);
+
+            if (response.IsSuccessStatusCode)
+            {
+                return ApiResult<bool>.Success(true);
+            }
+
+            return await HandleErrorResponseAsync<bool>(response);
+        }
+        catch (Exception ex)
+        {
+            return await HandleExceptionAsync<bool>(ex, $"Failed to update permissions for labor {laborId}");
+        }
+    }
+
+    public async Task<ApiResult<bool>> ResetLaborPasswordAsync(Guid laborId)
+    {
+        try
+        {
+            var response = await _httpClient.PostAsync($"api/v1/labors/{laborId}/reset-password", null);
+
+            if (response.IsSuccessStatusCode)
+            {
+                return ApiResult<bool>.Success(true);
+            }
+
+            return await HandleErrorResponseAsync<bool>(response);
+        }
+        catch (Exception ex)
+        {
+            return await HandleExceptionAsync<bool>(ex, $"Failed to reset password for labor {laborId}");
+        }
+    }
+
+    public async Task<ApiResult<List<string>>> GetAssignableRolesAsync()
+    {
+        try
+        {
+            var response = await _httpClient.GetAsync("identity/assignable-roles");
+
+            if (response.IsSuccessStatusCode)
+            {
+                var roles = await response.Content.ReadFromJsonAsync<List<string>>();
+                return ApiResult<List<string>>.Success(roles ?? []);
+            }
+
+            return await HandleErrorResponseAsync<List<string>>(response);
+        }
+        catch (Exception ex)
+        {
+            return await HandleExceptionAsync<List<string>>(ex, "Failed to retrieve assignable roles");
+        }
+    }
+
+    public async Task<ApiResult<List<EmployeeModel>>> GetEmployeesAsync()
+    {
+        try
+        {
+            var response = await _httpClient.GetAsync("api/v1/labors/details");
+
+            if (response.IsSuccessStatusCode)
+            {
+                var dtos = await response.Content.ReadFromJsonAsync<List<EmployeeDetailDto>>();
+                var models = dtos?.Select(dto => new EmployeeModel
+                {
+                    LaborId = dto.Id,
+                    FirstName = dto.FirstName,
+                    LastName = dto.LastName,
+                    Email = dto.Email,
+                    Roles = dto.Roles ?? [],
+                    IsActive = dto.IsActive
+                }).ToList() ?? [];
+
+                return ApiResult<List<EmployeeModel>>.Success(models);
+            }
+
+            return await HandleErrorResponseAsync<List<EmployeeModel>>(response);
+        }
+        catch (Exception ex)
+        {
+            return await HandleExceptionAsync<List<EmployeeModel>>(ex, "Failed to retrieve employee details");
         }
     }
 }

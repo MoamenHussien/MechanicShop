@@ -1,5 +1,7 @@
 using Asp.Versioning;
+using MechanicShop.Application.Features.Labors.Queries;
 using MechanicShop.Contracts.Requests.Labors;
+using MechanicShop.Contracts.Responses;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -25,6 +27,21 @@ public sealed class LaborsController(ISender sender, IOutputCacheStore outputCac
     public async Task<IActionResult> Get(CancellationToken ct)
     {
         var result = await sender.Send(new GetLaborsQuery(), ct);
+
+        return result.Match(success => Ok(success), Problem);
+    }
+
+    [HttpGet("details")]
+    [Authorize(Roles = nameof(Role.Manager))]
+    [ProducesResponseType(typeof(List<EmployeeDetailDto>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status401Unauthorized)]
+    [EndpointSummary("Retrieves detailed information for all employees.")]
+    [EndpointDescription("Returns complete employee details including name, email, roles, and status. Accessible only to Managers.")]
+    [EndpointName("GetEmployeeDetails")]
+    [MapToApiVersion("1.0")]
+    public async Task<IActionResult> GetEmployeeDetails(CancellationToken ct)
+    {
+        var result = await sender.Send(new GetEmployeeDetailsQuery(), ct);
 
         return result.Match(success => Ok(success), Problem);
     }

@@ -234,7 +234,7 @@
                                         <option value="@Guid.Empty">-- Select Model --</option>
                                         @foreach (var model in GetModelsForMake(GetMakeId(index, false)).OrderBy(m => m.Model))
                                         {
-                                            <option value="@model.Id">@model.Model</option>
+                                            <option value="@model.ModelId">@model.Model</option>
                                         }
                                     </InputSelect>
                                     <ValidationMessage For="@(() => newCustomerRequest.Vehicles[index].ModelId)"
@@ -345,7 +345,7 @@
                                         <option value="@Guid.Empty">-- Select Model --</option>
                                         @foreach (var model in GetModelsForMake(GetMakeId(index, true)).OrderBy(m => m.Model))
                                         {
-                                            <option value="@model.Id">@model.Model</option>
+                                            <option value="@model.ModelId">@model.Model</option>
                                         }
                                     </InputSelect>
                                     <ValidationMessage For="@(() => updateCustomerRequest.Vehicles[index].ModelId)"
@@ -397,8 +397,8 @@
     [Inject] private ServiceApi serviceApi { get; set; } = default!;
     [Inject] private IJSRuntime JSRuntime { get; set; } = default!;
 
-    private List<VehicleMakeResponse> _vehicleMakes = [];
-    private Dictionary<Guid, List<VehicleModelResponse>> _modelsByMakeCache = new();
+    private List<VehicleMakeModel> _vehicleMakes = [];
+    private Dictionary<Guid, List<VehicleModelItemModel>> _modelsByMakeCache = new();
     private List<Guid> _newVehicleMakeIds = [];
     private List<Guid> _updateVehicleMakeIds = [];
 
@@ -445,7 +445,7 @@
         }
     }
 
-    private List<VehicleModelResponse> GetModelsForMake(Guid makeId)
+    private List<VehicleModelItemModel> GetModelsForMake(Guid makeId)
     {
         return _modelsByMakeCache.TryGetValue(makeId, out var list) ? list : [];
     }
@@ -565,7 +565,7 @@ c.Vehicles.Count),
                 var model = models.FirstOrDefault(m => string.Equals(m.Model, v.Model, StringComparison.OrdinalIgnoreCase));
                 if (model != null)
                 {
-                    modelId = model.Id;
+                    modelId = model.ModelId ?? Guid.Empty;
                 }
             }
 

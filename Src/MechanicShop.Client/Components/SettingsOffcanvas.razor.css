@@ -1,0 +1,14 @@
+.offcanvas-backdrop {
+    background-color: rgba(0, 0, 0, 0.6);
+    z-index: 1040;
+}
+
+.offcanvas {
+    z-index: 1050;
+    box-shadow: -5px 0 25px rgba(0, 0, 0, 0.5);
+    transition: transform 0.3s ease-in-out;
+}
+
+.font-weight-bold {
+    font-weight: 600;
+}

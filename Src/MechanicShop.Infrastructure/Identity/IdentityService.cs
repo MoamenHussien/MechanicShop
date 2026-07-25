@@ -1,5 +1,6 @@
 using System.Data.Common;
 using System.Security.Claims;
+using MechanicShop.Application.Features.Labors.DTOs;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -270,6 +271,61 @@ public class IdentityService(IHttpContextAccessor httpContextAccessor, UserManag
             logger.LogError(ex, "Failed to update roles and claims for user {UserId}", userId);
 
             return Error.Failure("Identity.UpdateUserInfo", "An unexpected error occurred while updating the user.");
+        }
+    }
+
+    public async Task<Result<List<EmployeeDetailDto>>> GetEmployeeDetailsAsync(CancellationToken ct)
+    {
+        try
+        {
+            var employees = await (
+                from employee in context.Employees
+                join appUser in context.Users on employee.Id equals appUser.Id
+                select new
+                {
+                    appUser.Id,
+                    appUser.Email,
+                    employee.FirstName,
+                    employee.LastName,
+                    employee.IsActive
+                })
+                .ToListAsync(ct);
+
+            var rolesLookup = await (
+                from userRole in context.UserRoles
+                join role in context.Roles on userRole.RoleId equals role.Id
+                select new
+                {
+                    userRole.UserId,
+                    RoleName = role.Name!
+                })
+                .GroupBy(x => x.UserId)
+                .ToDictionaryAsync(
+                    g => g.Key,
+                    g => g.Select(x => x.RoleName).ToList(),
+                    ct);
+
+            var result = employees
+                .Select(employee =>
+                {
+                    var roles = rolesLookup.GetValueOrDefault(employee.Id, []);
+
+                    return new EmployeeDetailDto(
+                        employee.Id,
+                        employee.FirstName,
+                        employee.LastName,
+                        employee.Email!,
+                        roles,
+                        employee.IsActive);
+                })
+                .ToList();
+
+            return result;
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "Failed to retrieve employee details");
+            return Error.Failure("Identity.GetEmployeeDetails", "An unexpected error occurred while retrieving employee details.");
         }
     }
 }

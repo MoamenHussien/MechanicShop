@@ -1,4 +1,4 @@
-﻿@using Microsoft.AspNetCore.Components.Authorization
+@using Microsoft.AspNetCore.Components.Authorization
 @inherits LayoutComponentBase
 
 <div>
@@ -59,10 +59,15 @@
                     <AuthorizeView>
                         <Authorized>
                             <span class="badge text-light p-2 border rounded">
-                                <span class="bi bi-lock me-3" aria-hidden="true" style="vertical-align:middle"></span>
-                                @context.User.Identity?.Name.
+                                <span class="bi bi-lock me-2" aria-hidden="true" style="vertical-align:middle"></span>
+                                @context.User.Identity?.Name
+                                <span class="mx-2 opacity-50">|</span>
+                                <button type="button" class="btn btn-link p-0 text-light text-decoration-none border-0 bg-transparent me-1 ms-1" @onclick="OpenSettings">
+                                    <i class="bi bi-gear me-1"></i>Settings
+                                </button>
+                                <span class="mx-1 opacity-50">|</span>
                                 <a href="logout"
-                                    class="link-body-emphasis link-offset-2 link-underline-opacity-25 link-underline-opacity-75-hover">
+                                    class="link-body-emphasis link-offset-2 link-underline-opacity-25 link-underline-opacity-75-hover ms-1">
                                     Logout</a>
                             </span>
                         </Authorized>
@@ -85,6 +90,15 @@
         </div>
     </main>
 </div>
+
+<SettingsOffcanvas Show="@isSettingsOpen" OnClose="CloseSettings" />
+
+@code {
+    private bool isSettingsOpen = false;
+
+    private void OpenSettings() => isSettingsOpen = true;
+    private void CloseSettings() => isSettingsOpen = false;
+}
 
 <script>
     window.downloadFileFromBase64 = (fileName, base64) => {
