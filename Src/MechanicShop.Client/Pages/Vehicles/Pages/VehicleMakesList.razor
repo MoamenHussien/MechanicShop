@@ -55,7 +55,7 @@
         <div class="card border-0 shadow-sm">
             <div class="table-responsive">
                 <table class="table table-hover align-middle mb-0">
-                    <thead class="table-light">
+                    <thead class="table-dark">
                         <tr>
                             <th scope="col" class="ps-4">Make Name</th>
                             <th scope="col" class="text-end pe-4">Actions</th>
@@ -65,7 +65,7 @@
                         @foreach (var make in makes)
                         {
                             <tr>
-                                <td class="ps-4 fw-semibold text-dark">
+                                <td class="ps-4 fw-semibold vehicle-make-name">
                                     <i class="bi bi-tag-fill me-2 text-primary opacity-75"></i>@make.VehicleMake
                                 </td>
                                 <td class="text-end pe-4">
@@ -131,11 +131,8 @@
                     {
                         var index = i;
                         <div class="input-group input-group-sm">
-                            <span class="input-group-text bg-light text-secondary">#(index + 1)</span>
+                            <span class="input-group-text bg-light text-secondary">#@(index + 1)</span>
                             <input type="text" class="form-control" placeholder="Model Name (e.g. Camry, F-150)" @bind="formModels[index].Model" disabled="@isSubmitting" />
-                            <button type="button" class="btn btn-outline-danger" @onclick="() => RemoveModelRow(index)" disabled="@isSubmitting">
-                                <i class="bi bi-trash"></i>
-                            </button>
                         </div>
                     }
                 </div>
@@ -263,14 +260,6 @@
     private void AddModelRow()
     {
         formModels.Add(new VehicleModelItemModel());
-    }
-
-    private void RemoveModelRow(int index)
-    {
-        if (index >= 0 && index < formModels.Count)
-        {
-            formModels.RemoveAt(index);
-        }
     }
 
     private async Task SaveMakeAsync()
