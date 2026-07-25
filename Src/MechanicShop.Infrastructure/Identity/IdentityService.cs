@@ -93,6 +93,21 @@ public class IdentityService(IHttpContextAccessor httpContextAccessor, UserManag
         return Result.Success;
     }
 
+    public async Task<Result<List<string>>> GetAllRolesAsync(CancellationToken ct = default)
+    {
+        var roles = await context.Roles
+            .Where(r => r.Name != null && r.Name != Role.Manager.ToString())
+            .Select(r => r.Name!)
+            .ToListAsync(ct);
+            
+        if (roles.Count == 0)
+        {
+            return Error.NotFound("Roles_Not_Found", "Roles not found");
+        }
+
+        return roles;
+    }
+
     public async Task<Result<HashSet<Guid>>> GetIdsOfUsersByRoleTypeAsync(Role role)
     {
         var users = await user.GetUsersInRoleAsync(role.ToString());
@@ -155,6 +170,49 @@ public class IdentityService(IHttpContextAccessor httpContextAccessor, UserManag
         return await user.IsInRoleAsync(userInfo, role);
     }
 
+    public async Task<Result<Success>> ResetUserPasswordAsync(Guid userId)
+    {
+        var userInfo = await user.FindByIdAsync(userId.ToString());
+        if (userInfo is null)
+        {
+            return Error.NotFound("User_Not_Found", "User not found.");
+        }
+
+        if (string.IsNullOrWhiteSpace(userInfo.Email) || userInfo.Email.Length < 6)
+        {
+            return Error.Validation("Invalid_Email_Length", "User email must be at least 6 characters long to be used as a password.");
+        }
+
+        var token = await user.GeneratePasswordResetTokenAsync(userInfo);
+        var newPassword = userInfo.Email;
+
+        var resetResult = await user.ResetPasswordAsync(userInfo, token, newPassword);
+        if (!resetResult.Succeeded)
+        {
+            var errors = string.Join(", ", resetResult.Errors.Select(e => e.Description));
+            return Error.Failure("Password_Reset_Failed", errors);
+        }
+
+        return Result.Success;
+    }
+
+    public async Task<Result<Success>> UpdateUserPasswordAsync(Guid userid, string newPassword, string currentPassword, CancellationToken ct)
+    {
+        var userInfo = await user.FindByIdAsync(userid.ToString());
+        if (userInfo is null)
+        {
+            return Error.NotFound("User_Not_Found", "User not found.");
+        }
+
+        var changeResult = await user.ChangePasswordAsync(userInfo, currentPassword, newPassword);
+        if (!changeResult.Succeeded)
+        {
+            var errors = string.Join(", ", changeResult.Errors.Select(x => x.Description));
+            return Error.Conflict("Password_Change_Failed", errors);
+        }
+
+        return Result.Success;
+    }
 
     public async Task<Result<bool>> UpdateUserPermissionsAsync(Guid userId, IList<string> roles, IList<Claim> claims, CancellationToken ct)
     {

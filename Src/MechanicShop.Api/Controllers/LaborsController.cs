@@ -1,4 +1,5 @@
 using Asp.Versioning;
+using MechanicShop.Contracts.Requests.Labors;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -91,4 +92,36 @@ public sealed class LaborsController(ISender sender, IOutputCacheStore outputCac
 
         return result.Match(_ => NoContent(), Problem);
     }
+
+    [HttpPost("{laborid:guid}/reset-password")]
+    [Authorize(Roles = nameof(Role.Manager))]
+    [ProducesResponseType(typeof(Success), StatusCodes.Status204NoContent)]
+    [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
+    [EndpointSummary("Resets the password of a specific labor.")]
+    [EndpointDescription("Resets the password for the labor with the specified ID to its email address. Accessible only to Managers.")]
+    [EndpointName("ResetLaborPassword")]
+    [MapToApiVersion("1.0")]
+    public async Task<IActionResult> ResetLaborPassword([FromRoute] Guid laborid, CancellationToken ct)
+    {
+        var result = await sender.Send(new ResetLaborPasswordCommand(laborid), ct);
+
+        return result.Match(_ => NoContent(), Problem);
+    }
+
+    [HttpPut("update-password")]
+    [Authorize(Roles = $"{nameof(Role.Manager)},{nameof(Role.Labor)}")]
+    [ProducesResponseType(typeof(Success), StatusCodes.Status204NoContent)]
+    [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
+    [EndpointSummary("Updates the password of a specific user.")]
+    [EndpointDescription("Updates the password of the user. Accessible only to Managers and Labors.")]
+    [EndpointName("UpdateUserPassword")]
+    [MapToApiVersion("1.0")]
+    public async Task<IActionResult> UpdateUserPassword([FromBody] UpdateLaborPasswordRequest request, CancellationToken ct)
+    {
+        var result = await sender.Send(new UpdateLaborPasswordCommand(request.NewPassword, request.CurrentPassword), ct);
+
+        return result.Match(_ => NoContent(), Problem);
+    }
+
+
 }
