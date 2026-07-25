@@ -1,81 +1,74 @@
 @using Microsoft.AspNetCore.Components.Authorization
 @inherits LayoutComponentBase
 
-<div>
-    <header class="border-bottom">
-        <div class="navbar navbar-dark bg-success-subtle shadow-sm">
-            <div class="container">
-                <a href="#" class="navbar-brand d-flex align-items-center">
+<div class="app-wrapper">
+    <header class="app-header-outer py-2">
+        <div class="container-fluid max-header-width px-3">
+            <div class="app-header-card px-3 px-md-4 py-2">
+                <!-- LEFT: Logo & Brand -->
+                <div class="header-left d-flex align-items-center">
+                    <a href="#" class="brand-link d-flex align-items-center text-decoration-none me-3">
+                        <svg fill="#ff574A" width="44" height="44px" viewBox="0 0 15 15" xmlns="http://www.w3.org/2000/svg" id="car-repair">
+                            <path d="M12.6,8.7,11.5,6.5a1.05,1.05,0,0,0-.9-.5H4.4a1.05,1.05,0,0,0-.9.5L2.4,8.7,1.16,9.852a.5.5,0,0,0-.16.367V14.5a.5.5,0,0,0,.5.5h2c.2,0,.5-.2.5-.4V14h7v.5c0,.2.2.5.4.5h2.1a.5.5,0,0,0,.5-.5V10.219a.5.5,0,0,0-.16-.367ZM4.5,7h6l1,2h-8ZM5,11.6c0,.2-.3.4-.5.4H2.4c-.2,0-.4-.3-.4-.5V10.4c.1-.3.3-.5.6-.4l2,.4c.2,0,.4.3.4.5Zm8-.1c0,.2-.2.5-.4.5H10.5c-.2,0-.5-.2-.5-.4v-.7c0-.2.2-.5.4-.5l2-.4c.3-.1.5.1.6.4ZM14,2V3a1.009,1.009,0,0,1-1.017,1H5.348A2.549,2.549,0,0,1,1,3.5H3.5v-2H1A2.549,2.549,0,0,1,5.348,1h7.635A1.009,1.009,0,0,1,14,2Z" />
+                        </svg>
+                        <div class="d-flex flex-column ms-2 me-3 me-md-4">
+                            <div class="brand-title lh-1">
+                                <span class="text-white fw-bold brand-name">Mechanic</span><span class="brand-red fw-bold brand-name">Shop</span>
+                            </div>
+                            <span class="brand-subtitle">SMART REPAIR SOLUTIONS</span>
+                        </div>
+                    </a>
+                    <div class="brand-divider d-none d-md-block me-3"></div>
+                </div>
 
-                    <?xml version="1.0" encoding="UTF-8" ?>
-                    <svg fill="#ff574A" width="48" height="48px" viewBox="0 0 15 15" xmlns="http://www.w3.org/2000/svg"
-                        id="car-repair">
-                        <path
-                            d="M12.6,8.7,11.5,6.5a1.05,1.05,0,0,0-.9-.5H4.4a1.05,1.05,0,0,0-.9.5L2.4,8.7,1.16,9.852a.5.5,0,0,0-.16.367V14.5a.5.5,0,0,0,.5.5h2c.2,0,.5-.2.5-.4V14h7v.5c0,.2.2.5.4.5h2.1a.5.5,0,0,0,.5-.5V10.219a.5.5,0,0,0-.16-.367ZM4.5,7h6l1,2h-8ZM5,11.6c0,.2-.3.4-.5.4H2.4c-.2,0-.4-.3-.4-.5V10.4c.1-.3.3-.5.6-.4l2,.4c.2,0,.4.3.4.5Zm8-.1c0,.2-.2.5-.4.5H10.5c-.2,0-.5-.2-.5-.4v-.7c0-.2.2-.5.4-.5l2-.4c.3-.1.5.1.6.4ZM14,2V3a1.009,1.009,0,0,1-1.017,1H5.348A2.549,2.549,0,0,1,1,3.5H3.5v-2H1A2.549,2.549,0,0,1,5.348,1h7.635A1.009,1.009,0,0,1,14,2Z" />
-                    </svg>
-                    <strong class="ms-3 fs-5">
-                        <span style="color: lightcyan;">M</span>
-                        <span style="color: orange;">e</span>
-                        <span style="color: yellow;">c</span>
-                        <span style="color: green;">h</span>
-                        <span style="color: lightblue;">a</span>
-                        <span style="color: lightcoral;">n</span>
-                        <span style="color: violet;">i</span>
-                        <span style="color: brown;">c</span>
-                        <span style="color: teal;"> </span>
-                        <span style="color: crimson;">S</span>
-                        <span style="color: red;">h</span>
-                        <span style="color: limegreen;">o</span>
-                        <span style="color: lightpink;">P</span>
-                    </strong>
-                </a>
-                <nav class="nav col-12 col-lg-auto my-2 justify-content-around my-md-0 text-small">
+                <!-- CENTER: Navigation Menu -->
+                <nav class="header-center nav d-flex align-items-center justify-content-center gap-3">
                     <AuthorizeView>
                         <Authorized>
-                            <NavLink href="customers"
-                                class="main-menu-item nav-link text-white d-flex flex-column justify-content-center align-items-center text-center"
-                                style="width: 120px;" Match="NavLinkMatch.All">
-                                <span class="bi bi-people nav-menu" aria-hidden="true"></span> Customers
+                            <NavLink href="customers" class="nav-item-stacked d-flex flex-column align-items-center text-decoration-none" Match="NavLinkMatch.All">
+                                <i class="bi bi-people nav-icon"></i>
+                                <span class="nav-text">Customers</span>
                             </NavLink>
-                            <NavLink href="repair-tasks"
-                                class="main-menu-item nav-link text-white d-flex flex-column justify-content-center align-items-center text-center"
-                                style="width: 120px;" Match="NavLinkMatch.All">
-                                <span class="bi bi-tools nav-menu" aria-hidden="true"></span> Services
+                            <NavLink href="repair-tasks" class="nav-item-stacked d-flex flex-column align-items-center text-decoration-none" Match="NavLinkMatch.All">
+                                <i class="bi bi-tools nav-icon"></i>
+                                <span class="nav-text">Services</span>
                             </NavLink>
-                            <NavLink href="workorders"
-                                class="main-menu-item nav-link text-white d-flex flex-column justify-content-center align-items-center text-center"
-                                style="width: 120px;" Match="NavLinkMatch.All">
-                                <span class="bi bi-clock nav-menu" aria-hidden="true"></span> WorkOrder
+                            <NavLink href="workorders" class="nav-item-stacked d-flex flex-column align-items-center text-decoration-none" Match="NavLinkMatch.All">
+                                <i class="bi bi-card-checklist nav-icon"></i>
+                                <span class="nav-text">WorkOrder</span>
                             </NavLink>
-                            <NavLink href="schedules"
-                                class="main-menu-item nav-link text-white d-flex flex-column justify-content-center align-items-center text-center"
-                                style="width: 120px;" Match="NavLinkMatch.All">
-                                <span class="bi bi-calendar4-week nav-menu" aria-hidden="true"></span> Schedules
+                            <NavLink href="schedules" class="nav-item-stacked d-flex flex-column align-items-center text-decoration-none" Match="NavLinkMatch.All">
+                                <i class="bi bi-calendar-event nav-icon"></i>
+                                <span class="nav-text">Schedules</span>
                             </NavLink>
                         </Authorized>
                     </AuthorizeView>
                 </nav>
-                <div>
+
+                <!-- RIGHT: User Profile & Actions -->
+                <div class="header-right d-flex align-items-center gap-2 justify-content-end">
                     <AuthorizeView>
                         <Authorized>
-                            <span class="badge text-light p-2 border rounded">
-                                <span class="bi bi-lock me-2" aria-hidden="true" style="vertical-align:middle"></span>
-                                @context.User.Identity?.Name
-                                <span class="mx-2 opacity-50">|</span>
-                                <button type="button" class="btn btn-link p-0 text-light text-decoration-none border-0 bg-transparent me-1 ms-1" @onclick="OpenSettings">
-                                    <i class="bi bi-gear me-1"></i>Settings
-                                </button>
-                                <span class="mx-1 opacity-50">|</span>
-                                <a href="logout"
-                                    class="link-body-emphasis link-offset-2 link-underline-opacity-25 link-underline-opacity-75-hover ms-1">
-                                    Logout</a>
-                            </span>
+                            <div class="profile-card d-flex align-items-center px-3 py-1.5 me-1">
+                                <div class="avatar-circle d-flex align-items-center justify-content-center me-2">
+                                    <i class="bi bi-person-fill text-white"></i>
+                                </div>
+                                <div class="d-flex flex-column text-start justify-content-center">
+                                    <span class="user-name text-white fw-semibold lh-sm">@context.User.Identity?.Name</span>
+                                    <span class="user-role text-secondary extra-small lh-sm mt-0.5">Manager</span>
+                                </div>
+                            </div>
+                            <button type="button" class="header-icon-btn d-flex align-items-center justify-content-center" @onclick="OpenSettings" title="Settings">
+                                <i class="bi bi-gear text-light"></i>
+                            </button>
+                            <a href="logout" class="header-icon-btn btn-logout d-flex align-items-center justify-content-center text-decoration-none" title="Logout">
+                                <i class="bi bi-box-arrow-right brand-red"></i>
+                            </a>
                         </Authorized>
                         <NotAuthorized>
-                            <a href="login"
-                                class="link-body-emphasis link-offset-2 link-underline-opacity-25 link-underline-opacity-75-hover">
-                                <span class="bi bi-unlock me-3" aria-hidden="true" style="vertical-align:middle"></span>
-                                Login
+                            <a href="login" class="btn btn-outline-light btn-sm d-flex align-items-center gap-2">
+                                <i class="bi bi-unlock"></i>
+                                <span>Login</span>
                             </a>
                         </NotAuthorized>
                     </AuthorizeView>
@@ -85,7 +78,7 @@
     </header>
 
     <main>
-        <div class="container mt-4">
+        <div class="container-fluid max-header-width mt-4 px-3">
             @Body
         </div>
     </main>
