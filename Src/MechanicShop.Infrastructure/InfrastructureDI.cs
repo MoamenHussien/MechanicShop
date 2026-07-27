@@ -12,6 +12,8 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Caching.Hybrid;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
+using MechanicShop.Application.Common.Interfaces;
+using MechanicShop.Infrastructure.Caching;
 using MechanicShop.Infrastructure.HealthChecks;
 
 public static class InfrastructureDI
@@ -31,6 +33,7 @@ public static class InfrastructureDI
         services.AddScoped<INotificationService, NotificationService>();
         services.AddScoped<IWorkOrderPolicy, WorkOrderPolicy>();
         services.AddScoped<IInvoicePdfGenerator, InvoicePdfGenerator>();
+        services.AddScoped<ICacheInvalidator, CacheInvalidator>();
         services.AddHttpContextAccessor();
         QuestPDF.Settings.License = QuestPDF.Infrastructure.LicenseType.Community;
 

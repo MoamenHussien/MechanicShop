@@ -1,10 +1,11 @@
 using MediatR;
+using MechanicShop.Application.Common.Constants;
 
 public record GetAllSystemRolesQuery() : ICachedQuery<Result<List<string>>>
 {
     public string CacheKey => "SystemRoles";
 
-    public string[] Tags => ["SystemRoles"];
+    public string[] Tags => [CacheTags.SystemRoles];
 
     public TimeSpan Expiration => TimeSpan.FromMinutes(10);
 }

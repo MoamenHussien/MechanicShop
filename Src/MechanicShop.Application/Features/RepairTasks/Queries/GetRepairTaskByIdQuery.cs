@@ -3,11 +3,13 @@ using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
+using MechanicShop.Application.Common.Constants;
+
 public sealed record GetRepairTaskByIdQuery(Guid id) : ICachedQuery<Result<RepairTaskDto>>
 {
     public string CacheKey => $"RepairTask-{id}";
 
-    public string[] Tags => ["RepairTasks"];
+    public string[] Tags => [CacheTags.RepairTasks];
 
     public TimeSpan Expiration => TimeSpan.FromHours(24);
 }

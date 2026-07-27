@@ -1,4 +1,5 @@
 using Asp.Versioning;
+using MechanicShop.Application.Common.Constants;
 using MechanicShop.Contracts.Requests.RepairTasks;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
@@ -12,7 +13,7 @@ namespace MechanicShop.Api.Controllers;
 [Tags("RepairTasks")]
 [Authorize]
 [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status401Unauthorized)]
-public sealed class RepairTasksController(ISender sender, IOutputCacheStore outputCache) : ApiController
+public sealed class RepairTasksController(ISender sender) : ApiController
 {
     [HttpGet]
     [ProducesResponseType(typeof(List<RepairTaskDto>), StatusCodes.Status200OK)]
@@ -21,7 +22,7 @@ public sealed class RepairTasksController(ISender sender, IOutputCacheStore outp
     [EndpointDescription("Returns a list of all repair tasks available in the system.")]
     [EndpointName("GetRepairTasks")]
     [MapToApiVersion("1.0")]
-    [OutputCache(PolicyName = nameof(Policies.SharedAuthCache), Duration = (int)DurationInSeconds.OneDay, Tags = ["RepairTasks"])]
+    [OutputCache(PolicyName = nameof(Policies.SharedAuthCache), Duration = (int)DurationInSeconds.OneDay, Tags = [CacheTags.RepairTasks])]
     public async Task<IActionResult> Get(CancellationToken ct)
     {
         var result = await sender.Send(new GetRepairTasksQuery(), ct);
@@ -37,7 +38,7 @@ public sealed class RepairTasksController(ISender sender, IOutputCacheStore outp
     [EndpointDescription("Returns detailed information for the specified repair task if it exists.")]
     [EndpointName("GetRepairTaskById")]
     [MapToApiVersion("1.0")]
-    [OutputCache(PolicyName = nameof(Policies.SharedAuthCache), Duration = (int)DurationInSeconds.OneDay, Tags = ["RepairTasks"], VaryByRouteValueNames = ["repairTaskId"])]
+    [OutputCache(PolicyName = nameof(Policies.SharedAuthCache), Duration = (int)DurationInSeconds.OneDay, Tags = [CacheTags.RepairTasks], VaryByRouteValueNames = ["repairTaskId"])]
     public async Task<IActionResult> GetById(Guid repairTaskId, CancellationToken ct)
     {
         var result = await sender.Send(new GetRepairTaskByIdQuery(repairTaskId), ct);
@@ -67,11 +68,6 @@ public sealed class RepairTasksController(ISender sender, IOutputCacheStore outp
 
         var result = await sender.Send(command, ct);
 
-        if (result.IsSuccess)
-        {
-            await outputCache.EvictByTagAsync("RepairTasks", ct);
-        }
-
         return result.Match(success => CreatedAtAction(nameof(GetById), new { repairTaskId = success.RepairTaskId }, success), Problem);
     }
 
@@ -99,11 +95,6 @@ public sealed class RepairTasksController(ISender sender, IOutputCacheStore outp
 
         var result = await sender.Send(command, ct);
 
-        if (result.IsSuccess)
-        {
-            await outputCache.EvictByTagAsync("RepairTasks", ct);
-        }
-
         return result.Match(_ => NoContent(), Problem);
     }
 
@@ -119,11 +110,6 @@ public sealed class RepairTasksController(ISender sender, IOutputCacheStore outp
     public async Task<IActionResult> Delete(Guid repairTaskId, CancellationToken ct)
     {
         var result = await sender.Send(new DeleteRepairTaskCommand(repairTaskId), ct);
-
-        if (result.IsSuccess)
-        {
-            await outputCache.EvictByTagAsync("RepairTasks", ct);
-        }
 
         return result.Match(_ => NoContent(), Problem);
     }

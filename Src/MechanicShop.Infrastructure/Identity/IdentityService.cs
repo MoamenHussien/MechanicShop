@@ -275,57 +275,66 @@ public class IdentityService(IHttpContextAccessor httpContextAccessor, UserManag
     }
 
     public async Task<Result<List<EmployeeDetailDto>>> GetEmployeeDetailsAsync(CancellationToken ct)
+{
+    try
     {
-        try
-        {
-            var employees = await (
-                from employee in context.Employees
-                join appUser in context.Users on employee.Id equals appUser.Id
-                select new
-                {
-                    appUser.Id,
-                    appUser.Email,
-                    employee.FirstName,
-                    employee.LastName,
-                    employee.IsActive
-                })
-                .ToListAsync(ct);
-
-            var rolesLookup = await (
+        var employees = await (
+            from employee in context.Employees
+            join appUser in context.Users on employee.Id equals appUser.Id
+            where !(
                 from userRole in context.UserRoles
                 join role in context.Roles on userRole.RoleId equals role.Id
-                select new
-                {
-                    userRole.UserId,
-                    RoleName = role.Name!
-                })
-                .GroupBy(x => x.UserId)
-                .ToDictionaryAsync(
-                    g => g.Key,
-                    g => g.Select(x => x.RoleName).ToList(),
-                    ct);
+                where role.Name == Role.Manager.ToString()
+                select userRole.UserId
+            ).Contains(appUser.Id)
+            select new
+            {
+                appUser.Id,
+                appUser.Email,
+                employee.FirstName,
+                employee.LastName,
+                employee.IsActive
+            })
+            .ToListAsync(ct);
 
-            var result = employees
-                .Select(employee =>
-                {
-                    var roles = rolesLookup.GetValueOrDefault(employee.Id, []);
+        var rolesLookup = await (
+            from userRole in context.UserRoles
+            join role in context.Roles on userRole.RoleId equals role.Id
+            select new
+            {
+                userRole.UserId,
+                RoleName = role.Name!
+            })
+            .GroupBy(x => x.UserId)
+            .ToDictionaryAsync(
+                g => g.Key,
+                g => g.Select(x => x.RoleName).ToList(),
+                ct);
 
-                    return new EmployeeDetailDto(
-                        employee.Id,
-                        employee.FirstName,
-                        employee.LastName,
-                        employee.Email!,
-                        roles,
-                        employee.IsActive);
-                })
-                .ToList();
+        var result = employees
+            .Select(employee =>
+            {
+                var roles = rolesLookup.GetValueOrDefault(employee.Id, []);
 
-            return result;
-        }
-        catch (Exception ex)
-        {
-            logger.LogError(ex, "Failed to retrieve employee details");
-            return Error.Failure("Identity.GetEmployeeDetails", "An unexpected error occurred while retrieving employee details.");
-        }
+                return new EmployeeDetailDto(
+                    employee.Id,
+                    employee.FirstName,
+                    employee.LastName,
+                    employee.Email!,
+                    roles,
+                    employee.IsActive);
+            })
+            .ToList();
+
+        return result;
     }
+    catch (Exception ex)
+    {
+        logger.LogError(ex, "Failed to retrieve employee details");
+
+        return Error.Failure(
+            "Identity.GetEmployeeDetails",
+            "An unexpected error occurred while retrieving employee details.");
+    }
+}
 }

@@ -2,8 +2,9 @@ using System.Security.Claims;
 using FluentValidation;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Caching.Hybrid;
 using Microsoft.Extensions.Logging;
+using MechanicShop.Application.Common.Constants;
+using MechanicShop.Application.Common.Interfaces;
 
 public sealed record UpdateLaborInfoCommand(Guid id, string FirstName, string LastName, bool IsActive) : IRequest<Result<Updated>>;
 
@@ -18,7 +19,8 @@ public class UpdateLaborInfoCommandValidator : AbstractValidator<UpdateLaborInfo
     }
 }
 
-public class UpdateLaborInfoCommandHandler(ILogger<UpdateLaborInfoCommandHandler> logger, IAppDbContext context, HybridCache cache)
+
+public class UpdateLaborInfoCommandHandler(ILogger<UpdateLaborInfoCommandHandler> logger, IAppDbContext context, ICacheInvalidator cacheInvalidator)
 : IRequestHandler<UpdateLaborInfoCommand, Result<Updated>>
 {
     public async Task<Result<Updated>> Handle(UpdateLaborInfoCommand request, CancellationToken cancellationToken)
@@ -39,8 +41,7 @@ public class UpdateLaborInfoCommandHandler(ILogger<UpdateLaborInfoCommandHandler
         }
 
         await context.SaveChangesAsync(cancellationToken);
-        await cache.RemoveByTagAsync("Labors", cancellationToken);
-        await cache.RemoveByTagAsync("Employees", cancellationToken);
+        await cacheInvalidator.EvictByTagsAsync(cancellationToken, CacheTags.Labors);
         logger.LogInformation("The Labor Is Updated Successfully , For This ID : {id}", request.id);
 
         return Result.Updated;

@@ -1,5 +1,6 @@
 using Asp.Versioning;
 using MechanicShop.Api.Controllers;
+using MechanicShop.Application.Common.Constants;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -12,7 +13,7 @@ namespace MechanicShop.Api.Controllers;
 [Route("api/v{version:apiVersion}/makes")]
 [Tags("Vehicle Makes")] 
 [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status401Unauthorized)] 
-public class VehicleMakesController(ISender sender, IOutputCacheStore outputCache) : ApiController
+public class VehicleMakesController(ISender sender) : ApiController
 {
     [HttpGet]
     [MapToApiVersion("1.0")]
@@ -21,7 +22,7 @@ public class VehicleMakesController(ISender sender, IOutputCacheStore outputCach
     [EndpointDescription("Retrieves a complete list of all supported vehicle makes.")]
     [ProducesResponseType(typeof(List<VehicleMakeResponse>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
-    [OutputCache(PolicyName =nameof(Policies.SharedAuthCache), Duration = (int)DurationInSeconds.OneDay, Tags = ["VehicleMakes"])]
+    [OutputCache(PolicyName =nameof(Policies.SharedAuthCache), Duration = (int)DurationInSeconds.OneDay, Tags = [CacheTags.VehicleMakes])]
     public async Task<IActionResult> GetVehicleMakes(CancellationToken ct)
     {
         var result = await sender.Send(new GetVehiclesMakesQuery(), ct);
@@ -35,7 +36,7 @@ public class VehicleMakesController(ISender sender, IOutputCacheStore outputCach
     [EndpointDescription("Retrieves a list of all vehicle models associated with a specific vehicle make.")]
     [ProducesResponseType(typeof(List<VehicleModelDto>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
-    [OutputCache(PolicyName = nameof(Policies.SharedAuthCache) ,Duration =(int)DurationInSeconds.OneDay, Tags = ["VehicleMakes"], VaryByRouteValueNames = ["makeId"])]
+    [OutputCache(PolicyName = nameof(Policies.SharedAuthCache) ,Duration =(int)DurationInSeconds.OneDay, Tags = [CacheTags.VehicleMakes], VaryByRouteValueNames = ["makeId"])]
     public async Task<IActionResult> GetVehicleModelsByMakeId([FromRoute] Guid makeId, CancellationToken ct)
     {
         var result = await sender.Send(new GetVehiclesModelsByMakeIdQuery(makeId), ct);
@@ -55,10 +56,6 @@ public class VehicleMakesController(ISender sender, IOutputCacheStore outputCach
         var models = request.Models.ConvertAll(n => new CreateVehicleModelCommand(n.Model));
         var result = await sender.Send(new CreateMakeCommand(request.Make, models), ct);
         
-        if (result.IsSuccess)
-        {
-           await outputCache.EvictByTagAsync("VehicleMakes", ct);
-        }
         return result.Match(success => StatusCode(StatusCodes.Status201Created, success), Problem); 
     }
 
@@ -75,11 +72,6 @@ public class VehicleMakesController(ISender sender, IOutputCacheStore outputCach
     {
         var models = request.Models.ConvertAll(n => new UpdateModelCommand(n.ModelId, n.Model));
         var result = await sender.Send(new UpdateMakeCommand(makeId, request.Make, models), ct); 
-        
-        if (result.IsSuccess)
-        {
-           await outputCache.EvictByTagAsync("VehicleMakes", ct);
-        }
         
         return result.Match(_ => NoContent(), Problem);
     }

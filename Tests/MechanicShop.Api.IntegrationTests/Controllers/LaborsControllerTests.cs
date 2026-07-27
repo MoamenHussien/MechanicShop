@@ -1,6 +1,8 @@
 using System.Net;
 using System.Net.Http.Json;
 using MechanicShop.Api.IntegrationTests.Common;
+using MechanicShop.Application.Features.Labors.DTOs;
+using MechanicShop.Contracts.Requests.Labors;
 using MechanicShop.Tests.Common.Security;
 using Microsoft.EntityFrameworkCore;
 using Xunit;
@@ -218,5 +220,85 @@ public class LaborsControllerTests
         var response = await _client.PutAsJsonAsync($"/api/v1.0/labors/{labor!.Id}/permissions", request);
 
         Assert.Equal(HttpStatusCode.Forbidden, response.StatusCode);
+    }
+
+    // ========================================================================
+    // GET /api/v{version}/labors/details
+    // ========================================================================
+
+    [Fact]
+    public async Task GetEmployeeDetails_WithManagerRole_ShouldReturnOk()
+    {
+        var token = await _client.GenerateTokenAsync(TestUsers.Manager);
+        _client.SetAuthorizationHeader(token);
+
+        var response = await _client.GetAsync("/api/v1.0/labors/details");
+
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+
+        var details = await response.Content.ReadFromJsonAsync<List<EmployeeDetailDto>>();
+
+        Assert.NotNull(details);
+        Assert.NotEmpty(details);
+    }
+
+    [Fact]
+    public async Task GetEmployeeDetails_WithoutManagerRole_ShouldReturnForbidden()
+    {
+        var token = await _client.GenerateTokenAsync(TestUsers.Labor01);
+        _client.SetAuthorizationHeader(token);
+
+        var response = await _client.GetAsync("/api/v1.0/labors/details");
+
+        Assert.Equal(HttpStatusCode.Forbidden, response.StatusCode);
+    }
+
+    // ========================================================================
+    // PUT /api/v{version}/labors/{laborid}/reset-password
+    // ========================================================================
+
+    [Fact]
+    public async Task ResetLaborPassword_WithManagerRole_ShouldReturnNoContent()
+    {
+        var token = await _client.GenerateTokenAsync(TestUsers.Manager);
+        _client.SetAuthorizationHeader(token);
+
+        var labor = await _context.Employees.FirstOrDefaultAsync(l => l.Id == TestUsers.Labor01.Id);
+        Assert.NotNull(labor);
+
+        var response = await _client.PutAsJsonAsync<object?>($"/api/v1.0/labors/{labor!.Id}/reset-password", null);
+
+        Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
+    }
+
+    [Fact]
+    public async Task ResetLaborPassword_WithoutManagerRole_ShouldReturnForbidden()
+    {
+        var token = await _client.GenerateTokenAsync(TestUsers.Labor01);
+        _client.SetAuthorizationHeader(token);
+
+        var labor = await _context.Employees.FirstOrDefaultAsync();
+        Assert.NotNull(labor);
+
+        var response = await _client.PutAsJsonAsync<object?>($"/api/v1.0/labors/{labor!.Id}/reset-password", null);
+
+        Assert.Equal(HttpStatusCode.Forbidden, response.StatusCode);
+    }
+
+    // ========================================================================
+    // PUT /api/v{version}/labors/update-password
+    // ========================================================================
+
+    [Fact]
+    public async Task UpdateUserPassword_WithValidCredentials_ShouldReturnNoContent()
+    {
+        var token = await _client.GenerateTokenAsync(TestUsers.Labor01);
+        _client.SetAuthorizationHeader(token);
+
+        var request = new UpdateLaborPasswordRequest(TestUsers.Labor01.Email!,"NewPassword123!");
+
+        var response = await _client.PutAsJsonAsync("/api/v1.0/labors/update-password", request);
+
+        Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
     }
 }

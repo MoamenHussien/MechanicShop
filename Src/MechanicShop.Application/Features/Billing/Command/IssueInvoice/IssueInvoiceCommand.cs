@@ -5,6 +5,9 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Hybrid;
 using Microsoft.Extensions.Logging;
 
+using MechanicShop.Application.Common.Constants;
+using MechanicShop.Application.Common.Interfaces;
+
 public sealed record IssueInvoiceCommand(Guid workOrderId) : IRequest<Result<InvoiceDto>>;
 
 public sealed class IssueInvoiceCommandValidator : AbstractValidator<IssueInvoiceCommand>
@@ -15,7 +18,7 @@ public sealed class IssueInvoiceCommandValidator : AbstractValidator<IssueInvoic
     }
 }
 
-public sealed class IssueInvoiceCommandHandler(ILogger<IssueInvoiceCommand> logger,IMediator mediator , IAppDbContext context, HybridCache cache,TimeProvider time)
+public sealed class IssueInvoiceCommandHandler(ILogger<IssueInvoiceCommand> logger,IMediator mediator , IAppDbContext context, ICacheInvalidator cacheInvalidator,TimeProvider time)
 : IRequestHandler<IssueInvoiceCommand, Result<InvoiceDto>>
 {
     public async Task<Result<InvoiceDto>> Handle(IssueInvoiceCommand request, CancellationToken cancellationToken)
@@ -95,7 +98,7 @@ public sealed class IssueInvoiceCommandHandler(ILogger<IssueInvoiceCommand> logg
         await context.Invoices.AddAsync(invoice.Value, cancellationToken);
         await context.SaveChangesAsync(cancellationToken);
 
-        await cache.RemoveByTagAsync("Invoices", cancellationToken);
+        await cacheInvalidator.EvictByTagsAsync(cancellationToken, CacheTags.Invoices, CacheTags.WorkOrders);
 
         logger.LogInformation("Invoice issued successfully for WorkOrder {WorkOrderId}. Cache 'Invoices' was invalidated. InvoiceId: {InvoiceId}",request.workOrderId,invoiceID);
 

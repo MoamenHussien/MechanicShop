@@ -1,11 +1,16 @@
-﻿@implements IAsyncDisposable
+@implements IAsyncDisposable
 
-<header class="dashboard-header">
-    <p class="lead text-muted">
-        Statistics for
-        <span id="dashboardDate">@data?.Date.ToString("MMMM dd, yyyy")</span>
-    </p>
-</header>
+<div class="mb-3 row align-items-center">
+    <h3 class="col-3 border-start border-5 p-1 mb-0">
+        <i class="bi bi-speedometer2 mx-2"></i>Dashboard
+    </h3>
+    <div class="col-6">
+        <DatePickerComponent SelectedDate="_selectedDate"
+                             SelectedDateChanged="OnDashboardDateChanged" />
+    </div>
+    <div class="col-3">
+    </div>
+</div>
 
 <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 row-cols-xl-5 g-4 mb-4">
     <div class="col">
@@ -167,13 +172,40 @@
     [Inject]
     private WorkOrderHubClient _hubClient { get; set; } = default!;
 
+    [Inject]
+    private NavigationManager _navigationManager { get; set; } = default!;
+
+    [Parameter]
+    [SupplyParameterFromQuery(Name = "date")]
+    public string? QueryDate { get; set; }
+
+    private DateTime _selectedDate = DateTime.Today;
+
     private TodayWorkOrderStatsModel? data;
 
     protected override async Task OnInitializedAsync()
     {
         await _hubClient.StartAsync(RefreshDashboard);
+    }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        if (!string.IsNullOrWhiteSpace(QueryDate) && DateTime.TryParse(QueryDate, CultureInfo.InvariantCulture, out var parsedDate))
+        {
+            _selectedDate = parsedDate;
+        }
+        else
+        {
+            _selectedDate = DateTime.Today;
+        }
 
         await RefreshDashboard();
+    }
+
+    private void OnDashboardDateChanged(DateTime newDate)
+    {
+        _selectedDate = newDate;
+        _navigationManager.NavigateTo($"/?date={newDate:yyyy-MM-dd}");
     }
 
     private string FormatCurrency(decimal amount)
@@ -183,7 +215,7 @@
 
     private async Task RefreshDashboard()
     {
-        var statsData = await _serviceApi.GetTodayWorkOrderStatsAsync();
+        var statsData = await _serviceApi.GetTodayWorkOrderStatsAsync(DateOnly.FromDateTime(_selectedDate));
 
         if (statsData.IsSuccess)
         {

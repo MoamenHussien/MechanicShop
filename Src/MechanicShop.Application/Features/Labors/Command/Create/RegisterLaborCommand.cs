@@ -1,9 +1,9 @@
 using System.Security.Claims;
 using FluentValidation;
 using MediatR;
-using Microsoft.EntityFrameworkCore.ChangeTracking;
-using Microsoft.Extensions.Caching.Hybrid;
 using Microsoft.Extensions.Logging;
+using MechanicShop.Application.Common.Constants;
+using MechanicShop.Application.Common.Interfaces;
 
 public sealed record RegisterLaborCommand(string email, string password, string FirstName, string LastName, List<string> Roles, List<Claim> Claims) : IRequest<Result<Guid>>;
 
@@ -20,7 +20,7 @@ public class RegisterLaborCommandValidator : AbstractValidator<RegisterLaborComm
     }
 }
 
-public class RegisterLaborCommandHandler(ILogger<RegisterLaborCommandHandler> logger, IAppDbContext context, IIdentityService identity, HybridCache cache)
+public class RegisterLaborCommandHandler(ILogger<RegisterLaborCommandHandler> logger, IAppDbContext context, IIdentityService identity, ICacheInvalidator cacheInvalidator)
 : IRequestHandler<RegisterLaborCommand, Result<Guid>>
 {
     public async Task<Result<Guid>> Handle(RegisterLaborCommand request, CancellationToken cancellationToken)
@@ -56,8 +56,7 @@ public class RegisterLaborCommandHandler(ILogger<RegisterLaborCommandHandler> lo
         await context.Employees.AddAsync(employee.Value, cancellationToken);
         await context.SaveChangesAsync(cancellationToken);
 
-        await cache.RemoveByTagAsync("Labors", cancellationToken);
-        await cache.RemoveByTagAsync("Employees", cancellationToken);
+        await cacheInvalidator.EvictByTagAsync(CacheTags.Users, cancellationToken);
 
         logger.LogInformation("Employee and User created successfully , With Same Id : {UserId}, Email: {Email}", UserId.Value, request.email);
 

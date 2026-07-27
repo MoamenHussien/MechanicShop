@@ -4,11 +4,13 @@ using FluentValidation;
 using MediatR;
 using Microsoft.Extensions.Logging;
 
+using MechanicShop.Application.Common.Constants;
+
 public sealed record GetUserByIdCommand(Guid id) : ICachedQuery<Result<AppUserDto>>
 {
     public string CacheKey => $"User-{id}";
 
-    public string[] Tags => ["Users"];
+    public string[] Tags => [CacheTags.Users];
 
     public TimeSpan Expiration => TimeSpan.FromMinutes(10);
 }

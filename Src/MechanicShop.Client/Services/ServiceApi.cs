@@ -324,21 +324,6 @@ public class ServiceApi(IHttpClientFactory httpClientFactory, TimeZoneService ti
                     return ApiResult<ScheduleModel>.Failure("Schedule data is null");
                 }
 
-                try
-                {
-                    var timeZone = TimeZoneInfo.FindSystemTimeZoneById("America/Montreal");
-
-                    foreach (var slot in schedule.Spots.SelectMany(s => s.Slots))
-                    {
-                        slot.StartAt = TimeZoneInfo.ConvertTime(slot.StartAt, timeZone);
-                        slot.EndAt = TimeZoneInfo.ConvertTime(slot.EndAt, timeZone);
-                    }
-                }
-                catch (TimeZoneNotFoundException)
-                {
-                    return ApiResult<ScheduleModel>.Failure("Time zone 'America/Montreal' not found on this system.");
-                }
-
                 return ApiResult<ScheduleModel>.Success(schedule);
             }
 
@@ -470,9 +455,20 @@ public class ServiceApi(IHttpClientFactory httpClientFactory, TimeZoneService ti
                 url += $"?date={date:yyyy-MM-dd}";
             }
 
-            var response = await _httpClient.GetFromJsonAsync<TodayWorkOrderStatsModel>(url);
+            var request = new HttpRequestMessage(HttpMethod.Get, url);
+            var tz = await _timeZoneService.GetLocalTimeZoneAsync();
+            request.Headers.Add("X-TimeZone", tz);
 
-            return ApiResult<TodayWorkOrderStatsModel>.Success(response!);
+            var response = await _httpClient.SendAsync(request, HttpCompletionOption.ResponseHeadersRead, CancellationToken.None)
+                                            .ConfigureAwait(false);
+
+            if (response.IsSuccessStatusCode)
+            {
+                var statsData = await response.Content.ReadFromJsonAsync<TodayWorkOrderStatsModel>().ConfigureAwait(false);
+                return ApiResult<TodayWorkOrderStatsModel>.Success(statsData!);
+            }
+
+            return await HandleErrorResponseAsync<TodayWorkOrderStatsModel>(response).ConfigureAwait(false);
         }
         catch (HttpRequestException ex)
         {
@@ -939,7 +935,7 @@ public class ServiceApi(IHttpClientFactory httpClientFactory, TimeZoneService ti
     {
         try
         {
-            var response = await _httpClient.PostAsync($"api/v1/labors/{laborId}/reset-password", null);
+            var response = await _httpClient.PutAsync($"api/v1/labors/{laborId}/reset-password", null);
 
             if (response.IsSuccessStatusCode)
             {

@@ -2,6 +2,8 @@ using FluentValidation;
 using MediatR;
 using Microsoft.Extensions.Caching.Hybrid;
 using Microsoft.Extensions.Logging;
+using MechanicShop.Application.Common.Constants;
+using MechanicShop.Application.Common.Interfaces;
 
 public sealed record SettleInvoiceCommand(Guid InvoiceId) : IRequest<Result<Success>>;
 
@@ -13,7 +15,9 @@ public class SettleInvoiceCommandValidator : AbstractValidator<SettleInvoiceComm
     }
 }
 
-public class SettleInvoiceCommandHandler(ILogger<SettleInvoiceCommandHandler> logger, TimeProvider time, IAppDbContext context, HybridCache cache)
+
+
+public class SettleInvoiceCommandHandler(ILogger<SettleInvoiceCommandHandler> logger, TimeProvider time, IAppDbContext context, ICacheInvalidator cacheInvalidator)
 : IRequestHandler<SettleInvoiceCommand, Result<Success>>
 {
     public async Task<Result<Success>> Handle(SettleInvoiceCommand request, CancellationToken cancellationToken)
@@ -40,7 +44,7 @@ public class SettleInvoiceCommandHandler(ILogger<SettleInvoiceCommandHandler> lo
         }
 
         await context.SaveChangesAsync(cancellationToken);
-        await cache.RemoveByTagAsync("Invoices", cancellationToken);
+        await cacheInvalidator.EvictByTagAsync(CacheTags.Invoices, cancellationToken);
 
         logger.LogInformation("Invoice {InvoiceId} successfully paid.", invoice.Id);
 

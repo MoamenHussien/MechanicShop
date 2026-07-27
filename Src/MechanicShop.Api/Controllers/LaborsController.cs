@@ -1,4 +1,5 @@
 using Asp.Versioning;
+using MechanicShop.Application.Common.Constants;
 using MechanicShop.Application.Features.Labors.Queries;
 using MechanicShop.Contracts.Requests.Labors;
 using MechanicShop.Contracts.Responses;
@@ -14,7 +15,7 @@ namespace MechanicShop.Api.Controllers;
 [Tags("Labors")]
 [Authorize]
 [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status401Unauthorized)]
-public sealed class LaborsController(ISender sender, IOutputCacheStore outputCache) : ApiController
+public sealed class LaborsController(ISender sender) : ApiController
 {
     [HttpGet]
     [ProducesResponseType(typeof(List<LaborDto>), StatusCodes.Status200OK)]
@@ -23,7 +24,7 @@ public sealed class LaborsController(ISender sender, IOutputCacheStore outputCac
     [EndpointDescription("Returns all labor records associated with the system. Accessible only to authorized users.")]
     [EndpointName("GetLabors")]
     [MapToApiVersion("1.0")]
-    [OutputCache(PolicyName = nameof(Policies.SharedAuthCache), Duration = (int)DurationInSeconds.OneDay, Tags = ["Labors"])]
+    [OutputCache(PolicyName = nameof(Policies.SharedAuthCache), Duration = (int)DurationInSeconds.OneDay, Tags = [CacheTags.Labors])]
     public async Task<IActionResult> Get(CancellationToken ct)
     {
         var result = await sender.Send(new GetLaborsQuery(), ct);
@@ -34,11 +35,11 @@ public sealed class LaborsController(ISender sender, IOutputCacheStore outputCac
     [HttpGet("details")]
     [Authorize(Roles = nameof(Role.Manager))]
     [ProducesResponseType(typeof(List<EmployeeDetailDto>), StatusCodes.Status200OK)]
-    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status401Unauthorized)]
     [EndpointSummary("Retrieves detailed information for all employees.")]
     [EndpointDescription("Returns complete employee details including name, email, roles, and status. Accessible only to Managers.")]
     [EndpointName("GetEmployeeDetails")]
     [MapToApiVersion("1.0")]
+    [OutputCache(PolicyName = nameof(Policies.SharedAuthCache), Duration = (int)DurationInSeconds.OneDay, Tags = [CacheTags.Labors])]
     public async Task<IActionResult> GetEmployeeDetails(CancellationToken ct)
     {
         var result = await sender.Send(new GetEmployeeDetailsQuery(), ct);
@@ -59,11 +60,6 @@ public sealed class LaborsController(ISender sender, IOutputCacheStore outputCac
     {
         var result = await sender.Send(new RegisterLaborCommand(request.Email, request.Password, request.FirstName, request.LastName, request.Roles, []), ct);
 
-        if (result.IsSuccess)
-        {
-            await outputCache.EvictByTagAsync("Labors", ct);
-        }
-
         return result.Match(success => StatusCode(StatusCodes.Status201Created, success), Problem);
     }
 
@@ -79,11 +75,7 @@ public sealed class LaborsController(ISender sender, IOutputCacheStore outputCac
     public async Task<IActionResult> UpdateLaborInfo([FromRoute] Guid laborid, [FromBody] UpdateLaborInfoRequest request, CancellationToken ct)
     {
         var result = await sender.Send(new UpdateLaborInfoCommand(laborid, request.FirstName, request.LastName, request.IsActive), ct);
-        if (result.IsSuccess)
-        {
-            await outputCache.EvictByTagAsync("Labors", ct);
-        }
-
+  
         return result.Match(_ => NoContent(), Problem);
     }
 
@@ -102,15 +94,10 @@ public sealed class LaborsController(ISender sender, IOutputCacheStore outputCac
 
         var result = await sender.Send(command, ct);
 
-        if (result.IsSuccess)
-        {
-            await outputCache.EvictByTagAsync("Labors", ct);
-        }
-
         return result.Match(_ => NoContent(), Problem);
     }
 
-    [HttpPost("{laborid:guid}/reset-password")]
+    [HttpPut("{laborid:guid}/reset-password")]
     [Authorize(Roles = nameof(Role.Manager))]
     [ProducesResponseType(typeof(Success), StatusCodes.Status204NoContent)]
     [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]

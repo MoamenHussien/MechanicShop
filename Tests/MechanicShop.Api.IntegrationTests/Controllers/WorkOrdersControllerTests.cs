@@ -239,11 +239,13 @@ public class WorkOrdersControllerTests(WebAppFactory webAppFactory)
 
         _client.SetAuthorizationHeader(token);
 
+        var futureDate = DateTime.UtcNow.Date.AddDays(10);
+
         var workOrder = WorkOrderTestDataBuilder.Create()
                .ForToday()
                .WithRepairTasks(await _context.RepairTasks.Take(1).ToListAsync())
                .WithVehicle(_context.Vehicles.FirstOrDefault()!.Id)
-               .WithTimeSlot(DateTimeOffset.UtcNow.DateTime.Add(TimeSpan.FromHours(10)),DateTimeOffset.UtcNow.DateTime.Add(TimeSpan.FromHours(12)))
+               .WithTimeSlot(futureDate.AddHours(9), futureDate.AddHours(11))
                .WithLabor(TestUsers.Labor01.Id)
                .Build();
 
@@ -253,7 +255,7 @@ public class WorkOrdersControllerTests(WebAppFactory webAppFactory)
 
         var request = new RelocateWorkOrderRequest
         {
-            NewStartAtUtc = DateTimeOffset.UtcNow.DateTime.Add(TimeSpan.FromHours(15)),
+            NewStartAtUtc = futureDate.AddHours(13),
             NewSpot = Contracts.Common.Spot.C
         };
 
@@ -590,7 +592,9 @@ public class WorkOrdersControllerTests(WebAppFactory webAppFactory)
 
         var today = DateOnly.FromDateTime(DateTime.UtcNow);
 
-        var request = new HttpRequestMessage(HttpMethod.Get, $"/api/v1.0/workorders/schedule/{today:yyyy-MM-dd}");
+        using var request = new HttpRequestMessage(
+            HttpMethod.Get,
+            $"/api/v1.0/workorders/schedule/{today:yyyy-MM-dd}");
 
         request.Headers.Add("X-TimeZone", "America/Montreal");
 
@@ -624,7 +628,9 @@ public class WorkOrdersControllerTests(WebAppFactory webAppFactory)
 
         try
         {
-            var request = new HttpRequestMessage(HttpMethod.Get, $"/api/v1.0/workorders/schedule/{today:yyyy-MM-dd}");
+            using var request = new HttpRequestMessage(
+                HttpMethod.Get,
+                $"/api/v1.0/workorders/schedule/{today:yyyy-MM-dd}");
 
             request.Headers.Add("X-TimeZone", "America/Montreal");
 
@@ -749,5 +755,24 @@ public class WorkOrdersControllerTests(WebAppFactory webAppFactory)
         var response = await _client.SendAsync(request);
 
         Assert.Equal(HttpStatusCode.Unauthorized, response.StatusCode);
+    }
+
+    [Fact]
+    public async Task GetSchedule_WithValidTokenAndTimeZone_ShouldReturnOk()
+    {
+        var token = await _client.GenerateTokenAsync(TestUsers.Manager);
+        _client.SetAuthorizationHeader(token);
+
+        var today = DateOnly.FromDateTime(DateTime.UtcNow);
+
+        using var request = new HttpRequestMessage(
+            HttpMethod.Get,
+            $"/api/v1.0/workorders/schedule/{today:yyyy-MM-dd}");
+
+        request.Headers.Add("X-TimeZone", "UTC");
+
+        var response = await _client.SendAsync(request);
+
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
     }
 }

@@ -1,4 +1,3 @@
-﻿
 using MechanicShop.Infrastructure.Data;
 using MediatR;
 using Microsoft.AspNetCore.Hosting;
@@ -16,8 +15,7 @@ namespace MechanicShop.Api.IntegrationTests.Common;
 
 public class WebAppFactory : WebApplicationFactory<IAssemblyMarker>, IAsyncLifetime
 {
-private readonly MsSqlContainer _dbContainer = new MsSqlBuilder("mcr.microsoft.com/mssql/server:2022-latest").Build();
-
+    private readonly MsSqlContainer _dbContainer = new MsSqlBuilder("mcr.microsoft.com/mssql/server:2022-latest").Build();
 
     public AppHttpClient CreateAppHttpClient()
     {
@@ -51,7 +49,11 @@ private readonly MsSqlContainer _dbContainer = new MsSqlBuilder("mcr.microsoft.c
           }).Unwrap();
     }
 
-    public new Task DisposeAsync() => _dbContainer.StopAsync();
+    public new async Task DisposeAsync()
+    {
+        await base.DisposeAsync();
+        await _dbContainer.DisposeAsync();
+    }
 
     protected override void ConfigureWebHost(IWebHostBuilder builder)
     {
@@ -60,12 +62,24 @@ private readonly MsSqlContainer _dbContainer = new MsSqlBuilder("mcr.microsoft.c
             services.RemoveAll<IHostedService>();
             services.RemoveAll<OverdueBookingCleanupService>();
 
+            services.RemoveAll<TimeProvider>();
+            services.AddSingleton(TimeProvider.System);
+
             services.RemoveAll<DbContextOptions<AppDbContext>>();
 
             services.AddDbContext<AppDbContext>((sp, options) =>
             {
                 options.AddInterceptors(sp.GetServices<ISaveChangesInterceptor>());
                 options.UseSqlServer(_dbContainer.GetConnectionString());
+            });
+
+            services.RemoveAll<AppSettings>();
+
+            services.PostConfigure<AppSettings>(opts =>
+            {
+                opts.OpeningTime = new TimeOnly(9, 0);
+                opts.ClosingTime = new TimeOnly(18, 0);
+                opts.MinimumAppointmentDurationInMinutes = 30;
             });
         });
     }

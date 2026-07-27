@@ -1,5 +1,6 @@
 using Asp.Versioning;
 using MechanicShop.Api.Controllers;
+using MechanicShop.Application.Common.Constants;
 using MechanicShop.Contracts.Requests.Customers;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
@@ -14,11 +15,11 @@ namespace MechanicShop.Api.Controllers;
 [Tags("Customers")]
 [Produces("application/json")]
 [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status401Unauthorized)]
-public class CustomersController(ISender sender, IOutputCacheStore outputCache) : ApiController
+public class CustomersController(ISender sender) : ApiController
 {
     [HttpGet]
     [MapToApiVersion("1.0")]
-    [OutputCache(PolicyName = nameof(Policies.SharedAuthCache), Tags = ["Customers"])]
+    [OutputCache(PolicyName = nameof(Policies.SharedAuthCache), Tags = [CacheTags.Customers])]
     [EndpointName("GetCustomers")]
     [EndpointSummary("Retrieve All Customers")]
     [EndpointDescription("Returns all customers along with their vehicles")]
@@ -32,7 +33,7 @@ public class CustomersController(ISender sender, IOutputCacheStore outputCache) 
 
     [HttpGet("{customerId:guid}", Name = "GetCustomerById")]
     [MapToApiVersion("1.0")]
-    [OutputCache(PolicyName = nameof(Policies.SharedAuthCache), Tags = ["Customers"], VaryByRouteValueNames = ["customerId"])]
+    [OutputCache(PolicyName = nameof(Policies.SharedAuthCache), Tags = [CacheTags.Customers], VaryByRouteValueNames = ["customerId"])]
     [EndpointName("GetCustomerById")]
     [EndpointSummary("Get Customer Info By Id")]
     [EndpointDescription("Get Customer Info By Id With His vehicles, If Found")]
@@ -58,11 +59,6 @@ public class CustomersController(ISender sender, IOutputCacheStore outputCache) 
         var vehicles = request.Vehicles.ConvertAll(n => new CreateVehicleCommand(n.Year, n.LicensePlate, n.ModelId));
         var result = await sender.Send(new CreateCustomerCommand(request.Name, request.Email, request.PhoneNumber, vehicles), ct);
 
-        if (result.IsSuccess)
-        {
-            await outputCache.EvictByTagAsync("Customers", ct);
-        }
-
         return result.Match(success => CreatedAtRoute("GetCustomerById", new { version = "1.0", customerId = success.CustomerId }, success), Problem);
     }
 
@@ -72,18 +68,13 @@ public class CustomersController(ISender sender, IOutputCacheStore outputCache) 
     [EndpointSummary("Updates an existing customer.")]
     [EndpointDescription("Updates customer information including associated vehicles.")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
-    [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)] // 💡 تمت الإضافة
+    [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status409Conflict)]
     public async Task<IActionResult> UpdateCustomer([FromRoute] Guid customerId, [FromBody] UpdateCustomerRequest request, CancellationToken ct)
     {
         var vehicles = request.Vehicles.ConvertAll(n => new UpdateVehicleCommand(n.VehicleId, n.Year, n.LicensePlate, n.ModelId));
         var result = await sender.Send(new UpdateCustomerCommand(customerId, request.Name, request.Email, request.PhoneNumber, vehicles), ct);
-
-        if (result.IsSuccess)
-        {
-            await outputCache.EvictByTagAsync("Customers", ct);
-        }
 
         return result.Match(_ => NoContent(), Problem);
     }
@@ -99,11 +90,6 @@ public class CustomersController(ISender sender, IOutputCacheStore outputCache) 
     public async Task<IActionResult> DeleteCustomer([FromRoute] Guid customerId, CancellationToken ct)
     {
         var result = await sender.Send(new DeleteCustomerCommand(customerId), ct);
-
-        if (result.IsSuccess)
-        {
-            await outputCache.EvictByTagAsync("Customers", ct);
-        }
 
         return result.Match(_ => NoContent(), Problem);
     }

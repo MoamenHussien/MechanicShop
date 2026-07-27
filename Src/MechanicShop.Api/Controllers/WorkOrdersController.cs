@@ -1,4 +1,5 @@
 using Asp.Versioning;
+using MechanicShop.Application.Common.Constants;
 using MechanicShop.Contracts.Requests.WorkOrders;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
@@ -12,7 +13,7 @@ namespace MechanicShop.Api.Controllers;
 [Authorize]
 [Tags("WorkOrders")]
 [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status401Unauthorized)]
-public sealed class WorkOrdersController(ISender sender, IOutputCacheStore outputCache) : ApiController
+public sealed class WorkOrdersController(ISender sender) : ApiController
 {
     [HttpGet]
     [MapToApiVersion("1.0")]
@@ -21,7 +22,7 @@ public sealed class WorkOrdersController(ISender sender, IOutputCacheStore outpu
     [EndpointDescription("Supports filtering by date range, status, vehicle, labor, spot, and searching by term. Pagination and sorting are supported.")]
     [ProducesResponseType(typeof(PaginatedList<WorkOrderListItemDto>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
-    [OutputCache(PolicyName = nameof(Policies.SharedAuthCache) ,Duration = (int)DurationInSeconds.FiveMinutes, Tags = ["WorkOrders"], VaryByQueryKeys = ["*"])]
+    [OutputCache(PolicyName = nameof(Policies.SharedAuthCache) ,Duration = (int)DurationInSeconds.FiveMinutes, Tags = [CacheTags.WorkOrders], VaryByQueryKeys = ["*"])]
     public async Task<IActionResult> Get
     ([FromQuery] WorkOrderFilterRequest filters, [FromQuery] PageRequest pageRequest, CancellationToken ct)
     {
@@ -62,7 +63,7 @@ public sealed class WorkOrdersController(ISender sender, IOutputCacheStore outpu
     [EndpointDescription("Returns detailed information about the specified work order if it exists.")]
     [ProducesResponseType(typeof(WorkOrderDto), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
-    [OutputCache(PolicyName = nameof(Policies.SharedAuthCache) ,Duration = (int)DurationInSeconds.TenMinutes, Tags = ["WorkOrders"], VaryByRouteValueNames = ["workOrderId"])]
+    [OutputCache(PolicyName = nameof(Policies.SharedAuthCache) ,Duration = (int)DurationInSeconds.TenMinutes, Tags = [CacheTags.WorkOrders], VaryByRouteValueNames = ["workOrderId"])]
     public async Task<IActionResult> GetById([FromRoute] Guid workOrderId, CancellationToken ct)
     {
         var result = await sender.Send(new GetWorkOrderByIdQuery(workOrderId), ct);
@@ -90,10 +91,6 @@ public sealed class WorkOrdersController(ISender sender, IOutputCacheStore outpu
             ),
             ct);
 
-        if (result.IsSuccess)
-        {
-            await outputCache.EvictByTagAsync("WorkOrders", ct);
-        }
 
         return result.Match(success => CreatedAtRoute( routeName: "GetWorkOrderById", routeValues: new { version = "1.0", workOrderId = success.WorkOrderId },value: success),Problem);
     }
@@ -116,10 +113,6 @@ public sealed class WorkOrdersController(ISender sender, IOutputCacheStore outpu
 
         var result = await sender.Send(command, ct);
 
-        if (result.IsSuccess)
-        {
-            await outputCache.EvictByTagAsync("WorkOrders", ct);
-        }
 
         return result.Match( _ => NoContent(), Problem);
     }
@@ -138,11 +131,6 @@ public sealed class WorkOrdersController(ISender sender, IOutputCacheStore outpu
         var command = new ReAssignLaborCommand(workOrderId, request.LaborId);
 
         var result = await sender.Send(command, ct);
-
-        if (result.IsSuccess)
-        {
-            await outputCache.EvictByTagAsync("WorkOrders", ct);
-        }
 
         return result.Match( _ => NoContent(), Problem);
     }
@@ -164,11 +152,6 @@ public sealed class WorkOrdersController(ISender sender, IOutputCacheStore outpu
 
         var result = await sender.Send(command, ct);
 
-        if (result.IsSuccess)
-        {
-            await outputCache.EvictByTagAsync("WorkOrders", ct);
-        }
-
         return result.Match(_ => NoContent(), Problem);
     }
 
@@ -187,10 +170,6 @@ public sealed class WorkOrdersController(ISender sender, IOutputCacheStore outpu
 
         var result = await sender.Send(command, ct);
 
-        if (result.IsSuccess)
-        {
-            await outputCache.EvictByTagAsync("WorkOrders", ct);
-        }
 
         return result.Match( _ => NoContent(),Problem);
     }
@@ -207,10 +186,7 @@ public sealed class WorkOrdersController(ISender sender, IOutputCacheStore outpu
     {
         var result = await sender.Send(new DeleteWorkOrderCommand(workOrderId), ct);
 
-        if (result.IsSuccess)
-        {
-            await outputCache.EvictByTagAsync("WorkOrders", ct);
-        }
+    
 
         return result.Match(_ => NoContent() ,Problem);
     }
@@ -223,7 +199,7 @@ public sealed class WorkOrdersController(ISender sender, IOutputCacheStore outpu
     [EndpointDescription("Returns a schedule view for the specified date. If no date is provided, today's schedule is returned. You can optionally filter by labor ID.")]
     [ProducesResponseType(typeof(ScheduleDto), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
-    [OutputCache(PolicyName = nameof(Policies.SharedAuthCache) ,Duration = (int)DurationInSeconds.ThreeMinutes, Tags = ["WorkOrders"], VaryByRouteValueNames = ["date"], VaryByQueryKeys = ["laborId"], VaryByHeaderNames = ["X-TimeZone"])] 
+    [OutputCache(PolicyName = nameof(Policies.SharedAuthCache) ,Duration = (int)DurationInSeconds.ThreeMinutes, Tags = [CacheTags.WorkOrders], VaryByRouteValueNames = ["date"], VaryByQueryKeys = ["laborId"], VaryByHeaderNames = ["X-TimeZone"])] 
        public async Task<IActionResult> GetSchedule([FromRoute] DateOnly? date, [FromQuery] Guid? laborId, [FromHeader(Name = "X-TimeZone")] string? tz, CancellationToken ct)
     {
         if (string.IsNullOrWhiteSpace(tz))

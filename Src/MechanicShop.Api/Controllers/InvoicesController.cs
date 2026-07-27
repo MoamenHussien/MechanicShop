@@ -1,5 +1,6 @@
 using Asp.Versioning;
 using MechanicShop.Api.Controllers;
+using MechanicShop.Application.Common.Constants;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -12,7 +13,7 @@ namespace MechanicShop.Api.Controllers;
 [Authorize(Roles = nameof(Role.Manager))]
 [Tags("Invoices")] 
 [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status401Unauthorized)] 
-public sealed class InvoicesController(ISender sender, IOutputCacheStore outputCache) : ApiController
+public sealed class InvoicesController(ISender sender) : ApiController
 {
     [HttpPost("workorders/{workOrderId:guid}")]
     [MapToApiVersion("1.0")]
@@ -38,7 +39,7 @@ public sealed class InvoicesController(ISender sender, IOutputCacheStore outputC
     [EndpointDescription("Returns detailed information about the specified invoice.")]
     [ProducesResponseType(typeof(InvoiceDto), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
-    [OutputCache(PolicyName = nameof(Policies.SharedAuthCache),Duration = (int)DurationInSeconds.OneHour, Tags = ["Invoices"], VaryByRouteValueNames = ["invoiceId"])] 
+    [OutputCache(PolicyName = nameof(Policies.SharedAuthCache),Duration = (int)DurationInSeconds.OneHour, Tags = [CacheTags.Invoices], VaryByRouteValueNames = ["invoiceId"])] 
     public async Task<IActionResult> GetInvoice([FromRoute] Guid invoiceId, CancellationToken ct)
     {
         var result = await sender.Send(new GetInvoiceByIdQuery(invoiceId), ct);
@@ -59,11 +60,6 @@ public sealed class InvoicesController(ISender sender, IOutputCacheStore outputC
     {
         var result = await sender.Send(new SettleInvoiceCommand(invoiceId), ct);
 
-        if (result.IsSuccess)
-        {
-            await outputCache.EvictByTagAsync("Invoices", ct);
-        }
-
         return result.Match( _ => NoContent(), Problem);
     }
 
@@ -74,7 +70,7 @@ public sealed class InvoicesController(ISender sender, IOutputCacheStore outputC
     [EndpointDescription("Returns the invoice PDF file for the specified invoice ID.")]
     [ProducesResponseType(typeof(FileContentResult), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
-    [OutputCache(PolicyName =nameof(Policies.SharedAuthCache),Duration = (int)DurationInSeconds.TenMinutes , Tags = ["Invoices"], VaryByRouteValueNames = ["invoiceId"])] 
+    [OutputCache(PolicyName =nameof(Policies.SharedAuthCache),Duration = (int)DurationInSeconds.TenMinutes , Tags = [CacheTags.Invoices], VaryByRouteValueNames = ["invoiceId"])] 
     [Produces("application/pdf")] 
     public async Task<IActionResult> GetInvoicePdf([FromRoute] Guid invoiceId, CancellationToken ct)
     {

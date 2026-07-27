@@ -3,6 +3,8 @@ using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Hybrid;
 using Microsoft.Extensions.Logging;
+using MechanicShop.Application.Common.Constants;
+using MechanicShop.Application.Common.Interfaces;
 
 public sealed record DeleteCustomerCommand(Guid CustomerId) : IRequest<Result<Deleted>>;
 
@@ -14,7 +16,9 @@ public class DeleteCustomerCommandValidator : AbstractValidator<DeleteCustomerCo
     }
 }
 
-public class DeleteCustomerCommandHandler(ILogger<DeleteCustomerCommandHandler> logger, HybridCache cache, IAppDbContext context,IWorkOrderPolicy policy)
+
+
+public class DeleteCustomerCommandHandler(ILogger<DeleteCustomerCommandHandler> logger, ICacheInvalidator cacheInvalidator, IAppDbContext context,IWorkOrderPolicy policy)
 : IRequestHandler<DeleteCustomerCommand, Result<Deleted>>
 {
     public async Task<Result<Deleted>> Handle(DeleteCustomerCommand request, CancellationToken cancellationToken)
@@ -35,7 +39,7 @@ public class DeleteCustomerCommandHandler(ILogger<DeleteCustomerCommandHandler> 
         context.Customers.Remove(Customer);
         await context.SaveChangesAsync(cancellationToken);
 
-        await cache.RemoveByTagAsync("Customers",cancellationToken);
+        await cacheInvalidator.EvictByTagAsync(CacheTags.Customers, cancellationToken);
 
         logger.LogInformation("Successfully Deleted The Customer With Id : {id} And Removed Cache Tag With Name Customer ",request.CustomerId);
 

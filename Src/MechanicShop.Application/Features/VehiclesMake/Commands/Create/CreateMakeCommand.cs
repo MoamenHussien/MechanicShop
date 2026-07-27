@@ -1,6 +1,7 @@
 using MediatR;
 using FluentValidation;
-using Microsoft.Extensions.Caching.Hybrid;
+using MechanicShop.Application.Common.Constants;
+using MechanicShop.Application.Common.Interfaces;
 using Microsoft.Extensions.Logging;
 using Microsoft.EntityFrameworkCore;
 
@@ -22,11 +23,21 @@ public class CreateMakeCommandValidator : AbstractValidator<CreateMakeCommand>
 }
 
 
-public class CreateMakeCommandHandler(IAppDbContext context,HybridCache cache ,ILogger<CreateMakeCommandHandler> logger)
+public class CreateMakeCommandHandler(IAppDbContext context, ICacheInvalidator cacheInvalidator, ILogger<CreateMakeCommandHandler> logger)
  : IRequestHandler<CreateMakeCommand,Result<Guid>>
 {
     public async Task<Result<Guid>> Handle(CreateMakeCommand request, CancellationToken cancellationToken)
     {
+        var make = request.Make.CapitalizeFirstLetter();
+        var IsMakeExits = await context.VehicleMakes.AnyAsync(n=> n.Make == make,cancellationToken);
+
+        if (IsMakeExits)
+        {
+            logger.LogWarning("This Make Vehicle Is Already Exits : {Make}",request.Make);
+            return VehicleMakeErrors.MakeIsAlreadyExists;
+
+        }
+
         List<VehicleModel> ListOfVehicleModel =[];
 
         foreach (var model in request.Models)
@@ -51,7 +62,7 @@ public class CreateMakeCommandHandler(IAppDbContext context,HybridCache cache ,I
         await context.SaveChangesAsync(cancellationToken);
         logger.LogInformation("Add New VehicleMake With id {id} And Name {Name}",Make.Value.Id,Make.Value.Make);
 
-        await cache.RemoveByTagAsync("VMakes",cancellationToken);
+        await cacheInvalidator.EvictByTagAsync(CacheTags.VehicleMakes, cancellationToken);
 
         logger.LogInformation("The Hybrid Cache Delete The Tag With Name VMakes");
 

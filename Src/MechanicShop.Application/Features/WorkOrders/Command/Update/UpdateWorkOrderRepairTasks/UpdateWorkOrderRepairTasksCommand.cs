@@ -1,7 +1,8 @@
 using FluentValidation;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Caching.Hybrid;
+using MechanicShop.Application.Common.Constants;
+using MechanicShop.Application.Common.Interfaces;
 using Microsoft.Extensions.Logging;
 using Microsoft.VisualBasic;
 
@@ -16,7 +17,7 @@ public class UpdateWorkOrderRepairTasksCommandValidator : AbstractValidator<Upda
     }
 }
 
-public class UpdateWorkOrderRepairTasksCommandHandler(ILogger<UpdateWorkOrderRepairTasksCommandHandler> logger, IIdentityService identity, IUser user, IAppDbContext context, HybridCache cache, IWorkOrderPolicy policy)
+public class UpdateWorkOrderRepairTasksCommandHandler(ILogger<UpdateWorkOrderRepairTasksCommandHandler> logger, IIdentityService identity, IUser user, IAppDbContext context, ICacheInvalidator cacheInvalidator, IWorkOrderPolicy policy)
 : IRequestHandler<UpdateWorkOrderRepairTasksCommand, Result<Updated>>
 {
     public async Task<Result<Updated>> Handle(UpdateWorkOrderRepairTasksCommand request, CancellationToken cancellationToken)
@@ -28,8 +29,11 @@ public class UpdateWorkOrderRepairTasksCommandHandler(ILogger<UpdateWorkOrderRep
         }
 
         var WorkOrder = await context.WorkOrders.Include(n => n.RepairTasks).FirstOrDefaultAsync(n => n.Id == request.WorkOrderid,cancellationToken);
+
         if (WorkOrder is null)
         {
+            logger.LogWarning("WorkOrder '{WorkOrderId}' not found for updating repair tasks", request.WorkOrderid);
+
             return ApplicationErrors.NotFoundTheWorkOrder;
         }
 
@@ -39,7 +43,7 @@ public class UpdateWorkOrderRepairTasksCommandHandler(ILogger<UpdateWorkOrderRep
         if (currentIds.SetEquals(newIds))
         {
             logger.LogInformation( "No changes detected for WorkOrder {WorkOrderId}",request.WorkOrderid);
-            return ApplicationErrors.NothingIsChanged;
+            return Result.Updated;
         }
 
         var RepairTasks = await context.RepairTasks.Where(n => newIds.Contains(n.Id)).ToListAsync(cancellationToken);
@@ -63,14 +67,17 @@ public class UpdateWorkOrderRepairTasksCommandHandler(ILogger<UpdateWorkOrderRep
 
         if (policy.IsOutsideOperatingHours(WorkOrder.StartAtUtc, TotalDurations))
         {
-            return Error.Conflict("WorkOrder Outside OperatingHours", "WorkOrder timing exceeds business hours.");
+            logger.LogWarning("Updated repair tasks duration ({StartAt} ? {EndAt}) exceeds operating hours for WorkOrder '{WorkOrderId}'",
+                WorkOrder.StartAtUtc, NewEndAt, WorkOrder.Id);
+            return ApplicationErrors.WorkOrderOutsideOperatingHour(WorkOrder.StartAtUtc, NewEndAt);
         }
 
-        var IsValid = policy.ValidateMinimumRequirement(WorkOrder.StartAtUtc, NewEndAt);
-
-        if (IsValid.IsError)
+        var MinimumRequirementResult = policy.ValidateMinimumRequirement(WorkOrder.StartAtUtc, NewEndAt);
+        if (MinimumRequirementResult.IsError)
         {
-            return IsValid.Errors;
+            logger.LogWarning("Updated repair tasks fail minimum requirement check for WorkOrder '{WorkOrderId}': {Error}",
+                WorkOrder.Id, MinimumRequirementResult.TopError.Description);
+            return MinimumRequirementResult.Errors;
         }
 
         if (await policy.IsLaborOccupiedDuringRange(WorkOrder.StartAtUtc, NewEndAt, WorkOrder.LaborId, WorkOrder.Id,cancellationToken))
@@ -100,7 +107,7 @@ public class UpdateWorkOrderRepairTasksCommandHandler(ILogger<UpdateWorkOrderRep
         }
 
         await context.SaveChangesAsync(cancellationToken);
-        await cache.RemoveByTagAsync("WorkOrders", cancellationToken);
+        await cacheInvalidator.EvictByTagAsync(CacheTags.WorkOrders, cancellationToken);
 
         logger.LogInformation("Successfully updated Repair Tasks for WorkOrder Id: {WorkOrderId}. New Duration: {Duration} mins, New EndAt: {EndAt} , And Remove Cache Tag 'WorkOrders' ",
             WorkOrder.Id, TotalDurations, WorkOrder.EndAtUtc);

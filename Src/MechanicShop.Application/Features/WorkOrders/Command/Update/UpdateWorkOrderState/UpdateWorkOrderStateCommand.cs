@@ -6,7 +6,8 @@ using FluentValidation;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
-using Microsoft.Extensions.Caching.Hybrid;
+using MechanicShop.Application.Common.Constants;
+using MechanicShop.Application.Common.Interfaces;
 using Microsoft.Extensions.Logging;
 
 public sealed record UpdateWorkOrderStateCommand(Guid WordOrderId, WorkOrderState NewState) : IRequest<Result<Updated>>;
@@ -20,7 +21,7 @@ public class UpdateWorkOrderStateCommandValidator : AbstractValidator<UpdateWork
     }
 }
 
-public class UpdateWorkOrderStateCommandHandler(ILogger<UpdateWorkOrderStateCommandHandler> logger, IAppDbContext context, IUser user, IIdentityService identity,TimeProvider time,HybridCache cache)
+public class UpdateWorkOrderStateCommandHandler(ILogger<UpdateWorkOrderStateCommandHandler> logger, IAppDbContext context, TimeProvider time, ICacheInvalidator cacheInvalidator)
 : IRequestHandler<UpdateWorkOrderStateCommand, Result<Updated>>
 {
     public async Task<Result<Updated>> Handle(UpdateWorkOrderStateCommand request, CancellationToken cancellationToken)
@@ -31,28 +32,28 @@ public class UpdateWorkOrderStateCommandHandler(ILogger<UpdateWorkOrderStateComm
             return ApplicationErrors.NotFoundTheWorkOrder;
         }
 
-        if(WorkOrder.State == request.NewState)
+        if (WorkOrder.State == request.NewState)
         {
-           return  ApplicationErrors.NothingIsChanged;
+            return Result.Updated;
         }
 
-         if (await identity.IsInRoleAsync(user.Id!.Value, Role.Labor.ToString()))
-        {
-            if ( WorkOrder.LaborId != user.Id.Value)
-            {
-                logger.LogWarning("State change forbidden: User {UserId} attempted to modify WorkOrder {WorkOrderId} not assigned to them",user.Id, WorkOrder.Id);
-                 return ApplicationErrors.NotAllowedToProcessWorkOrder;
-            }  
-        }
+        // var IsLaborUser = await identity.IsInRoleAsync(user.Id!.Value, Role.Labor.ToString());
 
-        var TimeNow = time.GetUtcNow();
+        // if (IsLaborUser && WorkOrder.LaborId != user.Id)
+        //     {
+        //     logger.LogWarning("Update State Failed: User '{UserId}' is not assigned to WorkOrder '{WorkOrderId}'", user.Id, WorkOrder.Id);
+
+        //     return ApplicationErrors.NotAllowed;
+        // }
+
+        var utcNow = time.GetUtcNow().UtcDateTime;
 
         var result = request.NewState switch
         {
-            WorkOrderState.InProgress => WorkOrder.StartAtUtc <= TimeNow ? WorkOrder.MarkAsInProgress() : ApplicationErrors.WorkOrderStartTimeNotComing(WorkOrder.StartAtUtc),
-            WorkOrderState.Completed  =>  WorkOrder.StartAtUtc <= TimeNow ? WorkOrder.MarkAsCompleted() : ApplicationErrors.WorkOrderStartTimeNotComing(WorkOrder.StartAtUtc),
-            WorkOrderState.Cancelled  => WorkOrder.MarkAsCancelled(),
-            _=> Error.Validation("Invalid state")
+            WorkOrderState.InProgress => WorkOrder.StartAtUtc <= utcNow ? WorkOrder.MarkAsInProgress() : ApplicationErrors.WorkOrderStartTimeNotComing(WorkOrder.StartAtUtc),
+            WorkOrderState.Completed => WorkOrder.StartAtUtc <= utcNow ? WorkOrder.MarkAsCompleted() : ApplicationErrors.WorkOrderStartTimeNotComing(WorkOrder.StartAtUtc),
+            WorkOrderState.Cancelled => WorkOrder.MarkAsCancelled(),
+            _ => Error.Validation("Invalid state")
         };
 
         if (result.IsError)
@@ -62,7 +63,7 @@ public class UpdateWorkOrderStateCommandHandler(ILogger<UpdateWorkOrderStateComm
         }
 
         await context.SaveChangesAsync(cancellationToken);
-        await cache.RemoveByTagAsync("WorkOrders",cancellationToken);
+        await cacheInvalidator.EvictByTagAsync(CacheTags.WorkOrders, cancellationToken);
 
         logger.LogInformation("Successfully updated WorkOrder Id: {WorkOrderId} State to: {NewState} , And Remove Cache Tag 'WorkOrders' ", WorkOrder.Id, request.NewState.ToString());
         return Result.Updated;

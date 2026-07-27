@@ -3,7 +3,7 @@ using FluentValidation;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
-public sealed record GetWorkOrderStatsQuery(DateOnly Date) : IRequest<Result<TodayWorkOrderStatsDto>>;
+public sealed record GetWorkOrderStatsQuery(DateOnly Date, TimeZoneInfo? TimeZone = null) : IRequest<Result<TodayWorkOrderStatsDto>>;
 
 public class GetWorkOrderStatsQueryValidator : AbstractValidator<GetWorkOrderStatsQuery>
 {
@@ -20,10 +20,15 @@ public class GetWorkOrderStatsQueryHandler(IAppDbContext context) : IRequestHand
 {
     public async Task<Result<TodayWorkOrderStatsDto>> Handle(GetWorkOrderStatsQuery request, CancellationToken cancellationToken)
     {
-        var StartDayTimeUtc = request.Date.ToDateTime(TimeOnly.MinValue, DateTimeKind.Utc);
-        var EndDayTimeUtc = StartDayTimeUtc.AddDays(1);
+        var localStartDayConst = request.Date.ToDateTime(TimeOnly.MinValue);
+        var localEndDayConst = localStartDayConst.AddDays(1);
 
-        var WorkOrders = context.WorkOrders.AsNoTracking().Where(n => n.StartAtUtc >= StartDayTimeUtc && n.StartAtUtc < EndDayTimeUtc)
+        var timeZone = request.TimeZone ?? TimeZoneInfo.Local;
+
+        var startDayTimeUtc = localStartDayConst.ToUtc(timeZone);
+        var endDayTimeUtc = localEndDayConst.ToUtc(timeZone);
+
+        var WorkOrders = context.WorkOrders.AsNoTracking().Where(n => n.StartAtUtc >= startDayTimeUtc && n.StartAtUtc < endDayTimeUtc)
                                                           .Include(n=>n.RepairTasks).ThenInclude(n=>n.Parts)
                                                           .Include(n=>n.Vehicle)
                                                           .Include(n=>n.Invoice);

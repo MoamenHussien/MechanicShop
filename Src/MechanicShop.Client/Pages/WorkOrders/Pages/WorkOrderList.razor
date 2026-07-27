@@ -138,10 +138,19 @@
                                                     }
                                                     else
                                                     {
-                                                        <button class="btn btn-sm btn-primary"
-                                                            @onclick="() => CreateInvoice(wo.WorkOrderId)" title="Create Invoice">
-                                                            <i class="bi bi-plus-circle"></i>
-                                                        </button>
+                                                        if (creatingInvoiceId == wo.WorkOrderId)
+                                                        {
+                                                            <button class="btn btn-sm btn-primary" disabled title="Creating Invoice...">
+                                                                <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                                                            </button>
+                                                        }
+                                                        else
+                                                        {
+                                                            <button class="btn btn-sm btn-primary"
+                                                                @onclick="() => CreateInvoice(wo)" title="Create Invoice" disabled="@(creatingInvoiceId.HasValue)">
+                                                                <i class="bi bi-plus-circle"></i>
+                                                            </button>
+                                                        }
                                                     }
                                                 }
                                             </Authorized>
@@ -171,6 +180,7 @@
     private WorkOrderFilterRequest filterRequest = new WorkOrderFilterRequest();
     private PageRequest pageRequest = new PageRequest { Page = 1, PageSize = 10 };
     private PaginatedList<WorkOrderListItemModel>? pagedResult;
+    private Guid? creatingInvoiceId;
 
     protected override async Task OnInitializedAsync()
     {
@@ -228,17 +238,29 @@
         await LoadWorkOrders();
     }
 
-    private async Task CreateInvoice(Guid workOrderId)
+    private async Task CreateInvoice(WorkOrderListItemModel wo)
     {
-        var createInvoiceResult = await serviceApi.IssueInvoiceAsync(workOrderId);
+        if (creatingInvoiceId.HasValue) return;
 
-        if (createInvoiceResult.IsSuccess)
+        creatingInvoiceId = wo.WorkOrderId;
+
+        try
         {
-            navigationManager.NavigateTo($"/invoice/{createInvoiceResult.Data!.InvoiceId}");
+            var createInvoiceResult = await serviceApi.IssueInvoiceAsync(wo.WorkOrderId);
+
+            if (createInvoiceResult.IsSuccess && createInvoiceResult.Data != null)
+            {
+                wo.InvoiceId = createInvoiceResult.Data.InvoiceId;
+                navigationManager.NavigateTo($"/invoice/{createInvoiceResult.Data.InvoiceId}");
+            }
+            else
+            {
+                await LoadWorkOrders();
+            }
         }
-        else
+        finally
         {
-
+            creatingInvoiceId = null;
         }
     }
 

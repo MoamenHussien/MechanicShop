@@ -2,13 +2,15 @@ using MediatR;
 using MechanicShop.Application.Features.Labors.DTOs;
 using Microsoft.Extensions.Logging;
 
+using MechanicShop.Application.Common.Constants;
+
 namespace MechanicShop.Application.Features.Labors.Queries;
 
 public sealed record GetEmployeeDetailsQuery() : ICachedQuery<Result<List<EmployeeDetailDto>>>
 {
     public string CacheKey => "EmployeeDetails";
 
-    public string[] Tags => ["Labors", "Employees"];
+    public string[] Tags => [CacheTags.Users];
 
     public TimeSpan Expiration => TimeSpan.FromDays(1);
 }

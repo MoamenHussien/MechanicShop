@@ -3,11 +3,13 @@ using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
+using MechanicShop.Application.Common.Constants;
+
 public sealed record GetLaborsQuery() : ICachedQuery<Result<List<LaborDto>>>
 {
     public string CacheKey => "Labors";
 
-    public string[] Tags => ["Labors"];
+    public string[] Tags => [CacheTags.Users];
 
     public TimeSpan Expiration => TimeSpan.FromHours(24);
 }

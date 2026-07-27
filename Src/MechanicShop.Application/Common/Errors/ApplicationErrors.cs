@@ -9,7 +9,7 @@ public static class ApplicationErrors
     public static readonly Error TheCustomerNotFound = Error.NotFound("The Customer Not Found", "Customer Not Found");
     public static readonly Error NotFoundAnyCustomers = Error.NotFound("The Customers Not Found", "Not Found Any Customers");
     public static readonly Error TheCustomerHasRecordForWorkOrderBefore = Error.Conflict("Cannot delete customer: There are vehicles with maintenance records", "Has Record For Work Order Before");
-    public static readonly Error CustomerExists = Error.Conflict("Customer_Email_Exists", "A customer with this email already exists");
+    public static readonly Error CustomerWithThisEmailIsAlreadyExists = Error.Conflict("Customer_Email_Exists", "A customer with this email already exists");
     public static readonly Error InvalidAccessToken = Error.Unauthorized("Auth.ExpiredAccessToken.Invalid", "Expired access token is not valid.");
     public static readonly Error UserIdClaimInvalid = Error.Conflict(code: "Auth.UserIdClaim.Invalid", "Invalid userId claim.");
     public static readonly Error RefreshTokenExpiredOrInvalid = Error.Unauthorized("Auth.RefreshToken.Expired", "Refresh token is invalid or has expired.");

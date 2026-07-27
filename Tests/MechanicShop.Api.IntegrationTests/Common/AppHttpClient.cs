@@ -1,4 +1,4 @@
-﻿using System.Net.Http.Headers;
+using System.Net.Http.Headers;
 using System.Net.Http.Json;
 
 using MechanicShop.Infrastructure.Identity;
@@ -16,28 +16,29 @@ public class AppHttpClient
 
     public async Task<string> GenerateTokenAsync(AppUser user)
     {
-        var generateTokenQuery = new GenerateTokenCommand(user.Email!, user.Email!);
+        var request = new GenerateTokenCommand(user.Email!, user.Email!);
 
-        var response = await _httpClient.PostAsJsonAsync("identity/token/generate", generateTokenQuery);
+        var response = await _httpClient.PostAsJsonAsync("identity/token/generate", request);
 
         if (!response.IsSuccessStatusCode)
         {
-            throw new InvalidOperationException($"Token generation failed with status code {response.StatusCode}");
+            var responseBody = await response.Content.ReadAsStringAsync();
+
+            throw new InvalidOperationException(
+                $"Token generation failed. Status Code: {(int)response.StatusCode} ({response.StatusCode}){Environment.NewLine}" +
+                $"Response:{Environment.NewLine}{responseBody}");
         }
 
-        var tokenResponse = await response.Content.ReadFromJsonAsync<TokenResponse>();
-
-        if (tokenResponse is null)
-        {
-            throw new InvalidOperationException("Token response is null.");
-        }
+        var tokenResponse = await response.Content.ReadFromJsonAsync<TokenResponse>()
+            ?? throw new InvalidOperationException("Token response is null.");
 
         return tokenResponse.AccessToken!;
     }
 
     public void SetAuthorizationHeader(string token)
     {
-        _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+        _httpClient.DefaultRequestHeaders.Authorization =
+            new AuthenticationHeaderValue("Bearer", token);
     }
 
     public void ClearAuthorizationHeader()
@@ -45,52 +46,64 @@ public class AppHttpClient
         _httpClient.DefaultRequestHeaders.Authorization = null;
     }
 
-    public async Task<HttpResponseMessage> GetAsync(string requestUri, CancellationToken cancellationToken = default)
-    {
-        return await _httpClient.GetAsync(requestUri, cancellationToken);
-    }
+    public Task<HttpResponseMessage> GetAsync(
+        string requestUri,
+        CancellationToken cancellationToken = default) =>
+        _httpClient.GetAsync(requestUri, cancellationToken);
 
-    public async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken = default)
-    {
-        return await _httpClient.SendAsync(request, cancellationToken);
-    }
+    public Task<HttpResponseMessage> SendAsync(
+        HttpRequestMessage request,
+        CancellationToken cancellationToken = default) =>
+        _httpClient.SendAsync(request, cancellationToken);
 
-    public async Task<HttpResponseMessage> PostAsJsonAsync<T>(string requestUri, T value, CancellationToken cancellationToken = default)
-    {
-        return await _httpClient.PostAsJsonAsync(requestUri, value, cancellationToken);
-    }
+    public Task<HttpResponseMessage> PostAsJsonAsync<T>(
+        string requestUri,
+        T value,
+        CancellationToken cancellationToken = default) =>
+        _httpClient.PostAsJsonAsync(requestUri, value, cancellationToken);
 
-    public async Task<HttpResponseMessage> PutAsJsonAsync<T>(string requestUri, T value, CancellationToken cancellationToken = default)
-    {
-        return await _httpClient.PutAsJsonAsync(requestUri, value, cancellationToken);
-    }
+    public Task<HttpResponseMessage> PutAsJsonAsync<T>(
+        string requestUri,
+        T value,
+        CancellationToken cancellationToken = default) =>
+        _httpClient.PutAsJsonAsync(requestUri, value, cancellationToken);
 
-    public async Task<HttpResponseMessage> DeleteAsync(string requestUri, CancellationToken cancellationToken = default)
-    {
-        return await _httpClient.DeleteAsync(requestUri, cancellationToken);
-    }
+    public Task<HttpResponseMessage> DeleteAsync(
+        string requestUri,
+        CancellationToken cancellationToken = default) =>
+        _httpClient.DeleteAsync(requestUri, cancellationToken);
 
-    public async Task<HttpResponseMessage> PatchAsJsonAsync<T>(string requestUri, T value, CancellationToken cancellationToken = default)
-    {
-        return await _httpClient.PatchAsJsonAsync(requestUri, value, cancellationToken);
-    }
+    public Task<HttpResponseMessage> PatchAsJsonAsync<T>(
+        string requestUri,
+        T value,
+        CancellationToken cancellationToken = default) =>
+        _httpClient.PatchAsJsonAsync(requestUri, value, cancellationToken);
 
-    public async Task<T?> GetFromJsonAsync<T>(string requestUri, CancellationToken cancellationToken = default)
+    public async Task<T?> GetFromJsonAsync<T>(
+        string requestUri,
+        CancellationToken cancellationToken = default)
     {
         var response = await GetAsync(requestUri, cancellationToken);
+
         response.EnsureSuccessStatusCode();
+
         return await response.Content.ReadFromJsonAsync<T>(cancellationToken);
     }
 
-    public async Task<T?> PostAndGetFromJsonAsync<TRequest, T>(string requestUri, TRequest value, CancellationToken cancellationToken = default)
+    public async Task<TResponse?> PostAndGetFromJsonAsync<TRequest, TResponse>(
+        string requestUri,
+        TRequest value,
+        CancellationToken cancellationToken = default)
     {
         var response = await PostAsJsonAsync(requestUri, value, cancellationToken);
+
         response.EnsureSuccessStatusCode();
-        return await response.Content.ReadFromJsonAsync<T>(cancellationToken);
+
+        return await response.Content.ReadFromJsonAsync<TResponse>(cancellationToken);
     }
 
     public void Dispose()
     {
-        _httpClient?.Dispose();
+        _httpClient.Dispose();
     }
 }
