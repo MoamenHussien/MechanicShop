@@ -122,4 +122,58 @@ public class IdentityControllerTests(WebAppFactory webAppFactory)
 
         Assert.Equal(HttpStatusCode.Unauthorized, response.StatusCode);
     }
+
+    // ========================================================================
+    // GET /identity/assignable-roles
+    // ========================================================================
+
+    [Fact]
+    public async Task GetRoles_WithManagerRole_ShouldReturnOk()
+    {
+        var token = await _client.GenerateTokenAsync(TestUsers.Manager);
+        _client.SetAuthorizationHeader(token);
+
+        var response = await _client.GetAsync("/identity/assignable-roles");
+
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+
+        var roles = await response.Content.ReadFromJsonAsync<List<string>>();
+
+        Assert.NotNull(roles);
+        Assert.NotEmpty(roles);
+    }
+
+    [Fact]
+    public async Task GetRoles_WithoutManagerRole_ShouldReturnForbidden()
+    {
+        var token = await _client.GenerateTokenAsync(TestUsers.Labor01);
+        _client.SetAuthorizationHeader(token);
+
+        var response = await _client.GetAsync("/identity/assignable-roles");
+
+        Assert.Equal(HttpStatusCode.Forbidden, response.StatusCode);
+    }
+
+    // ========================================================================
+    // POST /identity/logout
+    // ========================================================================
+
+    [Fact]
+    public async Task Logout_WithValidToken_ShouldReturnNoContent()
+    {
+        var token = await _client.GenerateTokenAsync(TestUsers.Manager);
+        _client.SetAuthorizationHeader(token);
+
+        var response = await _client.PostAsJsonAsync<object?>("/identity/logout", null);
+
+        Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
+    }
+
+    [Fact]
+    public async Task Logout_WithoutAuthentication_ShouldReturnUnauthorized()
+    {
+        var response = await _client.PostAsJsonAsync<object?>("/identity/logout", null);
+
+        Assert.Equal(HttpStatusCode.Unauthorized, response.StatusCode);
+    }
 }

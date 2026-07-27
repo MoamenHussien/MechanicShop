@@ -3,50 +3,59 @@ using System.Net.Http.Headers;
 using FluentValidation;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Caching.Hybrid;
+using MechanicShop.Application.Common.Constants;
+using MechanicShop.Application.Common.Interfaces;
 using Microsoft.Extensions.Logging;
 
-public sealed record UpdateMakeCommand(Guid id ,string Make,List<UpdateModelCommand> Models) :IRequest<Result<Updated>>;
+public sealed record UpdateMakeCommand(Guid id, string Make, List<UpdateModelCommand> Models) : IRequest<Result<Updated>>;
 public class UpdateMakeCommandValidator : AbstractValidator<UpdateMakeCommand>
 {
     public UpdateMakeCommandValidator()
     {
-        RuleFor(n=>n.id).IdRequired("Make");
-        RuleFor(n=>n.Make).NotEmpty().Must(x=> !string.IsNullOrWhiteSpace(x)).WithMessage("You Must Enter Vehicle Make");
-        RuleFor(n=>n.Models).NotNull().Must(n=> n != null && n.Count()>0).WithMessage("You Must Enter At Least One Model");
-        RuleForEach(n=> n.Models).SetValidator(new UpdateModelCommandValidator());
+        RuleFor(n => n.id).IdRequired("Make");
+        RuleFor(n => n.Make).NotEmpty().Must(x => !string.IsNullOrWhiteSpace(x)).WithMessage("You Must Enter Vehicle Make");
+        RuleFor(n => n.Models).NotNull().Must(n => n != null && n.Count() > 0).WithMessage("You Must Enter At Least One Model");
+        RuleForEach(n => n.Models).SetValidator(new UpdateModelCommandValidator());
     }
 }
-public class UpdateMakeCommandHandler(IAppDbContext context,ILogger<CreateMakeCommandHandler> logger ,HybridCache Cache) 
+public class UpdateMakeCommandHandler(IAppDbContext context, ILogger<CreateMakeCommandHandler> logger, ICacheInvalidator cacheInvalidator)
           : IRequestHandler<UpdateMakeCommand, Result<Updated>>
 {
     public async Task<Result<Updated>> Handle(UpdateMakeCommand request, CancellationToken cancellationToken)
     {
-        var Make = await context.VehicleMakes.Include(n=>n.VehicleModels)
-                                   .FirstOrDefaultAsync(n=>n.Id==request.id,cancellationToken);
+        var Make = await context.VehicleMakes.Include(n => n.VehicleModels)
+                                      .FirstOrDefaultAsync(n => n.Id == request.id, cancellationToken);
+
         if (Make is not null)
         {
-           var  UpdateMakeInfoResult = Make.Update(request.Make);
-           if (UpdateMakeInfoResult.IsError)
+            var isMakeExists = await context.VehicleMakes.AnyAsync(n => n.Id != request.id && n.Make.ToLower() == request.Make.ToLower(), cancellationToken);
+
+            if (isMakeExists)
             {
-                logger.LogWarning("The Update Is failed , to vehicleMake With id {id}",request.id);
-                return UpdateMakeInfoResult.TopError;
+                logger.LogWarning("Make name '{Make}' already exists for another VehicleMake.", request.Make);
+                return VehicleMakeErrors.MakeIsAlreadyExists;
             }
 
-             List<VehicleModel> UpVehicleModel =[];
+            var updateResult = Make.Update(request.Make);
 
-             foreach(var model in request.Models)
+            if (updateResult.IsError)
             {
-              var id = model.ModelId ?? Guid.NewGuid();                
-              var upModel =VehicleModel.Create(id,model.model);
+                logger.LogWarning("Update Make failed for Id = {id}: {Error}", request.id, updateResult.TopError.Description);
+                return updateResult.Errors;
+            }
 
+            var UpVehicleModel = new List<VehicleModel>();
+
+            foreach (var item in request.Models)
+            {
+                var upModel = VehicleModel.Create(item.ModelId ?? Guid.NewGuid(), item.model);
                 if (upModel.IsError)
                 {
-                    logger.LogWarning("The Process to Create The Model With Id {id} and Name {name}"
-                                                                        ,model.ModelId,model.model);
+                    logger.LogWarning("VehicleModel creation failed during UpdateMake for Model '{Model}': {Error}", item.model, upModel.TopError.Description);
+
                     return upModel.Errors;
+
                 }
-                
                 UpVehicleModel.Add(upModel.Value);
             }
 
@@ -62,14 +71,14 @@ public class UpdateMakeCommandHandler(IAppDbContext context,ILogger<CreateMakeCo
         }
         else
         {
-            logger.LogError("The vehicle Make Is Not Found With Id = {id}",request.id);
+            logger.LogError("The vehicle Make Is Not Found With Id = {id}", request.id);
 
             return ApplicationErrors.MakeNotFound;
         }
 
-        await Cache.RemoveByTagAsync("VMakes",cancellationToken);
+        await cacheInvalidator.EvictByTagAsync(CacheTags.VehicleMakes, cancellationToken);
 
-           logger.LogInformation("The Hybrid Cache Delete The Tag With Name VMakes");
+        logger.LogInformation("The Hybrid Cache Delete The Tag With Name VMakes");
 
         return Result.Updated;
     }

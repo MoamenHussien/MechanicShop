@@ -1,0 +1,43 @@
+@using System.Globalization
+
+<div class="d-flex align-items-center gap-2">
+    <button type="button" class="btn btn-outline-info opacity-75" disabled="@IsLoading" @onclick="GoToPreviousDay">
+        <i class="bi bi-chevron-left"></i>
+    </button>
+    <InputDate Type="InputDateType.Date"
+               @bind-Value="SelectedDate"
+               @bind-Value:after="OnDateInputChanged"
+               class="form-control"
+               disabled="@IsLoading" />
+    <button type="button" class="btn btn-outline-info opacity-75" disabled="@IsLoading" @onclick="GoToNextDay">
+        <i class="bi bi-chevron-right"></i>
+    </button>
+</div>
+
+@code {
+    [Parameter]
+    public DateTime SelectedDate { get; set; } = DateTime.Today;
+
+    [Parameter]
+    public EventCallback<DateTime> SelectedDateChanged { get; set; }
+
+    [Parameter]
+    public bool IsLoading { get; set; }
+
+    private async Task GoToPreviousDay()
+    {
+        SelectedDate = SelectedDate.AddDays(-1);
+        await SelectedDateChanged.InvokeAsync(SelectedDate);
+    }
+
+    private async Task GoToNextDay()
+    {
+        SelectedDate = SelectedDate.AddDays(1);
+        await SelectedDateChanged.InvokeAsync(SelectedDate);
+    }
+
+    private async Task OnDateInputChanged()
+    {
+        await SelectedDateChanged.InvokeAsync(SelectedDate);
+    }
+}

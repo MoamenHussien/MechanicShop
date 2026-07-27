@@ -3,11 +3,13 @@ using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
+using MechanicShop.Application.Common.Constants;
+
 public sealed record GetWorkOrderByIdQuery(Guid id) : ICachedQuery<Result<WorkOrderDto>>
 {
     public string CacheKey => $"Work-Order:{id}";
 
-    public string[] Tags => ["WorkOrders"];
+    public string[] Tags => [CacheTags.WorkOrders];
 
     public TimeSpan Expiration => TimeSpan.FromMinutes(10);
 }

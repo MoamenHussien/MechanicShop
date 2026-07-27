@@ -1,77 +1,282 @@
-.page {
-    position: relative;
-    display: flex;
-    flex-direction: column;
+/* Premium Dark Layout Container */
+.app-wrapper {
+    background-color: #0b0c10;
+    min-height: 100vh;
+    color: #e2e8f0;
+    overflow-x: hidden;
 }
 
-main {
-    flex: 1;
+/* Header Container */
+.app-header-outer {
+    background-color: #0b0c10;
+    position: sticky;
+    top: 0;
+    z-index: 1030;
 }
 
-.sidebar {
-    background-image: linear-gradient(180deg, rgb(5, 39, 103) 0%, #3a0647 70%);
+.max-header-width {
+    max-width: 1440px;
+    margin: 0 auto;
 }
 
-.top-row {
-    background-color: #f7f7f7;
-    border-bottom: 1px solid #d6d5d5;
-    justify-content: flex-end;
-    height: 3.5rem;
-    display: flex;
+/* 3-Column Grid Layout for Perfect Centering on Desktop */
+.app-header-card {
+    display: grid;
+    grid-template-columns: auto 1fr auto;
     align-items: center;
+    background: linear-gradient(180deg, #131620 0%, #0f1118 100%);
+    border: 1px solid #1f2330;
+    border-radius: 10px;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.45);
+    min-height: 68px;
 }
 
-    .top-row ::deep a, .top-row ::deep .btn-link {
-        white-space: nowrap;
-        margin-left: 1.5rem;
-        text-decoration: none;
-    }
+/* Left Brand Section */
+.header-left {
+    grid-column: 1;
+}
 
-        .top-row ::deep a:hover, .top-row ::deep .btn-link:hover {
-            text-decoration: underline;
-        }
+.brand-link {
+    transition: opacity 0.2s ease;
+}
 
-        .top-row ::deep a:first-child {
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
+.brand-link:hover {
+    opacity: 0.9;
+}
 
-@media (max-width: 640.98px) {
-    .top-row {
+.brand-name {
+    font-size: 1.35rem;
+    letter-spacing: -0.2px;
+}
+
+.brand-red {
+    color: #ea3838 !important;
+}
+
+.brand-subtitle {
+    font-size: 0.62rem;
+    color: #787f90;
+    letter-spacing: 1.8px;
+    font-weight: 600;
+    margin-top: 2px;
+}
+
+.brand-divider {
+    height: 34px;
+    width: 1px;
+    background-color: #222634;
+}
+
+/* Center Navigation Section */
+.header-center {
+    grid-column: 2;
+    justify-self: center;
+}
+
+.nav-item-stacked {
+    color: #9da3b4;
+    position: relative;
+    padding: 6px 12px;
+    width: 110px;
+    text-align: center;
+    transition: color 0.15s ease;
+}
+
+.nav-item-stacked .nav-icon {
+    font-size: 1.3rem;
+    margin-bottom: 3px;
+    transition: transform 0.15s ease;
+}
+
+.nav-item-stacked .nav-text {
+    font-size: 0.85rem;
+    font-weight: 500;
+    letter-spacing: 0.1px;
+}
+
+.nav-item-stacked:hover {
+    color: #ffffff;
+}
+
+.nav-item-stacked:hover .nav-icon {
+    transform: translateY(-1px);
+}
+
+/* Active NavLink State (Blazor applies .active automatically) */
+::deep .nav-item-stacked.active {
+    color: #ea3838 !important;
+}
+
+::deep .nav-item-stacked.active::after {
+    content: '';
+    position: absolute;
+    bottom: -6px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 44px;
+    height: 2px;
+    background-color: #ea3838;
+    border-radius: 2px;
+    box-shadow: 0 0 8px rgba(234, 56, 56, 0.45);
+}
+
+/* Right Panel Section */
+.header-right {
+    grid-column: 3;
+}
+
+/* Profile Card */
+.profile-card {
+    background-color: #171a24;
+    border: 1px solid #242836;
+    border-radius: 8px;
+    min-height: 44px;
+    padding-left: 12px;
+    padding-right: 16px;
+}
+
+.avatar-circle {
+    width: 30px;
+    height: 30px;
+    background-color: #262a39;
+    border-radius: 50%;
+    font-size: 0.95rem;
+}
+
+.user-name {
+    font-size: 0.85rem;
+    letter-spacing: -0.1px;
+}
+
+.extra-small {
+    font-size: 0.7rem;
+    color: #787f90 !important;
+}
+
+/* Square Action Buttons (Settings & Logout) */
+.header-icon-btn {
+    width: 42px;
+    height: 42px;
+    background-color: #171a24;
+    border: 1px solid #242836;
+    border-radius: 8px;
+    color: #cbd5e1;
+    font-size: 1.1rem;
+    transition: all 0.15s ease;
+    padding: 0;
+}
+
+.header-icon-btn:hover {
+    background-color: #1f2330;
+    border-color: #2e3446;
+    color: #ffffff;
+    transform: translateY(-1px);
+}
+
+.btn-logout:hover {
+    border-color: rgba(234, 56, 56, 0.4);
+}
+
+/* ====================================================== */
+/* Responsive Mobile & Tablet Layout (< 992px)            */
+/* ====================================================== */
+@media (max-width: 991.98px) {
+    .app-header-card {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
         justify-content: space-between;
+        padding: 6px 10px !important;
+        min-height: auto;
+        gap: 4px 0;
     }
 
-        .top-row ::deep a, .top-row ::deep .btn-link {
-            margin-left: 0;
-        }
-}
-
-@media (min-width: 641px) {
-    .page {
-        flex-direction: row;
+    /* Row 1: Left Brand & Right Profile/Actions */
+    .header-left {
+        order: 1;
     }
 
-    .sidebar {
-        width: 250px;
-        height: 100vh;
-        position: sticky;
-        top: 0;
+    .header-right {
+        order: 2;
+        margin-left: auto;
+        display: flex;
+        align-items: center;
+        gap: 6px;
     }
 
-    .top-row {
-        position: sticky;
-        top: 0;
-        z-index: 1;
+    /* Row 2: Navigation Menu spanning full width */
+    .header-center {
+        order: 3;
+        width: 100%;
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center !important;
+        gap: 8px !important;
+        border-top: 1px solid #1f2330;
+        padding-top: 4px;
+        margin-top: 2px;
     }
 
-        .top-row.auth ::deep a:first-child {
-            flex: 1;
-            text-align: right;
-            width: 0;
-        }
+    .brand-svg-icon {
+        width: 30px !important;
+        height: 30px !important;
+    }
 
-    .top-row, article {
-        padding-left: 2rem !important;
-        padding-right: 1.5rem !important;
+    .brand-name {
+        font-size: 1.05rem;
+    }
+
+    .brand-subtitle {
+        font-size: 0.48rem;
+        letter-spacing: 0.8px;
+    }
+
+    .brand-divider {
+        display: none !important;
+    }
+
+    .nav-item-stacked {
+        width: auto;
+        min-width: 64px;
+        padding: 2px 4px;
+    }
+
+    .nav-item-stacked .nav-icon {
+        font-size: 1rem;
+        margin-bottom: 1px;
+    }
+
+    .nav-text {
+        font-size: 0.7rem;
+    }
+
+    ::deep .nav-item-stacked.active::after {
+        width: 24px;
+        bottom: -4px;
+    }
+
+    .profile-card {
+        min-height: 32px;
+        padding: 2px 6px;
+    }
+
+    .avatar-circle {
+        width: 22px;
+        height: 22px;
+        font-size: 0.75rem;
+    }
+
+    .user-name {
+        font-size: 0.72rem;
+    }
+
+    .extra-small {
+        font-size: 0.6rem;
+    }
+
+    .header-icon-btn {
+        width: 32px;
+        height: 32px;
+        font-size: 0.85rem;
     }
 }

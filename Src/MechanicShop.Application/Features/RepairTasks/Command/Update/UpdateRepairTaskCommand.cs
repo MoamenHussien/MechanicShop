@@ -2,7 +2,8 @@ using System.Security.AccessControl;
 using FluentValidation;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Caching.Hybrid;
+using MechanicShop.Application.Common.Constants;
+using MechanicShop.Application.Common.Interfaces;
 using Microsoft.Extensions.Logging;
 
 public sealed record UpdateRepairTaskCommand(Guid id, string name, decimal LaborCost, RepairDurationInMinutes duration, List<UpdatePartCommand> Parts) : IRequest<Result<Updated>>;
@@ -20,7 +21,7 @@ public sealed class UpdateRepairTaskCommandValidator : AbstractValidator<UpdateR
     }
 }
 
-public class UpdateRepairTaskCommandHandler(ILogger<UpdateRepairTaskCommandHandler> logger, IAppDbContext context, HybridCache cache)
+public class UpdateRepairTaskCommandHandler(ILogger<UpdateRepairTaskCommandHandler> logger, IAppDbContext context, ICacheInvalidator cacheInvalidator)
 : IRequestHandler<UpdateRepairTaskCommand, Result<Updated>>
 {
     public async Task<Result<Updated>> Handle(UpdateRepairTaskCommand request, CancellationToken cancellationToken)
@@ -75,7 +76,7 @@ public class UpdateRepairTaskCommandHandler(ILogger<UpdateRepairTaskCommandHandl
         }
 
         await context.SaveChangesAsync(cancellationToken);
-        await cache.RemoveByTagAsync("RepairTasks", cancellationToken);
+        await cacheInvalidator.EvictByTagAsync(CacheTags.RepairTasks, cancellationToken);
 
         logger.LogInformation("Updated Info and UpSered Part For Repair Task Is successfully with Id: {Id} , And removed the cache tag 'RepairTasks'", request.id);
 

@@ -4,6 +4,8 @@ using FluentValidation;
 using MediatR;
 using Microsoft.Extensions.Caching.Hybrid;
 using Microsoft.Extensions.Logging;
+using MechanicShop.Application.Common.Constants;
+using MechanicShop.Application.Common.Interfaces;
 
 public sealed record DeleteWorkOrderCommand(Guid id) : IRequest<Result<Deleted>>;
 
@@ -15,18 +17,19 @@ public class DeleteWorkOrderCommandValidator : AbstractValidator<DeleteWorkOrder
     }
 }
 
-public class DeleteWorkOrderCommandHandler(ILogger<DeleteCustomerCommandHandler> logger, IAppDbContext context, HybridCache cache,IIdentityService identity,IUser user)
+
+public class DeleteWorkOrderCommandHandler(ILogger<DeleteCustomerCommandHandler> logger, IAppDbContext context, ICacheInvalidator cacheInvalidator)
 : IRequestHandler<DeleteWorkOrderCommand, Result<Deleted>>
 {
     public async Task<Result<Deleted>> Handle(DeleteWorkOrderCommand request, CancellationToken cancellationToken)
     {
-        if(await identity.IsInRoleAsync(user.Id!.Value,Role.Labor.ToString()))
-        {
-            logger.LogWarning("Delete Work Order: (Forbidden) , This User {UserId} is not allowed to Delete This Work Order", user.Id);
-            return ApplicationErrors.NotAllowed;
-        }
+        // if(await identity.IsInRoleAsync(user.Id!.Value,Role.Labor.ToString()))
+        // {
+        //     logger.LogWarning("Delete Work Order: (Forbidden) , This User {UserId} is not allowed to Delete This Work Order", user.Id);
+        //     return ApplicationErrors.NotAllowed;
+        // }
 
-        var WorkOrder = await context.WorkOrders.FindAsync(request.id, cancellationToken);
+        var WorkOrder = await context.WorkOrders.FindAsync([request.id], cancellationToken);
 
         if (WorkOrder is null)
         {
@@ -44,7 +47,7 @@ public class DeleteWorkOrderCommandHandler(ILogger<DeleteCustomerCommandHandler>
         context.WorkOrders.Remove(WorkOrder);
 
         await context.SaveChangesAsync(cancellationToken);
-        await cache.RemoveByTagAsync("WorkOrders",cancellationToken);
+        await cacheInvalidator.EvictByTagAsync(CacheTags.WorkOrders, cancellationToken);
 
         logger.LogInformation("WorkOrder with Id '{WorkOrderId}' was successfully removed, and cache tag 'WorkOrders' was cleared",request.id);
 

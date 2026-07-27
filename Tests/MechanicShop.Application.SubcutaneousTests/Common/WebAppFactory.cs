@@ -22,7 +22,8 @@ public class TestUser : IUser
 
 public class WebAppFactory : WebApplicationFactory<IAssemblyMarker>, IAsyncLifetime
 {
-private readonly MsSqlContainer _dbContainer = new MsSqlBuilder("mcr.microsoft.com/mssql/server:2022-latest").Build();
+    private readonly MsSqlContainer _dbContainer = new MsSqlBuilder("mcr.microsoft.com/mssql/server:2022-latest").Build();
+    
     public IMediator CreateMediator()
     {
         var serviceScope = Services.CreateScope();
@@ -50,7 +51,11 @@ private readonly MsSqlContainer _dbContainer = new MsSqlBuilder("mcr.microsoft.c
           }).Unwrap();
     }
 
-    public new Task DisposeAsync() => _dbContainer.StopAsync();
+    public new async Task DisposeAsync()
+    {
+        await base.DisposeAsync();
+        await _dbContainer.DisposeAsync();
+    }
 
     protected override void ConfigureWebHost(IWebHostBuilder builder)
     {
@@ -58,6 +63,9 @@ private readonly MsSqlContainer _dbContainer = new MsSqlBuilder("mcr.microsoft.c
         {
             services.RemoveAll<IHostedService>();
             services.RemoveAll<OverdueBookingCleanupService>();
+
+            services.RemoveAll<TimeProvider>();
+            services.AddSingleton(TimeProvider.System);
 
             services.RemoveAll<DbContextOptions<AppDbContext>>();
             services.AddDbContext<AppDbContext>((sp, options) =>

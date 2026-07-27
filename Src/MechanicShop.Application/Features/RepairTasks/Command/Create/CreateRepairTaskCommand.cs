@@ -3,7 +3,8 @@ using FluentValidation;
 using MediatR;
 using MediatR.Pipeline;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Caching.Hybrid;
+using MechanicShop.Application.Common.Constants;
+using MechanicShop.Application.Common.Interfaces;
 using Microsoft.Extensions.Logging;
 
 public sealed record CreateRepairTaskCommand(string name, decimal LaborCost, RepairDurationInMinutes duration, List<CreateRepairTaskPartCommand> Parts) : IRequest<Result<RepairTaskDto>>;
@@ -19,7 +20,7 @@ public class CreateRepairTaskCommandValidator : AbstractValidator<CreateRepairTa
     }
 }
 
-public class CreateRepairTaskCommandHandler(ILogger<CreateRepairTaskCommandHandler> logger, IAppDbContext context, HybridCache cache)
+public class CreateRepairTaskCommandHandler(ILogger<CreateRepairTaskCommandHandler> logger, IAppDbContext context, ICacheInvalidator cacheInvalidator)
 : IRequestHandler<CreateRepairTaskCommand, Result<RepairTaskDto>>
 {
     public async Task<Result<RepairTaskDto>> Handle(CreateRepairTaskCommand request, CancellationToken cancellationToken)
@@ -57,11 +58,10 @@ public class CreateRepairTaskCommandHandler(ILogger<CreateRepairTaskCommandHandl
         await context.RepairTasks.AddAsync(CreteRepairTaskStatus.Value, cancellationToken);
         await context.SaveChangesAsync(cancellationToken);
 
-        await cache.RemoveByTagAsync("RepairTasks", cancellationToken);
+        await cacheInvalidator.EvictByTagAsync(CacheTags.RepairTasks, cancellationToken);
 
         logger.LogInformation("Created and saved new Repair Task successfully with Id: {Id} and removed the cache tag 'RepairTasks'", CreteRepairTaskStatus.Value.Id);
 
         return CreteRepairTaskStatus.Value.ToDto();
     }
 }
-

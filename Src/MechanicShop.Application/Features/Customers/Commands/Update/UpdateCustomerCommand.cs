@@ -1,7 +1,8 @@
 using FluentValidation;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Caching.Hybrid;
+using MechanicShop.Application.Common.Constants;
+using MechanicShop.Application.Common.Interfaces;
 using Microsoft.Extensions.Logging;
 
 public sealed record UpdateCustomerCommand(Guid id, string name, string email, string PhoneNumber, List<UpdateVehicleCommand> Vehicles) : IRequest<Result<Updated>>;
@@ -22,7 +23,7 @@ public class UpdateCustomerCommandValidator : AbstractValidator<UpdateCustomerCo
     }
 }
 
-public class UpdateCustomerCommandHandler(ILogger<UpdateCustomerCommandHandler> logger, HybridCache cache, IAppDbContext context)
+public class UpdateCustomerCommandHandler(ILogger<UpdateCustomerCommandHandler> logger, ICacheInvalidator cacheInvalidator, IAppDbContext context)
 : IRequestHandler<UpdateCustomerCommand, Result<Updated>>
 {
     public async Task<Result<Updated>> Handle(UpdateCustomerCommand request, CancellationToken cancellationToken)
@@ -40,7 +41,7 @@ public class UpdateCustomerCommandHandler(ILogger<UpdateCustomerCommandHandler> 
         if (IFExists)
         {
             logger.LogWarning("Customer creation aborted. Email already exists : {email}", Email);
-            return ApplicationErrors.CustomerExists;
+            return ApplicationErrors.CustomerWithThisEmailIsAlreadyExists;
         }
 
         var vehicleModelIds = request.Vehicles.Select(v => v.VehicleModelId).Distinct().ToList();
@@ -88,7 +89,7 @@ public class UpdateCustomerCommandHandler(ILogger<UpdateCustomerCommandHandler> 
 
         await context.SaveChangesAsync(cancellationToken);
 
-        await cache.RemoveByTagAsync("Customers", cancellationToken);
+        await cacheInvalidator.EvictByTagAsync(CacheTags.Customers, cancellationToken);
 
         logger.LogInformation("Successfully Update The Customer With ID : {id} And Removed Cache Tag With Name Customer", request.id);
 

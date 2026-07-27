@@ -4,11 +4,13 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Hybrid;
 using Microsoft.Extensions.Logging;
 
+using MechanicShop.Application.Common.Constants;
+
 public sealed record GetCustomersQuery() : ICachedQuery<Result<List<CustomerDto>>>
 {
     public string CacheKey => "AllCustomers";
 
-    public string[] Tags => ["Customers"];
+    public string[] Tags => [CacheTags.Customers];
 
     public TimeSpan Expiration => TimeSpan.FromMinutes(10);
 }

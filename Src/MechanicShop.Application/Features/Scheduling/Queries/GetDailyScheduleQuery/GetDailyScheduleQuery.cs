@@ -4,11 +4,13 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage.Internal;
 using Microsoft.Extensions.Logging;
 
+using MechanicShop.Application.Common.Constants;
+
 public sealed record GetDailyScheduleQuery(DateOnly ScheduleDate, TimeZoneInfo TimeZone, Guid? LaborId = null) : ICachedQuery<Result<ScheduleDto>>
 {
     public string CacheKey => $"date:{ScheduleDate:yyyyMMdd}-labor:{LaborId?.ToString() ?? "-"}";
 
-    public string[] Tags => ["WorkOrders"];
+    public string[] Tags => [CacheTags.WorkOrders, CacheTags.Schedules];
 
     public TimeSpan Expiration => TimeSpan.FromMinutes(10);
 }
@@ -67,8 +69,8 @@ public class GetDailyScheduleQueryHandler(IAppDbContext context, TimeProvider ti
                         {
                             WorkOrderId = WorkOrderInThisTime.Id,
                             Spot = spotEn,
-                            StartAt = WorkOrderInThisTime.StartAtUtc,
-                            EndAt = WorkOrderInThisTime.EndAtUtc,
+                            StartAt = WorkOrderInThisTime.StartAtUtc.ToLocal(request.TimeZone),
+                            EndAt = WorkOrderInThisTime.EndAtUtc.ToLocal(request.TimeZone),
                             Vehicle = WorkOrderInThisTime.Vehicle?.VehicleModel?.VehicleMake?.Make +" | "+WorkOrderInThisTime.Vehicle?.LicensePlate,
                             Labor = WorkOrderInThisTime.Labor.ToDto(),
                             IsOccupied = true,
@@ -85,8 +87,8 @@ public class GetDailyScheduleQueryHandler(IAppDbContext context, TimeProvider ti
                     {
                         WorkOrderId = null,
                         Spot = spotEn,
-                        StartAt = StartRangeUtc,
-                        EndAt = EndRangeUtc,
+                        StartAt = startRangeLocal,
+                        EndAt = EndRangeLocal,
                         Vehicle = null,
                         Labor = null,
                         IsOccupied = false,

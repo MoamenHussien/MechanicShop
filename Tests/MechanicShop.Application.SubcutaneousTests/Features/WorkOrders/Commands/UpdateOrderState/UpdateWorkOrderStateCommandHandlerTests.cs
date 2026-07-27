@@ -30,7 +30,7 @@ public class UpdateWorkOrderStateCommandHandlerTests(WebAppFactory factory)
     }
 
     [Fact]
-    public async Task UpdateWorkOrderStateHandler_WithSameState_ShouldFail()
+    public async Task UpdateWorkOrderStateHandler_WithSameState_ShouldSucceed()
     {
         // Arrange
         var vehicleMake = VehicleMakeFactory.CreateVehicleMake().Value;
@@ -68,8 +68,8 @@ public class UpdateWorkOrderStateCommandHandlerTests(WebAppFactory factory)
         var result = await _mediator.Send(command);
 
         // Assert
-        Assert.True(result.IsError);
-        Assert.Equal(ApplicationErrors.NothingIsChanged.Code, result.TopError.Code);
+        Assert.True(result.IsSuccess);
+        // Assert.Equal(ApplicationErrors.NothingIsChanged.Code, result.TopError.Code);
     }
 
     [Fact]

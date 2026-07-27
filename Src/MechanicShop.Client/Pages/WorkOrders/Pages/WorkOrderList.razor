@@ -1,56 +1,71 @@
-﻿@page "/workorders"
+@page "/workorders"
 @page "/workorders/Page/{Page:int}"
 
 @attribute [Authorize]
 
-<h3 class="my-4 border-start border-5 p-1">
-    <i class="bi bi-calendar-plus-fill mx-2"></i>WorkOrders
-</h3>
+<div class="container-fluid py-4">
+    <!-- Header Section -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="h3 mb-1 text-body-emphasis">
+                <i class="bi bi-clipboard-text me-2"></i>WorkOrders
+            </h1>
+            <p class="text-muted mb-0">Manage work orders and track service progress</p>
+        </div>
+    </div>
 
-<div class="mb-3">
-    <EditForm Model="filterRequest" OnValidSubmit="ApplyFilter">
-        <div class="row g-2 align-items-end">
-            <div class="col-2">
-                <InputText @bind-Value="filterRequest.SearchTerm" placeholder="Search…" class="form-control" />
-            </div>
-            <div class="col-2">
-                <InputSelect @bind-Value="filterRequest.State" class="form-select">
-                    <option value="">All Status</option>
-                    @foreach (var st in Enum.GetValues<WorkOrderState>())
-                    {
-                        <option value="@st">@st</option>
-                    }
-                </InputSelect>
-            </div>
-            <div class="col-2">
-                <InputDate @bind-Value="filterRequest.StartDateFrom" class="form-control" placeholder="Start From" />
-            </div>
-            <div class="col-2">
-                <InputDate @bind-Value="filterRequest.StartDateTo" class="form-control" placeholder="Start To" />
-            </div>
-            <div class="col-auto">
-                <button type="submit" class="btn btn-primary btn-sm">Filter</button>
-                <button type="button" class="btn btn-secondary btn-sm" @onclick="ResetFilter">Reset</button>
+    <!-- Search and Filter Toolbar -->
+    <div class="card border mb-4">
+        <div class="card-body">
+            <EditForm Model="filterRequest" OnValidSubmit="ApplyFilter">
+                <div class="row g-3 align-items-end">
+                    <div class="col-md-3">
+                        <InputText @bind-Value="filterRequest.SearchTerm" placeholder="Search…" class="form-control" />
+                    </div>
+                    <div class="col-md-2">
+                        <InputSelect @bind-Value="filterRequest.State" class="form-select">
+                            <option value="">All Status</option>
+                            @foreach (var st in Enum.GetValues<WorkOrderState>())
+                            {
+                                <option value="@st">@st</option>
+                            }
+                        </InputSelect>
+                    </div>
+                    <div class="col-md-2">
+                        <InputDate @bind-Value="filterRequest.StartDateFrom" class="form-control" placeholder="Start From" />
+                    </div>
+                    <div class="col-md-2">
+                        <InputDate @bind-Value="filterRequest.StartDateTo" class="form-control" placeholder="Start To" />
+                    </div>
+                    <div class="col-md-3">
+                        <button type="submit" class="btn btn-primary me-1">Filter</button>
+                        <button type="button" class="btn btn-outline-secondary" @onclick="ResetFilter">Reset</button>
+                    </div>
+                </div>
+            </EditForm>
+        </div>
+    </div>
+
+    @if (pagedResult?.Items == null)
+    {
+        <div class="d-flex justify-content-center py-5">
+            <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Loading...</span>
             </div>
         </div>
-    </EditForm>
-</div>
-
-@if (pagedResult?.Items == null)
-{
-    <p>Loading...</p>
-}
-else if (!pagedResult.Items.Any())
-{
-    <p>No appointments found.</p>
-}
-else
-{
-    <div class="container">
-        <div class="table-responsive">
+    }
+    else if (!pagedResult.Items.Any())
+    {
+        <div class="alert alert-info" role="alert">
+            <i class="bi bi-info-circle me-2"></i>No work orders found matching your criteria.
+        </div>
+    }
+    else
+    {
+        <div class="card border">
             <div class="table-responsive">
-                <table class="table table-hover table-striped align-middle text-nowrap">
-                    <thead class="table-light sticky-top z-1">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="table-dark">
                         <tr>
                             <th style="width: 26%" @onclick="() => SortBy(nameof(WorkOrderListItemModel.Vehicle))">
                                 Vehicle <i class="bi @GetSortIcon(nameof(WorkOrderListItemModel.Vehicle))"></i>
@@ -123,10 +138,19 @@ else
                                                     }
                                                     else
                                                     {
-                                                        <button class="btn btn-sm btn-primary"
-                                                            @onclick="() => CreateInvoice(wo.WorkOrderId)" title="Create Invoice">
-                                                            <i class="bi bi-plus-circle"></i>
-                                                        </button>
+                                                        if (creatingInvoiceId == wo.WorkOrderId)
+                                                        {
+                                                            <button class="btn btn-sm btn-primary" disabled title="Creating Invoice...">
+                                                                <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                                                            </button>
+                                                        }
+                                                        else
+                                                        {
+                                                            <button class="btn btn-sm btn-primary"
+                                                                @onclick="() => CreateInvoice(wo)" title="Create Invoice" disabled="@(creatingInvoiceId.HasValue)">
+                                                                <i class="bi bi-plus-circle"></i>
+                                                            </button>
+                                                        }
                                                     }
                                                 }
                                             </Authorized>
@@ -137,16 +161,14 @@ else
                         }
                     </tbody>
                 </table>
-
             </div>
-
+            <div class="card-footer bg-transparent border-top p-3">
+                <Paginator TotalItems="pagedResult.TotalCount" ItemsPerPage="pagedResult.PageSize"
+                    CurrentPageNumber="pagedResult.PageNumber" NavUrl="workorders/page/" />
+            </div>
         </div>
-        <div class="row">
-            <Paginator TotalItems="pagedResult.TotalCount" ItemsPerPage="pagedResult.PageSize"
-                CurrentPageNumber="pagedResult.PageNumber" NavUrl="workorders/page/" />
-        </div>
-    </div>
-}
+    }
+</div>
 
 @code {
     [Inject] private ServiceApi serviceApi { get; set; } = default!;
@@ -158,6 +180,7 @@ else
     private WorkOrderFilterRequest filterRequest = new WorkOrderFilterRequest();
     private PageRequest pageRequest = new PageRequest { Page = 1, PageSize = 10 };
     private PaginatedList<WorkOrderListItemModel>? pagedResult;
+    private Guid? creatingInvoiceId;
 
     protected override async Task OnInitializedAsync()
     {
@@ -215,17 +238,29 @@ else
         await LoadWorkOrders();
     }
 
-    private async Task CreateInvoice(Guid workOrderId)
+    private async Task CreateInvoice(WorkOrderListItemModel wo)
     {
-        var createInvoiceResult = await serviceApi.IssueInvoiceAsync(workOrderId);
+        if (creatingInvoiceId.HasValue) return;
 
-        if (createInvoiceResult.IsSuccess)
+        creatingInvoiceId = wo.WorkOrderId;
+
+        try
         {
-            navigationManager.NavigateTo($"/invoice/{createInvoiceResult.Data!.InvoiceId}");
+            var createInvoiceResult = await serviceApi.IssueInvoiceAsync(wo.WorkOrderId);
+
+            if (createInvoiceResult.IsSuccess && createInvoiceResult.Data != null)
+            {
+                wo.InvoiceId = createInvoiceResult.Data.InvoiceId;
+                navigationManager.NavigateTo($"/invoice/{createInvoiceResult.Data.InvoiceId}");
+            }
+            else
+            {
+                await LoadWorkOrders();
+            }
         }
-        else
+        finally
         {
-
+            creatingInvoiceId = null;
         }
     }
 

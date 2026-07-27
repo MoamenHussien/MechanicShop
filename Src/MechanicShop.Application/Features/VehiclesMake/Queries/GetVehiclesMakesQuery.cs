@@ -3,11 +3,13 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Internal;
 using Microsoft.Extensions.Logging;
 
+using MechanicShop.Application.Common.Constants;
+
 public sealed record GetVehiclesMakesQuery : ICachedQuery<Result<List<VehicleMakeResponse>>>
 {
     public string CacheKey => "VehiclesMakes";
 
-    public string[] Tags => ["VMakes"];
+    public string[] Tags => [CacheTags.VehicleMakes];
 
     public TimeSpan Expiration => TimeSpan.FromHours(24);
 }

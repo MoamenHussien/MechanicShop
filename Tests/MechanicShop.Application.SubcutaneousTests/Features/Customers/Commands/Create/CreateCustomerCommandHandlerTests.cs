@@ -85,7 +85,7 @@ public class CreateCustomerCommandHandlerTests(WebAppFactory factory)
 
         // Assert
         Assert.True(result.IsError);
-        Assert.Equal(ApplicationErrors.CustomerExists.Code, result.TopError.Code);
+        Assert.Equal(ApplicationErrors.CustomerWithThisEmailIsAlreadyExists.Code, result.TopError.Code);
     }
 
     [Fact]

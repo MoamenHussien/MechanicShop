@@ -5,6 +5,8 @@ using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Hybrid;
 using Microsoft.Extensions.Logging;
+using MechanicShop.Application.Common.Constants;
+using MechanicShop.Application.Common.Interfaces;
 
 public sealed record ReAssignLaborCommand(Guid WorkOrderId, Guid LaborId) : IRequest<Result<Updated>>;
 
@@ -17,16 +19,18 @@ public class ReAssignLaborCommandValidator : AbstractValidator<ReAssignLaborComm
     }
 }
 
-public class ReAssignLaborCommandHandler(ILogger<ReAssignLaborCommandHandler> logger, IAppDbContext context, HybridCache cache, IUser user, IIdentityService identity,IWorkOrderPolicy policy)
+
+
+public class ReAssignLaborCommandHandler(ILogger<ReAssignLaborCommandHandler> logger, IAppDbContext context, ICacheInvalidator cacheInvalidator,IUser user ,IWorkOrderPolicy policy)
 : IRequestHandler<ReAssignLaborCommand, Result<Updated>>
 {
     public async Task<Result<Updated>> Handle(ReAssignLaborCommand request, CancellationToken cancellationToken)
     {
-        if(await identity.IsInRoleAsync(user.Id!.Value,Role.Labor.ToString()))
-        {
-            logger.LogWarning("ReAssignLabor: (Forbidden) , This User {UserId} is not allowed to reassign labor", user.Id);
-            return ApplicationErrors.NotAllowed;
-        }
+        // if(await identity.IsInRoleAsync(user.Id!.Value,Role.Labor.ToString()))
+        // {
+        //     logger.LogWarning("ReAssignLabor: (Forbidden) , This User {UserId} is not allowed to reassign labor", user.Id);
+        //     return ApplicationErrors.NotAllowed;
+        // }
 
         var WordOrder = await context.WorkOrders.FindAsync([request.WorkOrderId],cancellationToken);
 
@@ -64,7 +68,7 @@ public class ReAssignLaborCommandHandler(ILogger<ReAssignLaborCommandHandler> lo
 
         await context.SaveChangesAsync(cancellationToken);
 
-        await cache.RemoveByTagAsync("WorkOrders",cancellationToken);
+        await cacheInvalidator.EvictByTagAsync(CacheTags.WorkOrders, cancellationToken);
 
         logger.LogInformation("ReAssignLabor: Successfully reassigned Labor {LaborId} to WorkOrder {WorkOrderId} by User {UserId}", request.LaborId, request.WorkOrderId, user.Id);
 

@@ -6,6 +6,8 @@ using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Hybrid;
 using Microsoft.Extensions.Logging;
+using MechanicShop.Application.Common.Constants;
+using MechanicShop.Application.Common.Interfaces;
 
 public sealed record CreateWorkOrderCommand(Guid LaborId, Guid VehicleId, Spot spot, DateTimeOffset StartAtUtc, List<Guid> repairTasksIds) : IRequest<Result<WorkOrderDto>>;
 
@@ -24,7 +26,9 @@ public class CreateWorkOrderCommandValidator : AbstractValidator<CreateWorkOrder
     }
 }
 
-public class CreateWorkOrderCommandHandler(ILogger<CreateWorkOrderCommandHandler> logger, IAppDbContext context, HybridCache cache, IWorkOrderPolicy policy)
+
+
+public class CreateWorkOrderCommandHandler(ILogger<CreateWorkOrderCommandHandler> logger, IAppDbContext context, ICacheInvalidator cacheInvalidator, IWorkOrderPolicy policy)
 : IRequestHandler<CreateWorkOrderCommand, Result<WorkOrderDto>>
 {
     public async Task<Result<WorkOrderDto>> Handle(CreateWorkOrderCommand request, CancellationToken cancellationToken)
@@ -115,7 +119,7 @@ public class CreateWorkOrderCommandHandler(ILogger<CreateWorkOrderCommandHandler
         
         await context.SaveChangesAsync(cancellationToken);
 
-        await cache.RemoveByTagAsync("WorkOrders", cancellationToken);
+        await cacheInvalidator.EvictByTagAsync(CacheTags.WorkOrders, cancellationToken);
 
         logger.LogInformation("Created WorkOrder with Id: {WorkOrderId}, saved changes to database, and removed cache tag 'WorkOrders'. VehicleId: {VehicleId}, LaborId: {LaborId}, StartAtUtc: {StartAt}, EndAtUtc: {EndAt}",CreateWorkOrderStatus.Value.Id,CreateWorkOrderStatus.Value.VehicleId,CreateWorkOrderStatus.Value.LaborId,CreateWorkOrderStatus.Value.StartAtUtc,CreateWorkOrderStatus.Value.EndAtUtc );
 

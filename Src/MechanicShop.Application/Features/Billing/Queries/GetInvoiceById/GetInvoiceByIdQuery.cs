@@ -4,11 +4,13 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.Extensions.Logging;
 
+using MechanicShop.Application.Common.Constants;
+
 public sealed record GetInvoiceByIdQuery(Guid invoiceId) : ICachedQuery<Result<InvoiceDto>>
 {
     public string CacheKey => $"InvoiceId:{invoiceId}";
 
-    public string[] Tags => ["Invoices"];
+    public string[] Tags => [CacheTags.Invoices];
 
     public TimeSpan Expiration => TimeSpan.FromMinutes(10);
 }

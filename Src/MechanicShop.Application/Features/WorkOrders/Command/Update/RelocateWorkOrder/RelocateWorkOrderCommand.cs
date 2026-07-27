@@ -2,7 +2,8 @@ using System.Security.AccessControl;
 using FluentValidation;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Caching.Hybrid;
+using MechanicShop.Application.Common.Constants;
+using MechanicShop.Application.Common.Interfaces;
 using Microsoft.Extensions.Logging;
 
 public sealed record RelocateWorkOrderCommand(Guid WorkOrderId, DateTimeOffset NewStartDateTimeUtc, Spot NewSpot) :IRequest<Result<Updated>>;
@@ -17,7 +18,7 @@ public class RelocateWorkOrderCommandValidator : AbstractValidator<RelocateWorkO
     }
 }
 
-public class RelocateWorkOrderCommandHandler(ILogger<RelocateWorkOrderCommandHandler> logger, IAppDbContext context,HybridCache cache, IUser user, IIdentityService identity , IWorkOrderPolicy policy)
+public class RelocateWorkOrderCommandHandler(ILogger<RelocateWorkOrderCommandHandler> logger, IAppDbContext context, ICacheInvalidator cacheInvalidator, IUser user, IIdentityService identity , IWorkOrderPolicy policy)
 : IRequestHandler<RelocateWorkOrderCommand, Result<Updated>>
 {
     public async Task<Result<Updated>> Handle(RelocateWorkOrderCommand request, CancellationToken cancellationToken)
@@ -78,7 +79,7 @@ public class RelocateWorkOrderCommandHandler(ILogger<RelocateWorkOrderCommandHan
         }
         
         await context.SaveChangesAsync(cancellationToken);
-        await cache.RemoveByTagAsync("WorkOrders",cancellationToken);
+        await cacheInvalidator.EvictByTagAsync(CacheTags.WorkOrders, cancellationToken);
 
         return Result.Updated;
     }

@@ -1,0 +1,277 @@
+@using System.Security.Claims
+@using MechanicShop.Client.Services
+@using MechanicShop.Contracts.Requests.Labors
+@inject AuthenticationStateProvider AuthStateProvider
+@inject ServiceApi ApiService
+
+@if (Show)
+{
+    <div class="offcanvas-backdrop fade show" @onclick="Close"></div>
+    <div class="offcanvas offcanvas-end show bg-dark text-light border-start border-secondary" tabindex="-1" style="visibility: visible; width: 420px; max-width: 100vw;">
+        <div class="offcanvas-header border-bottom border-secondary">
+            <h5 class="offcanvas-title d-flex align-items-center">
+                <i class="bi bi-gear me-2 text-primary"></i> Settings
+            </h5>
+            <button type="button" class="btn-close btn-close-white" @onclick="Close" aria-label="Close"></button>
+        </div>
+
+        <div class="offcanvas-body">
+            <!-- My Profile Section -->
+            <div class="card bg-secondary bg-opacity-10 border-secondary mb-4">
+                <div class="card-header bg-transparent border-secondary text-primary font-weight-bold d-flex align-items-center">
+                    <i class="bi bi-person-badge me-2"></i> My Profile
+                </div>
+                <div class="card-body">
+                    @if (!string.IsNullOrEmpty(firstName) || !string.IsNullOrEmpty(lastName))
+                    {
+                        <div class="row mb-3">
+                            <div class="col-6">
+                                <label class="text-secondary small d-block">First Name</label>
+                                <span class="fs-6 font-monospace text-light">@firstName</span>
+                            </div>
+                            <div class="col-6">
+                                <label class="text-secondary small d-block">Last Name</label>
+                                <span class="fs-6 font-monospace text-light">@lastName</span>
+                            </div>
+                        </div>
+                    }
+
+                    <div class="mb-3">
+                        <label class="text-secondary small d-block">Email Address</label>
+                        <span class="fs-6 font-monospace text-light">@userEmail</span>
+                    </div>
+
+                    <div class="mb-2">
+                        <label class="text-secondary small d-block mb-1">Assigned Roles</label>
+                        @if (userRoles.Any())
+                        {
+                            <div>
+                                @foreach (var role in userRoles)
+                                {
+                                    <span class="badge bg-primary text-light me-1 px-2 py-1">
+                                        <i class="bi bi-shield-check me-1"></i>@role
+                                    </span>
+                                }
+                            </div>
+                        }
+                        else
+                        {
+                            <span class="text-muted small">No roles assigned</span>
+                        }
+                    </div>
+                </div>
+            </div>
+
+            <!-- Change Password Form -->
+            <div class="card bg-secondary bg-opacity-10 border-secondary mb-4">
+                <div class="card-header bg-transparent border-secondary text-primary font-weight-bold d-flex align-items-center">
+                    <i class="bi bi-key me-2"></i> Change Password
+                </div>
+                <div class="card-body">
+                    <EditForm Model="this" OnValidSubmit="HandleChangePassword">
+                        @if (!string.IsNullOrEmpty(errorMessage))
+                        {
+                            <div class="alert alert-danger alert-dismissible fade show p-2 small mb-3" role="alert">
+                                <i class="bi bi-exclamation-triangle-fill me-1"></i> @errorMessage
+                            </div>
+                        }
+
+                        @if (!string.IsNullOrEmpty(successMessage))
+                        {
+                            <div class="alert alert-success alert-dismissible fade show p-2 small mb-3" role="alert">
+                                <i class="bi bi-check-circle-fill me-1"></i> @successMessage
+                            </div>
+                        }
+
+                        <div class="mb-3">
+                            <label class="form-label small text-secondary">Current Password</label>
+                            <input type="password" class="form-control form-control-sm bg-dark text-light border-secondary" 
+                                   @bind="currentPassword" required autocomplete="current-password" placeholder="••••••••" />
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label small text-secondary">New Password</label>
+                            <input type="password" class="form-control form-control-sm bg-dark text-light border-secondary" 
+                                   @bind="newPassword" required autocomplete="new-password" placeholder="••••••••" />
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label small text-secondary">Confirm Password</label>
+                            <input type="password" class="form-control form-control-sm bg-dark text-light border-secondary" 
+                                   @bind="confirmPassword" required autocomplete="new-password" placeholder="••••••••" />
+                        </div>
+
+                        <button type="submit" class="btn btn-primary btn-sm w-100 mt-2" disabled="@isSubmitting">
+                            @if (isSubmitting)
+                            {
+                                <span class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span>
+                                <span>Updating...</span>
+                            }
+                            else
+                            {
+                                <i class="bi bi-check2-circle me-1"></i>
+                                <span>Update Password</span>
+                            }
+                        </button>
+                    </EditForm>
+                </div>
+            </div>
+
+            <!-- Manager Only Sections (Placeholders) -->
+            @if (isManager)
+            {
+                <div class="border-top border-secondary pt-3 mt-4">
+                    <h6 class="text-secondary small text-uppercase font-weight-bold mb-3">
+                        <i class="bi bi-sliders me-1"></i> Administration
+                    </h6>
+
+                    <NavLink href="employees" class="card bg-secondary bg-opacity-10 border-secondary mb-2 text-decoration-none" @onclick="Close">
+                        <div class="card-body p-3 d-flex justify-content-between align-items-center">
+                            <div>
+                                <h6 class="m-0 text-light fs-6"><i class="bi bi-people me-2"></i> Employee Management</h6>
+                                <small class="text-secondary">Manage staff, roles, and permissions</small>
+                            </div>
+                            <span class="badge bg-primary">Open</span>
+                        </div>
+                    </NavLink>
+
+                    <NavLink href="makes" class="card bg-secondary bg-opacity-10 border-secondary mb-2 text-decoration-none" @onclick="Close">
+                        <div class="card-body p-3 d-flex justify-content-between align-items-center">
+                            <div>
+                                <h6 class="m-0 text-light fs-6"><i class="bi bi-car-front me-2 text-primary"></i> Vehicle Makes</h6>
+                                <small class="text-secondary">Manage catalog makes and models</small>
+                            </div>
+                            <i class="bi bi-chevron-right text-secondary"></i>
+                        </div>
+                    </NavLink>
+                </div>
+            }
+        </div>
+    </div>
+}
+
+@code {
+    [Parameter] public bool Show { get; set; }
+    [Parameter] public EventCallback OnClose { get; set; }
+
+    private string userEmail = string.Empty;
+    private string firstName = string.Empty;
+    private string lastName = string.Empty;
+    private List<string> userRoles = [];
+    private bool isManager = false;
+
+    private string currentPassword = string.Empty;
+    private string newPassword = string.Empty;
+    private string confirmPassword = string.Empty;
+
+    private bool isSubmitting = false;
+    private string? errorMessage;
+    private string? successMessage;
+
+    protected override async Task OnParametersSetAsync()
+    {
+        if (Show)
+        {
+            var authState = await AuthStateProvider.GetAuthenticationStateAsync();
+            var user = authState.User;
+
+            if (user.Identity?.IsAuthenticated == true)
+            {
+                userEmail = user.FindFirst(ClaimTypes.Email)?.Value ?? user.Identity.Name ?? "N/A";
+                userRoles = user.FindAll(ClaimTypes.Role).Select(c => c.Value).ToList();
+                isManager = user.IsInRole("Manager");
+
+                firstName = user.FindFirst(ClaimTypes.GivenName)?.Value ?? user.FindFirst("given_name")?.Value ?? string.Empty;
+                lastName = user.FindFirst(ClaimTypes.Surname)?.Value ?? user.FindFirst("family_name")?.Value ?? string.Empty;
+
+                if (string.IsNullOrEmpty(firstName) && string.IsNullOrEmpty(lastName))
+                {
+                    try
+                    {
+                        var laborsResult = await ApiService.GetLaborsAsync();
+                        if (laborsResult.IsSuccess && laborsResult.Data != null)
+                        {
+                            var userIdClaim = user.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+                            if (Guid.TryParse(userIdClaim, out var userId))
+                            {
+                                var labor = laborsResult.Data.FirstOrDefault(l => l.LaborId == userId);
+                                if (labor != null && !string.IsNullOrEmpty(labor.Name))
+                                {
+                                    var parts = labor.Name.Split(' ', 2);
+                                    firstName = parts.Length > 0 ? parts[0] : string.Empty;
+                                    lastName = parts.Length > 1 ? parts[1] : string.Empty;
+                                }
+                            }
+                        }
+                    }
+                    catch
+                    {
+                        // Ignore lookup errors gracefully
+                    }
+                }
+            }
+        }
+    }
+
+    private async Task HandleChangePassword()
+    {
+        errorMessage = null;
+        successMessage = null;
+
+        if (string.IsNullOrWhiteSpace(currentPassword))
+        {
+            errorMessage = "Current password is required.";
+            return;
+        }
+
+        if (string.IsNullOrWhiteSpace(newPassword) || newPassword.Length < 8)
+        {
+            errorMessage = "New password must be at least 8 characters long.";
+            return;
+        }
+
+        if (newPassword != confirmPassword)
+        {
+            errorMessage = "New password and Confirm password do not match.";
+            return;
+        }
+
+        isSubmitting = true;
+
+        try
+        {
+            var request = new UpdateLaborPasswordRequest(currentPassword, newPassword);
+            var result = await ApiService.UpdateUserPasswordAsync(request);
+
+            if (result.IsSuccess)
+            {
+                successMessage = "Password changed successfully.";
+                currentPassword = string.Empty;
+                newPassword = string.Empty;
+                confirmPassword = string.Empty;
+            }
+            else
+            {
+                errorMessage = result.ErrorMessage ?? "Failed to update password. Please verify your current password.";
+            }
+        }
+        catch (Exception)
+        {
+            errorMessage = "An unexpected error occurred while updating password. Please try again.";
+        }
+        finally
+        {
+            isSubmitting = false;
+        }
+    }
+
+    private async Task Close()
+    {
+        errorMessage = null;
+        successMessage = null;
+        currentPassword = string.Empty;
+        newPassword = string.Empty;
+        confirmPassword = string.Empty;
+        await OnClose.InvokeAsync();
+    }
+}

@@ -1,4 +1,5 @@
 using MediatR;
+using MechanicShop.Application.Common.Constants;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Microsoft.VisualBasic;
@@ -32,7 +33,7 @@ public sealed record GetAllWorkOrderQuery(
                              $":EndAtFrom={EndDateFrom?.ToString("yyyyMMdd") ?? "-"}" +
                              $":EndAtTo={EndDateTo?.ToString("yyyyMMdd") ?? "-"}" +
                              $":spot={Spot?.ToString() ?? "-"}";
-    public string[] Tags => ["WorkOrders"];
+    public string[] Tags => [CacheTags.WorkOrders];
 
     public TimeSpan Expiration => TimeSpan.FromMinutes(10);
 }
@@ -160,22 +161,23 @@ public class GetAllWorkOrderQueryHandler(IAppDbContext context)
 
     private static IQueryable<WorkOrder> ApplySearchTerm(IQueryable<WorkOrder> query, string searchTerm)
     {
-        var normalized = searchTerm.CapitalizeFirstLetter();
+        var term = searchTerm.Trim();
 
         return query.Where(wo =>
+            (wo.Vehicle != null && wo.Vehicle.Customer != null && EF.Functions.Like(wo.Vehicle.Customer.Name, $"%{term}%")) ||
             (wo.Vehicle != null && (
-                EF.Functions.Like(wo.Vehicle.VehicleModel.VehicleMake.Make, $"%{normalized}%") ||
-                EF.Functions.Like(wo.Vehicle.VehicleModel.Model, $"%{normalized}%") ||
-                EF.Functions.Like(wo.Vehicle.LicensePlate, $"%{normalized}%")
+                EF.Functions.Like(wo.Vehicle.VehicleModel.VehicleMake.Make, $"%{term}%") ||
+                EF.Functions.Like(wo.Vehicle.VehicleModel.Model, $"%{term}%") ||
+                EF.Functions.Like(wo.Vehicle.LicensePlate, $"%{term}%")
             )) ||
             (wo.Labor != null && (
-                EF.Functions.Like(wo.Labor.FirstName, $"%{normalized}%") ||
-                EF.Functions.Like(wo.Labor.LastName, $"%{normalized}%") ||
-                EF.Functions.Like(wo.Labor.FirstName + " " + wo.Labor.LastName, $"%{normalized}%")
+                EF.Functions.Like(wo.Labor.FirstName, $"%{term}%") ||
+                EF.Functions.Like(wo.Labor.LastName, $"%{term}%") ||
+                EF.Functions.Like(wo.Labor.FirstName + " " + wo.Labor.LastName, $"%{term}%")
             )) ||
             wo.RepairTasks.Any(rt =>
-                EF.Functions.Like(rt.Name, $"%{normalized}%")) ||
-            EF.Functions.Like(wo.Id.ToString(), $"%{normalized}%"));
+                EF.Functions.Like(rt.Name, $"%{term}%")) ||
+            EF.Functions.Like(wo.Id.ToString(), $"%{term}%"));
     }
 
     private static IQueryable<WorkOrder> ApplySorting(IQueryable<WorkOrder> query, string sortColumn, string sortDirection)

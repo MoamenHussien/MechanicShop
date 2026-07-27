@@ -1,4 +1,5 @@
 using System.Security.Claims;
+using MechanicShop.Application.Features.Labors.DTOs;
 
 public interface IIdentityService
 {
@@ -12,5 +13,9 @@ public interface IIdentityService
     Task<Result<Success>> DeleteUserAsync(Guid userid);
     Result<string> GetRefreshTokenFromCookies();
     void DeleteRefreshTokenCookie();
+    Task<Result<List<string>>> GetAllRolesAsync(CancellationToken ct = default);
+    Task<Result<Success>> ResetUserPasswordAsync(Guid userid);
+    Task<Result<Success>> UpdateUserPasswordAsync(Guid userid,string newPassword,string currentPassword,CancellationToken ct);
+    Task<Result<List<EmployeeDetailDto>>> GetEmployeeDetailsAsync(CancellationToken ct);
 
 }

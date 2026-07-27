@@ -73,5 +73,25 @@ public class IdentityController(ISender sender) : ApiController
         return NoContent();
     }
 
+    [HttpGet("assignable-roles")]
+    [Authorize(Roles = nameof(Role.Manager))]
+    [EndpointName("AssignableRoles")]
+    [EndpointSummary("Gets all assignable roles.")]
+    [EndpointDescription("Returns all system roles except the Manager role.")]
+    [ProducesResponseType(typeof(List<string>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status401Unauthorized)]
+    [OutputCache(PolicyName = nameof(Policies.SharedAuthCache), Duration = 120)]
+    public async Task<IActionResult> GetRoles(CancellationToken ct)
+    {
+        var result = await sender.Send(new GetAllSystemRolesQuery(), ct);
+
+        return result.Match(success => Ok(success), Problem);
+    }
+
+
+
+
+
+
 
 }

@@ -1,7 +1,8 @@
 using FluentValidation;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Caching.Hybrid;
+using MechanicShop.Application.Common.Constants;
+using MechanicShop.Application.Common.Interfaces;
 using Microsoft.Extensions.Logging;
 
 public sealed record CreateCustomerCommand(
@@ -37,30 +38,30 @@ public class CreateCustomerCommandValidator : AbstractValidator<CreateCustomerCo
 
 public class CreateCustomerCommandHandler(
     ILogger<CreateCustomerCommandHandler> logger,
-    HybridCache cache,
+    ICacheInvalidator cacheInvalidator,
     IAppDbContext context) : IRequestHandler<CreateCustomerCommand, Result<CustomerDto>>
 {
-    public async Task<Result<CustomerDto>> Handle(CreateCustomerCommand request,CancellationToken cancellationToken)
+    public async Task<Result<CustomerDto>> Handle(CreateCustomerCommand request, CancellationToken cancellationToken)
     {
         var email = request.email.Trim().ToLowerInvariant();
 
-        var exists = await context.Customers
-            .AnyAsync(c => c.Email == email, cancellationToken);
-
-        if (exists)
+        if (await context.Customers.AnyAsync(n => n.Email == email, cancellationToken))
         {
-            logger.LogWarning(
-                "Customer creation aborted. Email already exists: {Email}",
-                email);
-
-            return ApplicationErrors.CustomerExists;
+            logger.LogWarning("Customer with email {Email} already exists.", email);
+            return ApplicationErrors.CustomerWithThisEmailIsAlreadyExists;
         }
 
-        var vehicleModelIds = request.Vehicles.Select(v => v.VehicleModelId).Distinct().ToList();
-        var existingModelsCount = await context.VehicleModels
-            .CountAsync(m => vehicleModelIds.Contains(m.Id), cancellationToken);
+        var vehicleModelIds = request.Vehicles
+            .Select(v => v.VehicleModelId)
+            .Distinct()
+            .ToList();
 
-        if (existingModelsCount != vehicleModelIds.Count)
+        var existingModelIds = await context.VehicleModels
+            .Where(vm => vehicleModelIds.Contains(vm.Id))
+            .Select(vm => vm.Id)
+            .ToListAsync(cancellationToken);
+
+        if (existingModelIds.Count != vehicleModelIds.Count)
         {
             logger.LogWarning("Some vehicle models were not found.");
             return ApplicationErrors.NotFoundTheVehicleModel;
@@ -78,21 +79,23 @@ public class CreateCustomerCommandHandler(
 
             if (createdVehicle.IsError)
             {
-                logger.LogWarning(
-                    "Error while creating vehicle: {@Errors}",
-                    createdVehicle.Errors);
-
+                logger.LogWarning("Failed to create vehicle domain model: {@Errors}", createdVehicle.Errors);
                 return createdVehicle.Errors;
             }
 
             vehicles.Add(createdVehicle.Value);
         }
 
-        var customer = Customer.Create(Guid.NewGuid(),request.name,email,request.PhoneNumber,vehicles);
+        var customer = Customer.Create(
+            Guid.NewGuid(),
+            request.name,
+            request.email,
+            request.PhoneNumber,
+            vehicles);
 
         if (customer.IsError)
         {
-            logger.LogWarning("Error while creating customer: {@Errors}",customer.Errors);
+            logger.LogWarning("Error while creating customer: {@Errors}", customer.Errors);
 
             return customer.Errors;
         }
@@ -101,13 +104,13 @@ public class CreateCustomerCommandHandler(
 
         await context.SaveChangesAsync(cancellationToken);
 
-        await cache.RemoveByTagAsync("Customers", cancellationToken);
+        await cacheInvalidator.EvictByTagAsync(CacheTags.Customers, cancellationToken);
 
         logger.LogInformation(
             "Successfully created customer with Id {CustomerId}. Removed Customers cache tag.",
             customer.Value.Id);
 
-      
+
         var vehicleIds = customer.Value.vehicles
             .Select(v => v.Id)
             .ToList();

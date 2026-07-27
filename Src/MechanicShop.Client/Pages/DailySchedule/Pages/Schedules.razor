@@ -4,27 +4,14 @@
 @attribute [Authorize]
 
 
-<div class="mb-3 row">
-    <h3 class="col-3 border-start border-5 p-1">
+<div class="mb-3 row align-items-center">
+    <h3 class="col-3 border-start border-5 p-1 mb-0">
         <i class="bi bi-calendar2-range mx-2"></i>Daily Schedule
     </h3>
-    <div class="col-1">
-        <button class="btn btn-outline-info opacity-75" disabled="@_isLoading" @onclick="GoToPreviousDay">
-            <i class="bi bi-chevron-left"></i>
-        </button>
-    </div>
-    <div class="col-4">
-        <InputDate Type="InputDateType.Date"
-                   @bind-Value="_selectedDate"
-                   class="form-control"
-                   id="dayScheduleDate"
-                   @onchange="OnDateChanged"
-                   disabled="@_isLoading" />
-    </div>
-    <div class="col-1">
-        <button class="btn btn-outline-info opacity-75" @onclick="GoToNextDay" disabled="@_isLoading">
-            <i class="bi bi-chevron-right"></i>
-        </button>
+    <div class="col-6">
+        <DatePickerComponent SelectedDate="_selectedDate"
+                             SelectedDateChanged="OnDateSelected"
+                             IsLoading="_isLoading" />
     </div>
     <div class="col-3">
         <select @bind="_selectedLaborId" @bind:after="UpdateDaySchedule" class="form-select" disabled="@_isLoading">
@@ -40,25 +27,7 @@
     </div>
 </div>
 
-<div class="container position-relative overflow-x-hidden" style="min-height: 100vh;">
-    @if (GetNowLinePosition() >= 0)
-    {
-        <div id="nowLineTarget" style="position: absolute; top: @($"{GetNowLinePosition()}%"); left: 0; right: 0; z-index: 10;">
-            <div id="now-line" style="border-top: 2px dashed red; width: 100%;position: relative; opacity: 0.8;">
-                <span style="
-                position: absolute;
-                top: -1.2rem;
-                right: 0.5rem;
-                font-size: 0.75rem;
-                color: red;
-                font-weight: bold;">
-                    @DateTime.Now.ToString("HH:mm")
-                </span>
-            </div>
-        </div>
-    }
-
-
+<div class="container overflow-x-hidden" style="min-height: 100vh;">
     <div class="overflow-hidden">
         <div class="row mb-2">
             <div class="col-1"></div>
@@ -70,7 +39,24 @@
             }
         </div>
 
-        <div class="row">
+        <div class="row position-relative">
+            @if (GetNowLinePositionPixels() >= 0)
+            {
+                <div id="nowLineTarget" style="position: absolute; top: @($"{GetNowLinePositionPixels()}px"); left: 0; right: 0; z-index: 10; pointer-events: none;">
+                    <div id="now-line" style="border-top: 2px dashed red; width: 100%; position: relative; opacity: 0.8;">
+                        <span style="
+                        position: absolute;
+                        top: -1.2rem;
+                        right: 0.5rem;
+                        font-size: 0.75rem;
+                        color: red;
+                        font-weight: bold;">
+                            @DateTime.Now.ToString("HH:mm")
+                        </span>
+                    </div>
+                </div>
+            }
+
             @if (operateHours is not null)
             {
                 <div class="col-1 pe-0">
@@ -202,16 +188,9 @@
         
     }
 
-    private async Task GoToPreviousDay()
+    private async Task OnDateSelected(DateTime newDate)
     {
-        _selectedDate = _selectedDate.AddDays(-1);
-        NavigateToCurrentDate();
-        await UpdateDaySchedule();
-    }
-
-    private async Task GoToNextDay()
-    {
-        _selectedDate = _selectedDate.AddDays(1);
+        _selectedDate = newDate;
         NavigateToCurrentDate();
         await UpdateDaySchedule();
     }
@@ -222,7 +201,6 @@
         _navigation.NavigateTo($"/schedules/{dateParam}");
     }
 
-    private async Task OnDateChanged(ChangeEventArgs _) => await UpdateDaySchedule();
 
     private async Task DeleteWorkOrder(Guid workOrderId)
     {
@@ -458,7 +436,7 @@
         _cts?.Dispose();
     }
 
-    private double GetNowLinePosition()
+    private double GetNowLinePositionPixels()
     {
         if (operateHours is null) return -1;
         if (_selectedDate.Date != DateTime.Today) return -1;
@@ -470,17 +448,11 @@
         if (open >= close) return -1;
         if (now < open || now > close) return -1;
 
-        const double pixelsPer15Min = 62.0;
-
-        var totalMinutes = (close - open).TotalMinutes;
-        var totalPixels = (totalMinutes / 15.0) * pixelsPer15Min;
-
+        const double pixelsPer15Min = 60.0;
         var minutesFromStart = (now - open).TotalMinutes;
         var offsetPixels = (minutesFromStart / 15.0) * pixelsPer15Min;
 
-        var percentage = (offsetPixels / totalPixels) * 100.0;
-
-        return Math.Round(percentage, 2);
+        return Math.Round(offsetPixels, 2);
     }
 
     private async Task ScrollToBottom()

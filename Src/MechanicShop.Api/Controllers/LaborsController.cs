@@ -1,4 +1,8 @@
 using Asp.Versioning;
+using MechanicShop.Application.Common.Constants;
+using MechanicShop.Application.Features.Labors.Queries;
+using MechanicShop.Contracts.Requests.Labors;
+using MechanicShop.Contracts.Responses;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -11,7 +15,7 @@ namespace MechanicShop.Api.Controllers;
 [Tags("Labors")]
 [Authorize]
 [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status401Unauthorized)]
-public sealed class LaborsController(ISender sender, IOutputCacheStore outputCache) : ApiController
+public sealed class LaborsController(ISender sender) : ApiController
 {
     [HttpGet]
     [ProducesResponseType(typeof(List<LaborDto>), StatusCodes.Status200OK)]
@@ -20,10 +24,25 @@ public sealed class LaborsController(ISender sender, IOutputCacheStore outputCac
     [EndpointDescription("Returns all labor records associated with the system. Accessible only to authorized users.")]
     [EndpointName("GetLabors")]
     [MapToApiVersion("1.0")]
-    [OutputCache(PolicyName = nameof(Policies.SharedAuthCache), Duration = (int)DurationInSeconds.OneDay, Tags = ["Labors"])]
+    [OutputCache(PolicyName = nameof(Policies.SharedAuthCache), Duration = (int)DurationInSeconds.OneDay, Tags = [CacheTags.Labors])]
     public async Task<IActionResult> Get(CancellationToken ct)
     {
         var result = await sender.Send(new GetLaborsQuery(), ct);
+
+        return result.Match(success => Ok(success), Problem);
+    }
+
+    [HttpGet("details")]
+    [Authorize(Roles = nameof(Role.Manager))]
+    [ProducesResponseType(typeof(List<EmployeeDetailDto>), StatusCodes.Status200OK)]
+    [EndpointSummary("Retrieves detailed information for all employees.")]
+    [EndpointDescription("Returns complete employee details including name, email, roles, and status. Accessible only to Managers.")]
+    [EndpointName("GetEmployeeDetails")]
+    [MapToApiVersion("1.0")]
+    [OutputCache(PolicyName = nameof(Policies.SharedAuthCache), Duration = (int)DurationInSeconds.OneDay, Tags = [CacheTags.Labors])]
+    public async Task<IActionResult> GetEmployeeDetails(CancellationToken ct)
+    {
+        var result = await sender.Send(new GetEmployeeDetailsQuery(), ct);
 
         return result.Match(success => Ok(success), Problem);
     }
@@ -41,11 +60,6 @@ public sealed class LaborsController(ISender sender, IOutputCacheStore outputCac
     {
         var result = await sender.Send(new RegisterLaborCommand(request.Email, request.Password, request.FirstName, request.LastName, request.Roles, []), ct);
 
-        if (result.IsSuccess)
-        {
-            await outputCache.EvictByTagAsync("Labors", ct);
-        }
-
         return result.Match(success => StatusCode(StatusCodes.Status201Created, success), Problem);
     }
 
@@ -61,11 +75,7 @@ public sealed class LaborsController(ISender sender, IOutputCacheStore outputCac
     public async Task<IActionResult> UpdateLaborInfo([FromRoute] Guid laborid, [FromBody] UpdateLaborInfoRequest request, CancellationToken ct)
     {
         var result = await sender.Send(new UpdateLaborInfoCommand(laborid, request.FirstName, request.LastName, request.IsActive), ct);
-        if (result.IsSuccess)
-        {
-            await outputCache.EvictByTagAsync("Labors", ct);
-        }
-
+  
         return result.Match(_ => NoContent(), Problem);
     }
 
@@ -84,11 +94,38 @@ public sealed class LaborsController(ISender sender, IOutputCacheStore outputCac
 
         var result = await sender.Send(command, ct);
 
-        if (result.IsSuccess)
-        {
-            await outputCache.EvictByTagAsync("Labors", ct);
-        }
+        return result.Match(_ => NoContent(), Problem);
+    }
+
+    [HttpPut("{laborid:guid}/reset-password")]
+    [Authorize(Roles = nameof(Role.Manager))]
+    [ProducesResponseType(typeof(Success), StatusCodes.Status204NoContent)]
+    [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
+    [EndpointSummary("Resets the password of a specific labor.")]
+    [EndpointDescription("Resets the password for the labor with the specified ID to its email address. Accessible only to Managers.")]
+    [EndpointName("ResetLaborPassword")]
+    [MapToApiVersion("1.0")]
+    public async Task<IActionResult> ResetLaborPassword([FromRoute] Guid laborid, CancellationToken ct)
+    {
+        var result = await sender.Send(new ResetLaborPasswordCommand(laborid), ct);
 
         return result.Match(_ => NoContent(), Problem);
     }
+
+    [HttpPut("update-password")]
+    [Authorize(Roles = $"{nameof(Role.Manager)},{nameof(Role.Labor)}")]
+    [ProducesResponseType(typeof(Success), StatusCodes.Status204NoContent)]
+    [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
+    [EndpointSummary("Updates the password of a specific user.")]
+    [EndpointDescription("Updates the password of the user. Accessible only to Managers and Labors.")]
+    [EndpointName("UpdateUserPassword")]
+    [MapToApiVersion("1.0")]
+    public async Task<IActionResult> UpdateUserPassword([FromBody] UpdateLaborPasswordRequest request, CancellationToken ct)
+    {
+        var result = await sender.Send(new UpdateLaborPasswordCommand(request.NewPassword, request.CurrentPassword), ct);
+
+        return result.Match(_ => NoContent(), Problem);
+    }
+
+
 }

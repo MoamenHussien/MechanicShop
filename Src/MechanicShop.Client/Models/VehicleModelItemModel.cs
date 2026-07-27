@@ -1,7 +1,7 @@
 namespace MechanicShop.Client.Models;
 
-public class VehicleModelResponse
+public class VehicleModelItemModel
 {
-    public Guid Id { get; set; }
+    public Guid? ModelId { get; set; }
     public string Model { get; set; } = string.Empty;
 }

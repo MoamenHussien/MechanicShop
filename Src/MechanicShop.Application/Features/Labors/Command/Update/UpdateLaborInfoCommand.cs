@@ -3,6 +3,8 @@ using FluentValidation;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using MechanicShop.Application.Common.Constants;
+using MechanicShop.Application.Common.Interfaces;
 
 public sealed record UpdateLaborInfoCommand(Guid id, string FirstName, string LastName, bool IsActive) : IRequest<Result<Updated>>;
 
@@ -17,12 +19,13 @@ public class UpdateLaborInfoCommandValidator : AbstractValidator<UpdateLaborInfo
     }
 }
 
-public class UpdateLaborInfoCommandHandler(ILogger<UpdateLaborInfoCommandHandler> logger, IAppDbContext context)
+
+public class UpdateLaborInfoCommandHandler(ILogger<UpdateLaborInfoCommandHandler> logger, IAppDbContext context, ICacheInvalidator cacheInvalidator)
 : IRequestHandler<UpdateLaborInfoCommand, Result<Updated>>
 {
     public async Task<Result<Updated>> Handle(UpdateLaborInfoCommand request, CancellationToken cancellationToken)
     {
-        var labor = await context.Employees.FindAsync(request.id);
+        var labor = await context.Employees.FindAsync(new object[] { request.id }, cancellationToken);
         if (labor is null)
         {
             logger.LogWarning("The Labor Is Not Found , To This Labor Id : {id}", request.id);
@@ -38,6 +41,7 @@ public class UpdateLaborInfoCommandHandler(ILogger<UpdateLaborInfoCommandHandler
         }
 
         await context.SaveChangesAsync(cancellationToken);
+        await cacheInvalidator.EvictByTagsAsync(cancellationToken, CacheTags.Labors);
         logger.LogInformation("The Labor Is Updated Successfully , For This ID : {id}", request.id);
 
         return Result.Updated;

@@ -4,11 +4,13 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using Microsoft.Extensions.Logging;
 
+using MechanicShop.Application.Common.Constants;
+
 public sealed record GetVehiclesModelsByMakeIdQuery(Guid MakeId) : ICachedQuery<Result<List<VehicleModelDto>>>
 {
     public string CacheKey => $"ModelsFor{MakeId}";
 
-    public string[] Tags => ["VMakes"];
+    public string[] Tags => [CacheTags.VehicleMakes];
 
     public TimeSpan Expiration => TimeSpan.FromHours(24);
 }
