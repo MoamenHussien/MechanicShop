@@ -21,7 +21,7 @@ public static class RepairTaskMapper
             LaborCost = repairTask.LaborCost,
             Parts = repairTask.Parts.ToDto(),
             // TotalCost = repairTask.TotalCost,
-            EstimatedDurationInMins =repairTask.EstimatedDuration
+            EstimatedDurationInMins = repairTask.EstimatedDuration
         };
     }
 

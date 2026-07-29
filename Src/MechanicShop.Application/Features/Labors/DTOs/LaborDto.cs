@@ -1,1 +1,1 @@
-public sealed record LaborDto(Guid LaborId , string Name);
+public sealed record LaborDto(Guid LaborId, string Name);

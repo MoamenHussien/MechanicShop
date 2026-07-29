@@ -88,7 +88,7 @@ public class VehicleMakesControllerTests
         var request = new CreateMakeRequest
         {
             Make = "Test Make",
-            Models = [ new() { Model = "Test Model A" } ]
+            Models = [new() { Model = "Test Model A" }]
         };
 
         try
@@ -113,7 +113,7 @@ public class VehicleMakesControllerTests
         var request = new CreateMakeRequest
         {
             Make = "Forbidden Make",
-            Models = [ new() { Model = "Forbidden Model" } ]
+            Models = [new() { Model = "Forbidden Model" }]
         };
 
         var response = await _client.PostAsJsonAsync("/api/v1.0/makes", request);
@@ -134,7 +134,7 @@ public class VehicleMakesControllerTests
         var createRequest = new CreateMakeRequest
         {
             Make = "Make To Update",
-            Models = [ new() { Model = "Model To Update" } ]
+            Models = [new() { Model = "Model To Update" }]
         };
 
         try
@@ -144,11 +144,11 @@ public class VehicleMakesControllerTests
 
             var content = await createResponse.Content.ReadFromJsonAsync<Guid>();
             var makeId = content;
-            
+
             var updateRequest = new UpdateMakeRequest
             {
                 Make = "Updated Make",
-                Models = [ new() { Model = "Updated Model Name" } ]
+                Models = [new() { Model = "Updated Model Name" }]
             };
 
             var updateResponse = await _client.PutAsJsonAsync($"/api/v1.0/makes/{makeId}", updateRequest);
@@ -172,7 +172,7 @@ public class VehicleMakesControllerTests
         var request = new UpdateMakeRequest
         {
             Make = "NonExistent Update",
-            Models = [ new() { Model = "Model Update" } ]
+            Models = [new() { Model = "Model Update" }]
         };
 
         var response = await _client.PutAsJsonAsync($"/api/v1.0/makes/{nonExistentId}", request);
@@ -192,7 +192,7 @@ public class VehicleMakesControllerTests
         var request = new UpdateMakeRequest
         {
             Make = "Forbidden Update",
-            Models = [ new() { Model = "Model Update" } ]
+            Models = [new() { Model = "Model Update" }]
         };
 
         var response = await _client.PutAsJsonAsync($"/api/v1.0/makes/{make!.Id}", request);

@@ -44,7 +44,7 @@ public class InvoicesControllerTests
 
         try
         {
-            var response = await _client.PostAsJsonAsync($"/api/v1.0/invoices/workorders/{workOrder.Id}", new {});
+            var response = await _client.PostAsJsonAsync($"/api/v1.0/invoices/workorders/{workOrder.Id}", new { });
 
             Assert.Equal(HttpStatusCode.Created, response.StatusCode);
 
@@ -77,7 +77,7 @@ public class InvoicesControllerTests
 
         try
         {
-            var response = await _client.PostAsJsonAsync($"/api/v1.0/invoices/workorders/{workOrder.Id}", new {});
+            var response = await _client.PostAsJsonAsync($"/api/v1.0/invoices/workorders/{workOrder.Id}", new { });
 
             Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode); // WorkOrderMustBeCompletedToIssueInvoice -> 400
         }
@@ -95,7 +95,7 @@ public class InvoicesControllerTests
 
         var nonExistentWorkOrderId = Guid.NewGuid();
 
-        var response = await _client.PostAsJsonAsync($"/api/v1.0/invoices/workorders/{nonExistentWorkOrderId}", new {});
+        var response = await _client.PostAsJsonAsync($"/api/v1.0/invoices/workorders/{nonExistentWorkOrderId}", new { });
 
         Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
     }
@@ -119,11 +119,11 @@ public class InvoicesControllerTests
         try
         {
             // Issue first time
-            var firstResponse = await _client.PostAsJsonAsync($"/api/v1.0/invoices/workorders/{workOrder.Id}", new {});
+            var firstResponse = await _client.PostAsJsonAsync($"/api/v1.0/invoices/workorders/{workOrder.Id}", new { });
             firstResponse.EnsureSuccessStatusCode();
 
             // Attempt to issue again
-            var secondResponse = await _client.PostAsJsonAsync($"/api/v1.0/invoices/workorders/{workOrder.Id}", new {});
+            var secondResponse = await _client.PostAsJsonAsync($"/api/v1.0/invoices/workorders/{workOrder.Id}", new { });
 
             Assert.Equal(HttpStatusCode.Conflict, secondResponse.StatusCode); // InvoiceAlreadyIssued -> 409
         }
@@ -142,7 +142,7 @@ public class InvoicesControllerTests
 
         var workOrderId = Guid.NewGuid();
 
-        var response = await _client.PostAsJsonAsync($"/api/v1.0/invoices/workorders/{workOrderId}", new {});
+        var response = await _client.PostAsJsonAsync($"/api/v1.0/invoices/workorders/{workOrderId}", new { });
 
         Assert.Equal(HttpStatusCode.Forbidden, response.StatusCode);
     }
@@ -169,14 +169,14 @@ public class InvoicesControllerTests
 
         try
         {
-            var issueResponse = await _client.PostAsJsonAsync($"/api/v1.0/invoices/workorders/{workOrder.Id}", new {});
+            var issueResponse = await _client.PostAsJsonAsync($"/api/v1.0/invoices/workorders/{workOrder.Id}", new { });
             var issuedInvoice = await issueResponse.Content.ReadFromJsonAsync<InvoiceDto>();
 
             var getResponse = await _client.GetAsync($"/api/v1.0/invoices/{issuedInvoice!.InvoiceId}");
 
             Assert.Equal(HttpStatusCode.OK, getResponse.StatusCode);
             var fetchedInvoice = await getResponse.Content.ReadFromJsonAsync<InvoiceDto>();
-            
+
             Assert.NotNull(fetchedInvoice);
             Assert.Equal(issuedInvoice.InvoiceId, fetchedInvoice!.InvoiceId);
         }
@@ -232,10 +232,10 @@ public class InvoicesControllerTests
 
         try
         {
-            var issueResponse = await _client.PostAsJsonAsync($"/api/v1.0/invoices/workorders/{workOrder.Id}", new {});
+            var issueResponse = await _client.PostAsJsonAsync($"/api/v1.0/invoices/workorders/{workOrder.Id}", new { });
             var issuedInvoice = await issueResponse.Content.ReadFromJsonAsync<InvoiceDto>();
 
-            var settleResponse = await _client.PutAsJsonAsync($"/api/v1.0/invoices/{issuedInvoice!.InvoiceId}/payments", new {});
+            var settleResponse = await _client.PutAsJsonAsync($"/api/v1.0/invoices/{issuedInvoice!.InvoiceId}/payments", new { });
 
             Assert.Equal(HttpStatusCode.NoContent, settleResponse.StatusCode);
         }
@@ -264,13 +264,13 @@ public class InvoicesControllerTests
 
         try
         {
-            var issueResponse = await _client.PostAsJsonAsync($"/api/v1.0/invoices/workorders/{workOrder.Id}", new {});
+            var issueResponse = await _client.PostAsJsonAsync($"/api/v1.0/invoices/workorders/{workOrder.Id}", new { });
             var issuedInvoice = await issueResponse.Content.ReadFromJsonAsync<InvoiceDto>();
 
-            var firstSettleResponse = await _client.PutAsJsonAsync($"/api/v1.0/invoices/{issuedInvoice!.InvoiceId}/payments", new {});
+            var firstSettleResponse = await _client.PutAsJsonAsync($"/api/v1.0/invoices/{issuedInvoice!.InvoiceId}/payments", new { });
             firstSettleResponse.EnsureSuccessStatusCode();
 
-            var secondSettleResponse = await _client.PutAsJsonAsync($"/api/v1.0/invoices/{issuedInvoice.InvoiceId}/payments", new {});
+            var secondSettleResponse = await _client.PutAsJsonAsync($"/api/v1.0/invoices/{issuedInvoice.InvoiceId}/payments", new { });
 
             Assert.Equal(HttpStatusCode.Conflict, secondSettleResponse.StatusCode);
         }
@@ -289,7 +289,7 @@ public class InvoicesControllerTests
 
         var nonExistentId = Guid.NewGuid();
 
-        var response = await _client.PutAsJsonAsync($"/api/v1.0/invoices/{nonExistentId}/payments", new {});
+        var response = await _client.PutAsJsonAsync($"/api/v1.0/invoices/{nonExistentId}/payments", new { });
 
         Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
     }
@@ -316,7 +316,7 @@ public class InvoicesControllerTests
 
         try
         {
-            var issueResponse = await _client.PostAsJsonAsync($"/api/v1.0/invoices/workorders/{workOrder.Id}", new {});
+            var issueResponse = await _client.PostAsJsonAsync($"/api/v1.0/invoices/workorders/{workOrder.Id}", new { });
             var issuedInvoice = await issueResponse.Content.ReadFromJsonAsync<InvoiceDto>();
 
             var pdfResponse = await _client.GetAsync($"/api/v1.0/invoices/{issuedInvoice!.InvoiceId}/pdf");

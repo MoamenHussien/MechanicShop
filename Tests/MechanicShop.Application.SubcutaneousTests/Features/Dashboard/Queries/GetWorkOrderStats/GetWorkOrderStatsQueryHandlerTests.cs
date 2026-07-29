@@ -39,11 +39,11 @@ public class GetWorkOrderStatsQueryHandlerTests(WebAppFactory factory)
         // Arrange
         var targetDate = DateOnly.FromDateTime(DateTime.UtcNow.AddDays(1));
         var startOfUtcDay = targetDate.ToDateTime(TimeOnly.MinValue, DateTimeKind.Utc);
-        
+
         var make = VehicleMakeFactory.CreateVehicleMake().Value;
         var customer = CustomerFactory.CreateCustomer(email: "stats1@localhost.com", vehicles: [VehicleFactory.CreateVehicle(vehicleModelId: make.VehicleModels.First().Id).Value]).Value;
         var vehicle = customer.vehicles.First();
-        
+
         var employee = MechanicShop.Tests.Common.Employees.EmployeeFactory.CreateEmployee().Value;
         var repairTask = MechanicShop.Tests.Common.RepaireTasks.RepairTaskFactory.CreateRepairTask().Value;
 

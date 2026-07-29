@@ -4,8 +4,8 @@ public enum DurationInSeconds
 
     OneMinute = 60,
 
-    ThreeMinutes = 180 ,
-    
+    ThreeMinutes = 180,
+
     FiveMinutes = 300,
 
     TenMinutes = 600,
@@ -14,7 +14,7 @@ public enum DurationInSeconds
 
     OneHour = 3600,
 
-    TwoHours = 7200 ,
+    TwoHours = 7200,
 
     OneDay = 86400
 }

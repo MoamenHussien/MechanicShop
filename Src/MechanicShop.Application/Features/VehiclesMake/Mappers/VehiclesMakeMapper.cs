@@ -5,25 +5,25 @@ public static class VehiclesMakeMapper
         ArgumentNullException.ThrowIfNull(make);
         return new VehicleMakeDto
         {
-            Id=make.Id,
-            Make=make.Make,
-             VehiclesModels = make.VehicleModels.ToModelsDto()
+            Id = make.Id,
+            Make = make.Make,
+            VehiclesModels = make.VehicleModels.ToModelsDto()
         };
     }
 
     public static List<VehicleMakeDto> ToMakesDto(this IEnumerable<VehicleMake> vehicleMakes)
     {
-        return vehicleMakes.Select(n=> ToMakeDto(n)).ToList();
+        return vehicleMakes.Select(n => ToMakeDto(n)).ToList();
     }
 
     public static VehicleModelDto ToModelDto(this VehicleModel model)
     {
-         ArgumentNullException.ThrowIfNull(model);
-        return new VehicleModelDto(model.Id,model.Model);
+        ArgumentNullException.ThrowIfNull(model);
+        return new VehicleModelDto(model.Id, model.Model);
     }
 
     public static List<VehicleModelDto> ToModelsDto(this IEnumerable<VehicleModel> Models)
     {
-        return Models.Select(n=> ToModelDto(n)).ToList();
+        return Models.Select(n => ToModelDto(n)).ToList();
     }
 }

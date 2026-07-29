@@ -22,7 +22,7 @@ public class SettleInvoiceCommandHandler(ILogger<SettleInvoiceCommandHandler> lo
 {
     public async Task<Result<Success>> Handle(SettleInvoiceCommand request, CancellationToken cancellationToken)
     {
-        var invoice = await context.Invoices.FindAsync([request.InvoiceId],cancellationToken);
+        var invoice = await context.Invoices.FindAsync([request.InvoiceId], cancellationToken);
         if (invoice is null)
         {
             logger.LogWarning("This Invoice Id : {InvoiceId} not found.", request.InvoiceId);
@@ -31,7 +31,7 @@ public class SettleInvoiceCommandHandler(ILogger<SettleInvoiceCommandHandler> lo
 
         if (invoice.Status == InvoiceStatus.Paid)
         {
-            logger.LogWarning("Invoice payment rejected. InvoiceId: {InvoiceId} has already been paid.",request.InvoiceId);
+            logger.LogWarning("Invoice payment rejected. InvoiceId: {InvoiceId} has already been paid.", request.InvoiceId);
             return ApplicationErrors.InvoiceIsAlreadyPaid;
         }
 
@@ -39,7 +39,7 @@ public class SettleInvoiceCommandHandler(ILogger<SettleInvoiceCommandHandler> lo
 
         if (paidStats.IsError)
         {
-            logger.LogWarning("Invoice payment failed for InvoiceId: {InvoiceId} Errors: {@Errors}",invoice.Id,paidStats.Errors);
+            logger.LogWarning("Invoice payment failed for InvoiceId: {InvoiceId} Errors: {@Errors}", invoice.Id, paidStats.Errors);
             return paidStats.Errors;
         }
 

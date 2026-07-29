@@ -11,8 +11,8 @@ namespace MechanicShop.Api.Controllers;
 [ApiVersion("1.0")]
 [Authorize]
 [Route("api/v{version:apiVersion}/makes")]
-[Tags("Vehicle Makes")] 
-[ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status401Unauthorized)] 
+[Tags("Vehicle Makes")]
+[ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status401Unauthorized)]
 public class VehicleMakesController(ISender sender) : ApiController
 {
     [HttpGet]
@@ -22,7 +22,7 @@ public class VehicleMakesController(ISender sender) : ApiController
     [EndpointDescription("Retrieves a complete list of all supported vehicle makes.")]
     [ProducesResponseType(typeof(List<VehicleMakeResponse>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
-    [OutputCache(PolicyName =nameof(Policies.SharedAuthCache), Duration = (int)DurationInSeconds.OneDay, Tags = [CacheTags.VehicleMakes])]
+    [OutputCache(PolicyName = nameof(Policies.SharedAuthCache), Duration = (int)DurationInSeconds.OneDay, Tags = [CacheTags.VehicleMakes])]
     public async Task<IActionResult> GetVehicleMakes(CancellationToken ct)
     {
         var result = await sender.Send(new GetVehiclesMakesQuery(), ct);
@@ -36,43 +36,43 @@ public class VehicleMakesController(ISender sender) : ApiController
     [EndpointDescription("Retrieves a list of all vehicle models associated with a specific vehicle make.")]
     [ProducesResponseType(typeof(List<VehicleModelDto>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
-    [OutputCache(PolicyName = nameof(Policies.SharedAuthCache) ,Duration =(int)DurationInSeconds.OneDay, Tags = [CacheTags.VehicleMakes], VaryByRouteValueNames = ["makeId"])]
+    [OutputCache(PolicyName = nameof(Policies.SharedAuthCache), Duration = (int)DurationInSeconds.OneDay, Tags = [CacheTags.VehicleMakes], VaryByRouteValueNames = ["makeId"])]
     public async Task<IActionResult> GetVehicleModelsByMakeId([FromRoute] Guid makeId, CancellationToken ct)
     {
         var result = await sender.Send(new GetVehiclesModelsByMakeIdQuery(makeId), ct);
         return result.Match(success => Ok(success), Problem);
     }
 
-    [HttpPost] 
+    [HttpPost]
     [MapToApiVersion("1.0")]
     [Authorize(Roles = nameof(Role.Manager))]
     [EndpointName("CreateVehicleMake")]
     [EndpointSummary("Create a new vehicle make")]
     [EndpointDescription("Creates a new vehicle make along with its associated models.")]
     [ProducesResponseType(typeof(Guid), StatusCodes.Status201Created)]
-    [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)] 
+    [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> CreateNewVehicleMake([FromBody] CreateMakeRequest request, CancellationToken ct)
     {
         var models = request.Models.ConvertAll(n => new CreateVehicleModelCommand(n.Model));
         var result = await sender.Send(new CreateMakeCommand(request.Make, models), ct);
-        
-        return result.Match(success => StatusCode(StatusCodes.Status201Created, success), Problem); 
+
+        return result.Match(success => StatusCode(StatusCodes.Status201Created, success), Problem);
     }
 
-    [HttpPut("{makeId:guid}")] 
+    [HttpPut("{makeId:guid}")]
     [MapToApiVersion("1.0")]
     [Authorize(Roles = nameof(Role.Manager))]
     [EndpointName("UpdateVehicleMake")]
     [EndpointSummary("Update an existing vehicle make")]
     [EndpointDescription("Updates the details of a specific vehicle make and modifies its associated models.")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
-    [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)] 
+    [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> UpdateMake([FromRoute] Guid makeId, [FromBody] UpdateMakeRequest request, CancellationToken ct)
     {
         var models = request.Models.ConvertAll(n => new UpdateModelCommand(n.ModelId, n.Model));
-        var result = await sender.Send(new UpdateMakeCommand(makeId, request.Make, models), ct); 
-        
+        var result = await sender.Send(new UpdateMakeCommand(makeId, request.Make, models), ct);
+
         return result.Match(_ => NoContent(), Problem);
     }
 }

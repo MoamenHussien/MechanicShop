@@ -29,57 +29,56 @@ public class TokenProvider(IOptions<JwtSettings> JwtConfigSettings, IAppDbContex
         return tokenResult.Value;
     }
 
-     public Result<ClaimsPrincipal> GetPrincipalFromExpiredToken(string token)
-     {
-         if (string.IsNullOrWhiteSpace(token))
-         {
-             return ApplicationErrors.InvalidAccessToken;
-         }
-     
-         try
-         {
-             var tokenValidationParameters = new TokenValidationParameters
-             {
-                 ValidateIssuerSigningKey = true,
-                 IssuerSigningKey = new SymmetricSecurityKey(
-                     Encoding.UTF8.GetBytes(JwtConfigSettings.Value.SecretKey)),
-                 ValidateIssuer = true,
-                 ValidIssuer = JwtConfigSettings.Value.Issuer,
-                 ValidateAudience = true,
-                 ValidAudience = JwtConfigSettings.Value.Audience,
-                 ValidateLifetime = false,
-                 ClockSkew = TimeSpan.Zero
-             };
-     
-             var tokenHandler = new JwtSecurityTokenHandler();
-     
-             var principal = tokenHandler.ValidateToken(
-                 token,
-                 tokenValidationParameters,
-                 out SecurityToken securityToken);
-     
-             if (securityToken is not JwtSecurityToken jwtSecurityToken ||
-                 !jwtSecurityToken.Header.Alg.Equals(
-                     SecurityAlgorithms.HmacSha256,
-                     StringComparison.OrdinalIgnoreCase))
-             {
-                 return ApplicationErrors.InvalidAccessToken;
-             }
-     
-             return principal;
-         }
-         
-         catch (SecurityTokenException)
-         {
-             return ApplicationErrors.InvalidAccessToken;
-         }
-         catch (ArgumentException)
-         {
-              // Handles invalid token arguments (e.g. null or malformed input).
-             return ApplicationErrors.InvalidAccessToken;
-         }
-     }
-     
+    public Result<ClaimsPrincipal> GetPrincipalFromExpiredToken(string token)
+    {
+        if (string.IsNullOrWhiteSpace(token))
+        {
+            return ApplicationErrors.InvalidAccessToken;
+        }
+
+        try
+        {
+            var tokenValidationParameters = new TokenValidationParameters
+            {
+                ValidateIssuerSigningKey = true,
+                IssuerSigningKey = new SymmetricSecurityKey(
+                    Encoding.UTF8.GetBytes(JwtConfigSettings.Value.SecretKey)),
+                ValidateIssuer = true,
+                ValidIssuer = JwtConfigSettings.Value.Issuer,
+                ValidateAudience = true,
+                ValidAudience = JwtConfigSettings.Value.Audience,
+                ValidateLifetime = false,
+                ClockSkew = TimeSpan.Zero
+            };
+
+            var tokenHandler = new JwtSecurityTokenHandler();
+
+            var principal = tokenHandler.ValidateToken(
+                token,
+                tokenValidationParameters,
+                out SecurityToken securityToken);
+
+            if (securityToken is not JwtSecurityToken jwtSecurityToken ||
+                !jwtSecurityToken.Header.Alg.Equals(
+                    SecurityAlgorithms.HmacSha256,
+                    StringComparison.OrdinalIgnoreCase))
+            {
+                return ApplicationErrors.InvalidAccessToken;
+            }
+
+            return principal;
+        }
+        catch (SecurityTokenException)
+        {
+            return ApplicationErrors.InvalidAccessToken;
+        }
+        catch (ArgumentException)
+        {
+            // Handles invalid token arguments (e.g. null or malformed input).
+            return ApplicationErrors.InvalidAccessToken;
+        }
+    }
+
     private async Task<Result<TokenResponse>> CreateAsync(AppUserDto user, CancellationToken ct = default)
     {
         var issuer = JwtConfigSettings.Value.Issuer;

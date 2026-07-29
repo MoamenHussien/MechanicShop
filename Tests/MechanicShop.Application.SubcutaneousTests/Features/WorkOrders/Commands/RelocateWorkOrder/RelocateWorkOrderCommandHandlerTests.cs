@@ -20,8 +20,8 @@ public class RelocateWorkOrderCommandHandlerTests(WebAppFactory factory)
     {
         // Arrange
         var command = new RelocateWorkOrderCommand(
-            Guid.NewGuid(), 
-            DateTimeOffset.UtcNow.AddDays(1), 
+            Guid.NewGuid(),
+            DateTimeOffset.UtcNow.AddDays(1),
             Spot.A);
 
         // Act

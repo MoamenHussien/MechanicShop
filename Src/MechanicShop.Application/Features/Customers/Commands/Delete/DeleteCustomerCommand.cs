@@ -12,28 +12,28 @@ public class DeleteCustomerCommandValidator : AbstractValidator<DeleteCustomerCo
 {
     public DeleteCustomerCommandValidator()
     {
-        RuleFor(n=>n.CustomerId).IdRequired("Customer");
+        RuleFor(n => n.CustomerId).IdRequired("Customer");
     }
 }
 
 
 
-public class DeleteCustomerCommandHandler(ILogger<DeleteCustomerCommandHandler> logger, ICacheInvalidator cacheInvalidator, IAppDbContext context,IWorkOrderPolicy policy)
+public class DeleteCustomerCommandHandler(ILogger<DeleteCustomerCommandHandler> logger, ICacheInvalidator cacheInvalidator, IAppDbContext context, IWorkOrderPolicy policy)
 : IRequestHandler<DeleteCustomerCommand, Result<Deleted>>
 {
     public async Task<Result<Deleted>> Handle(DeleteCustomerCommand request, CancellationToken cancellationToken)
     {
-        var Customer = await context.Customers.FindAsync(request.CustomerId,cancellationToken);
+        var Customer = await context.Customers.FindAsync(request.CustomerId, cancellationToken);
 
         if (Customer is null)
         {
-            logger.LogWarning("The Customer Is Not Found With Id : {id}",request.CustomerId);
+            logger.LogWarning("The Customer Is Not Found With Id : {id}", request.CustomerId);
             return ApplicationErrors.TheCustomerNotFound;
         }
 
-        if ( await policy.IsThisCustomerHasAnyRequestForWorkOrderBeforeAsync(request.CustomerId,cancellationToken))
+        if (await policy.IsThisCustomerHasAnyRequestForWorkOrderBeforeAsync(request.CustomerId, cancellationToken))
         {
-            logger.LogWarning("This Customer With Id : {id} Has Record At Work Order Table",request.CustomerId);
+            logger.LogWarning("This Customer With Id : {id} Has Record At Work Order Table", request.CustomerId);
             return ApplicationErrors.TheCustomerHasRecordForWorkOrderBefore;
         }
         context.Customers.Remove(Customer);
@@ -41,7 +41,7 @@ public class DeleteCustomerCommandHandler(ILogger<DeleteCustomerCommandHandler> 
 
         await cacheInvalidator.EvictByTagAsync(CacheTags.Customers, cancellationToken);
 
-        logger.LogInformation("Successfully Deleted The Customer With Id : {id} And Removed Cache Tag With Name Customer ",request.CustomerId);
+        logger.LogInformation("Successfully Deleted The Customer With Id : {id} And Removed Cache Tag With Name Customer ", request.CustomerId);
 
         return Result.Deleted;
     }

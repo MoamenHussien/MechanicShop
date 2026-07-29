@@ -25,5 +25,5 @@ public static class RepairTaskErrors
     public static Error DuplicateName =>
 
     Error.Conflict("RepairTaskPart.Duplicate", "A part with the same name already exists in this repair task.");
-    
+
 }

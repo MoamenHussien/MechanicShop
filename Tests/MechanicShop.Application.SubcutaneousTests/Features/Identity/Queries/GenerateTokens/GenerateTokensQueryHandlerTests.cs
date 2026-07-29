@@ -58,7 +58,7 @@ public class GenerateTokensQueryHandlerTests(WebAppFactory factory)
             UserName = "anotheruser@localhost.com",
             EmailConfirmed = true
         };
-        
+
         var password = "ValidPassword123!";
 
         var createResult = await userManager.CreateAsync(appUser, password);
@@ -102,7 +102,7 @@ public class GenerateTokensQueryHandlerTests(WebAppFactory factory)
             UserName = "lockeduser@localhost.com",
             EmailConfirmed = true
         };
-        
+
         var password = "ValidPassword123!";
         var createResult = await userManager.CreateAsync(appUser, password);
         Assert.True(createResult.Succeeded);
@@ -135,7 +135,7 @@ public class GenerateTokensQueryHandlerTests(WebAppFactory factory)
             UserName = "unconfirmeduser@localhost.com",
             EmailConfirmed = false // Crucial missing confirmation
         };
-        
+
         var password = "ValidPassword123!";
         var createResult = await userManager.CreateAsync(appUser, password);
         Assert.True(createResult.Succeeded);

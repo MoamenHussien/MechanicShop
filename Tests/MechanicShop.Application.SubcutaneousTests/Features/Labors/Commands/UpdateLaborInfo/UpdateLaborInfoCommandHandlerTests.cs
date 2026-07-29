@@ -19,7 +19,7 @@ public class UpdateLaborInfoCommandHandlerTests(WebAppFactory factory)
         // Arrange
         using var scope = factory.Services.CreateScope();
         var userManager = scope.ServiceProvider.GetRequiredService<Microsoft.AspNetCore.Identity.UserManager<AppUser>>();
-        
+
         var appUser = new AppUser
         {
             Id = Guid.NewGuid(),

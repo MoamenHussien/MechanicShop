@@ -75,7 +75,7 @@ public sealed class LaborsController(ISender sender) : ApiController
     public async Task<IActionResult> UpdateLaborInfo([FromRoute] Guid laborid, [FromBody] UpdateLaborInfoRequest request, CancellationToken ct)
     {
         var result = await sender.Send(new UpdateLaborInfoCommand(laborid, request.FirstName, request.LastName, request.IsActive), ct);
-  
+
         return result.Match(_ => NoContent(), Problem);
     }
 

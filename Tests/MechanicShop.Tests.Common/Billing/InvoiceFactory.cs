@@ -12,6 +12,6 @@ public static class InvoiceFactory
         decimal? taxAmount = null,
         TimeProvider? timeProvider = null)
     {
-        return Invoice.Create(id ?? Guid.NewGuid(),timeProvider ?? TimeProvider.System, taxAmount ?? 0,discount ?? 0 , items ?? [InvoiceLineItem.Create(Guid.NewGuid(), "Oil Change", 1, 50, 2).Value],workOrderId ?? Guid.NewGuid());
+        return Invoice.Create(id ?? Guid.NewGuid(), timeProvider ?? TimeProvider.System, taxAmount ?? 0, discount ?? 0, items ?? [InvoiceLineItem.Create(Guid.NewGuid(), "Oil Change", 1, 50, 2).Value], workOrderId ?? Guid.NewGuid());
     }
 }

@@ -52,7 +52,7 @@ public class WorkOrderTests
         Assert.Equal(200m, workOrder.TotalPartsCost);
     }
 
-    
+
     [Fact]
     public void TotalLaborCost_ShouldReturnCorrectValue()
     {
@@ -211,13 +211,13 @@ public class WorkOrderTests
     {
         // Act
         var result = WorkOrder.Create(
-            id : Guid.Empty,
-            LaborId : Guid.NewGuid(),
-            VehicleId : Guid.NewGuid(),
-            spot : Spot.A,
-            StartAtUtc : DateTimeOffset.UtcNow.AddDays(1),
-            EndAt : DateTimeOffset.UtcNow.AddDays(1).AddHours(1),
-            repairTasks : [RepairTaskFactory.CreateRepairTask().Value]);
+            id: Guid.Empty,
+            LaborId: Guid.NewGuid(),
+            VehicleId: Guid.NewGuid(),
+            spot: Spot.A,
+            StartAtUtc: DateTimeOffset.UtcNow.AddDays(1),
+            EndAt: DateTimeOffset.UtcNow.AddDays(1).AddHours(1),
+            repairTasks: [RepairTaskFactory.CreateRepairTask().Value]);
 
         // Assert
         Assert.True(result.IsSuccess);
@@ -229,13 +229,13 @@ public class WorkOrderTests
     {
         // Act
         var result = WorkOrder.Create(
-            id : Guid.NewGuid(),
-            LaborId : Guid.NewGuid(),
-            VehicleId : Guid.Empty,
-            spot : Spot.A,
-            StartAtUtc : DateTimeOffset.UtcNow.AddDays(1),
-            EndAt : DateTimeOffset.UtcNow.AddDays(1).AddHours(1),
-            repairTasks : [RepairTaskFactory.CreateRepairTask().Value]);
+            id: Guid.NewGuid(),
+            LaborId: Guid.NewGuid(),
+            VehicleId: Guid.Empty,
+            spot: Spot.A,
+            StartAtUtc: DateTimeOffset.UtcNow.AddDays(1),
+            EndAt: DateTimeOffset.UtcNow.AddDays(1).AddHours(1),
+            repairTasks: [RepairTaskFactory.CreateRepairTask().Value]);
 
         // Assert
         Assert.True(result.IsError);
@@ -249,13 +249,13 @@ public class WorkOrderTests
     {
         // Act
         var result = WorkOrder.Create(
-            id : Guid.NewGuid(),
-            LaborId : Guid.Empty,
-            VehicleId : Guid.NewGuid(),
-            spot : Spot.A,
-            StartAtUtc : DateTimeOffset.UtcNow.AddDays(1),
-            EndAt : DateTimeOffset.UtcNow.AddDays(1).AddHours(1),
-            repairTasks : [RepairTaskFactory.CreateRepairTask().Value]);
+            id: Guid.NewGuid(),
+            LaborId: Guid.Empty,
+            VehicleId: Guid.NewGuid(),
+            spot: Spot.A,
+            StartAtUtc: DateTimeOffset.UtcNow.AddDays(1),
+            EndAt: DateTimeOffset.UtcNow.AddDays(1).AddHours(1),
+            repairTasks: [RepairTaskFactory.CreateRepairTask().Value]);
 
         // Assert
         Assert.True(result.IsError);
@@ -321,13 +321,13 @@ public class WorkOrderTests
     {
         // Act
         var result = WorkOrder.Create(
-            id : Guid.NewGuid(),
-            LaborId : Guid.NewGuid(),
-            VehicleId : Guid.NewGuid(),
-            spot : Spot.A,
-            StartAtUtc : DateTimeOffset.UtcNow.AddDays(1),
-            EndAt : DateTimeOffset.UtcNow.AddDays(1).AddHours(1),
-            repairTasks : null!);
+            id: Guid.NewGuid(),
+            LaborId: Guid.NewGuid(),
+            VehicleId: Guid.NewGuid(),
+            spot: Spot.A,
+            StartAtUtc: DateTimeOffset.UtcNow.AddDays(1),
+            EndAt: DateTimeOffset.UtcNow.AddDays(1).AddHours(1),
+            repairTasks: null!);
 
         // Assert
         Assert.True(result.IsError);
@@ -520,7 +520,7 @@ public class WorkOrderTests
             result.TopError.Code);
     }
 
-        [Fact]
+    [Fact]
     public void MarkAsCancelled_ShouldSucceed_WhenStateIsScheduled()
     {
         // Arrange
@@ -764,7 +764,7 @@ public class WorkOrderTests
         Assert.Single(workOrder.RepairTasks);
         Assert.Equal(task2.Id, workOrder.RepairTasks.Single().Id);
     }
- 
+
     [Fact]
     public void RemoveAndInsertRepairTasks_ShouldFail_WhenWorkOrderIsNotEditable()
     {

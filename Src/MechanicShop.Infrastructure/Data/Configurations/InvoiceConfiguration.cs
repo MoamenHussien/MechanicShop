@@ -17,7 +17,7 @@ public class InvoiceConfiguration : IEntityTypeConfiguration<Invoice>
         builder.OwnsMany(n => n.InvoiceLineItems, items =>
         {
             items.ToTable("Invoice Line Item");
-            items.WithOwner().HasForeignKey(n=>n.InvoiceId);
+            items.WithOwner().HasForeignKey(n => n.InvoiceId);
             items.HasKey(n => new { n.InvoiceId, n.LineNumber });
             items.Property(n => n.Description).HasMaxLength(200).IsRequired();
             items.Property(n => n.LineNumber).ValueGeneratedNever().IsRequired();

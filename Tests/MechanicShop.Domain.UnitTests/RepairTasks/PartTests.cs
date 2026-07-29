@@ -35,7 +35,7 @@ public class PartTests
     public void CreatePart_ShouldSucceed_WithEmptyId()
     {
         // Act
-        var result = Part.Create(id : Guid.Empty,Costs: 100,Name : "Brake Pad",Quantity : 2);
+        var result = Part.Create(id: Guid.Empty, Costs: 100, Name: "Brake Pad", Quantity: 2);
 
         // Assert
         Assert.True(result.IsSuccess);
@@ -63,7 +63,7 @@ public class PartTests
     public void CreatePart_ShouldFail_WithInvalidName(string? value)
     {
         // Act
-        var result = Part.Create(id : Guid.Empty,Costs: 100,Name : value!,Quantity : 2);
+        var result = Part.Create(id: Guid.Empty, Costs: 100, Name: value!, Quantity: 2);
 
 
         // Assert

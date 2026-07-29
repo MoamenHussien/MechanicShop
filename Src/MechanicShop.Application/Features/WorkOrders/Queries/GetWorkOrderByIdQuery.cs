@@ -70,7 +70,7 @@ public class GetWorkOrderByIdQueryHandler(ILogger<GetWorkOrderByIdQueryHandler> 
 
                    }).ToList(),
 
-                   Labor = new LaborDto( w.Labor.Id, w.Labor.FullName),
+                   Labor = new LaborDto(w.Labor.Id, w.Labor.FullName),
 
                    State = w.State,
 

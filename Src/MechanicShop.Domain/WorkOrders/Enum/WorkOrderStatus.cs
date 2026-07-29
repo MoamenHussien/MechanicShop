@@ -1,7 +1,7 @@
 public enum WorkOrderState
 {
-Scheduled,
-InProgress,
-Completed,
-Cancelled
+    Scheduled,
+    InProgress,
+    Completed,
+    Cancelled
 }

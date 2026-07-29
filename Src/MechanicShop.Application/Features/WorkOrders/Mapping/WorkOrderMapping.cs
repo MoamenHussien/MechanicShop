@@ -22,7 +22,7 @@ public static class WorkOrderMapping
         ArgumentNullException.ThrowIfNull(workOrders);
         return workOrders.Select(ToDto).ToList();
     }
-    
+
 
     public static WorkOrderListItemDto ToListItemDto(this WorkOrder workOrder)
     {

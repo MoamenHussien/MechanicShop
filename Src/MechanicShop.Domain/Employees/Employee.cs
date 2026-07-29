@@ -7,25 +7,25 @@ public sealed class Employee : AuditableEntity
     public bool IsActive { get; private set; }
     public string FullName => FirstName + " " + LastName;
 
-    #pragma warning disable CS8618
+#pragma warning disable CS8618
     private Employee()
     {
-        
-    }
-    #pragma warning restore CS8618
 
-    private Employee(Guid id,string FirstName,string LastName):base(id)
+    }
+#pragma warning restore CS8618
+
+    private Employee(Guid id, string FirstName, string LastName) : base(id)
     {
-        this.FirstName=FirstName;
-        this.LastName=LastName;
-        this.IsActive=true;
+        this.FirstName = FirstName;
+        this.LastName = LastName;
+        this.IsActive = true;
     }
 
-    public static Result<Employee> Create(Guid id,string FirstName,string LastName)
+    public static Result<Employee> Create(Guid id, string FirstName, string LastName)
     {
         if (id == Guid.Empty)
         {
-            id=Guid.NewGuid();
+            id = Guid.NewGuid();
         }
 
         if (string.IsNullOrWhiteSpace(FirstName))
@@ -38,9 +38,9 @@ public sealed class Employee : AuditableEntity
             return EmployeeErrors.LastNameRequired;
         }
 
-        return new Employee(id,FirstName.CapitalizeFirstLetter(),LastName.CapitalizeFirstLetter());
+        return new Employee(id, FirstName.CapitalizeFirstLetter(), LastName.CapitalizeFirstLetter());
     }
-    public Result<Updated> Update(string FirstName,string LastName,bool IsActive)
+    public Result<Updated> Update(string FirstName, string LastName, bool IsActive)
     {
         if (string.IsNullOrWhiteSpace(FirstName))
         {
@@ -51,10 +51,10 @@ public sealed class Employee : AuditableEntity
         {
             return EmployeeErrors.LastNameRequired;
         }
-        
-        this.FirstName=FirstName.CapitalizeFirstLetter();
-        this.LastName=LastName.CapitalizeFirstLetter();
-        this.IsActive=IsActive;
+
+        this.FirstName = FirstName.CapitalizeFirstLetter();
+        this.LastName = LastName.CapitalizeFirstLetter();
+        this.IsActive = IsActive;
 
         return Result.Updated;
     }

@@ -45,11 +45,11 @@ public class RepairTaskTests
     {
         // Act
         var result = RepairTask.Create(
-            id  :Guid.Empty,
-            name : "Brake Inspection",
-            LaborCost : 100,
-            repairDuration : RepairDurationInMinutes.Min30,
-            parts : [PartFactory.CreatePart(name:"Brake pads",cost:50,quantity:1).Value]);
+            id: Guid.Empty,
+            name: "Brake Inspection",
+            LaborCost: 100,
+            repairDuration: RepairDurationInMinutes.Min30,
+            parts: [PartFactory.CreatePart(name: "Brake pads", cost: 50, quantity: 1).Value]);
 
         // Assert
         Assert.True(result.IsSuccess);
@@ -65,11 +65,11 @@ public class RepairTaskTests
     {
         // Act
         var result = RepairTask.Create(
-            id  :Guid.NewGuid(),
-            name : value!,
-            LaborCost : 100,
-            repairDuration : RepairDurationInMinutes.Min30,
-            parts : [PartFactory.CreatePart(name:"Brake pads",cost:50,quantity:1).Value]);
+            id: Guid.NewGuid(),
+            name: value!,
+            LaborCost: 100,
+            repairDuration: RepairDurationInMinutes.Min30,
+            parts: [PartFactory.CreatePart(name: "Brake pads", cost: 50, quantity: 1).Value]);
 
         // Assert
         Assert.True(result.IsError);
@@ -106,11 +106,11 @@ public class RepairTaskTests
     {
         // Act
         var result = RepairTask.Create(
-            id  :Guid.Empty,
-            name : "Brake Inspection",
-            LaborCost : 100,
-            repairDuration : RepairDurationInMinutes.Min30,
-            parts : null!);
+            id: Guid.Empty,
+            name: "Brake Inspection",
+            LaborCost: 100,
+            repairDuration: RepairDurationInMinutes.Min30,
+            parts: null!);
 
         // Assert
         Assert.True(result.IsError);

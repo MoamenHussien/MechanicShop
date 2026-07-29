@@ -295,7 +295,7 @@ public class LaborsControllerTests
         var token = await _client.GenerateTokenAsync(TestUsers.Labor01);
         _client.SetAuthorizationHeader(token);
 
-        var request = new UpdateLaborPasswordRequest(TestUsers.Labor01.Email!,"NewPassword123!");
+        var request = new UpdateLaborPasswordRequest(TestUsers.Labor01.Email!, "NewPassword123!");
 
         var response = await _client.PutAsJsonAsync("/api/v1.0/labors/update-password", request);
 

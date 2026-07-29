@@ -8,6 +8,6 @@ public static class LaborMapper
     public static LaborDto ToDto(this Employee employee)
     {
         ArgumentNullException.ThrowIfNull(employee);
-        return new LaborDto(employee.Id,employee.FullName);
+        return new LaborDto(employee.Id, employee.FullName);
     }
 }

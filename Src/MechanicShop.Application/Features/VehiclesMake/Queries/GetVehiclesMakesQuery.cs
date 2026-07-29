@@ -15,20 +15,20 @@ public sealed record GetVehiclesMakesQuery : ICachedQuery<Result<List<VehicleMak
 }
 
 
-public class GetVehiclesMakesQueriesHandler(IAppDbContext context , ILogger<GetVehiclesMakesQueriesHandler> logger)
+public class GetVehiclesMakesQueriesHandler(IAppDbContext context, ILogger<GetVehiclesMakesQueriesHandler> logger)
  : IRequestHandler<GetVehiclesMakesQuery, Result<List<VehicleMakeResponse>>>
 {
     async Task<Result<List<VehicleMakeResponse>>> IRequestHandler<GetVehiclesMakesQuery, Result<List<VehicleMakeResponse>>>.Handle(GetVehiclesMakesQuery request, CancellationToken cancellationToken)
     {
-       var makes = await context.VehicleMakes.AsNoTracking().Select(x=> new VehicleMakeResponse(x.Id,x.Make)).ToListAsync(cancellationToken);
-       if (makes.Count == 0 )
+        var makes = await context.VehicleMakes.AsNoTracking().Select(x => new VehicleMakeResponse(x.Id, x.Make)).ToListAsync(cancellationToken);
+        if (makes.Count == 0)
         {
-           logger.LogWarning("Not Found Any Of Vehicles Makes");
-           return  ApplicationErrors.NotFoundAnyMakes; 
+            logger.LogWarning("Not Found Any Of Vehicles Makes");
+            return ApplicationErrors.NotFoundAnyMakes;
         }
 
         logger.LogInformation("Returning And Caching Vehicles Makes");
 
-        return  makes;
+        return makes;
     }
 }

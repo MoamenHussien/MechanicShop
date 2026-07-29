@@ -15,25 +15,25 @@ public sealed class Customer : AuditableEntity
 #pragma warning disable CS8618
     private Customer()
     {
-        
+
     }
-     
+
 #pragma warning restore CS8618
 
 
-    private Customer(Guid id,string name,string email,string phone,List<Vehicle> vehicles) :base (id)
+    private Customer(Guid id, string name, string email, string phone, List<Vehicle> vehicles) : base(id)
     {
-        this.Name =name;
-        this.Email= email;
+        this.Name = name;
+        this.Email = email;
         this.PhoneNumber = phone;
         this._vehicles = vehicles;
     }
 
-    public static Result<Customer> Create (Guid id ,string name,string email,string phone,List<Vehicle> vehicles)
+    public static Result<Customer> Create(Guid id, string name, string email, string phone, List<Vehicle> vehicles)
     {
         if (id == Guid.Empty)
         {
-            id=Guid.NewGuid();
+            id = Guid.NewGuid();
         }
 
         if (string.IsNullOrWhiteSpace(name))
@@ -51,15 +51,15 @@ public sealed class Customer : AuditableEntity
             return CustomerErrors.PhoneRequired;
         }
 
-        if(vehicles is null || vehicles.Count ==0 )
+        if (vehicles is null || vehicles.Count == 0)
         {
             return CustomerErrors.VehiclesRequired;
         }
 
-        return new Customer(id,name.CapitalizeFirstLetter(),email,phone.Trim(),vehicles);
+        return new Customer(id, name.CapitalizeFirstLetter(), email, phone.Trim(), vehicles);
     }
 
-    public Result<Updated> Update (string name,string email,string phone)
+    public Result<Updated> Update(string name, string email, string phone)
     {
         if (string.IsNullOrWhiteSpace(name))
         {
@@ -75,9 +75,9 @@ public sealed class Customer : AuditableEntity
         {
             return CustomerErrors.PhoneRequired;
         }
-        this.Name =name.CapitalizeFirstLetter();
-        this.Email=email;
-        this.PhoneNumber=phone.Trim();
+        this.Name = name.CapitalizeFirstLetter();
+        this.Email = email;
+        this.PhoneNumber = phone.Trim();
 
         return Result.Updated;
     }
@@ -88,28 +88,28 @@ public sealed class Customer : AuditableEntity
         {
             return CustomerErrors.VehiclesRequired;
         }
-        
-        var vehicleHash = vehicles.Select(n=>n.Id).ToHashSet();
 
-        this._vehicles.RemoveAll(n=> !vehicleHash.Contains(n.Id));
+        var vehicleHash = vehicles.Select(n => n.Id).ToHashSet();
 
-        var vehicleDire = this._vehicles.ToDictionary(n=>n.Id);
+        this._vehicles.RemoveAll(n => !vehicleHash.Contains(n.Id));
 
-        foreach(var UpVec in vehicles)
+        var vehicleDire = this._vehicles.ToDictionary(n => n.Id);
+
+        foreach (var UpVec in vehicles)
         {
-            if (vehicleDire.TryGetValue(UpVec.Id,out Vehicle? vehicle))
+            if (vehicleDire.TryGetValue(UpVec.Id, out Vehicle? vehicle))
             {
-                var UpState = vehicle.Update(UpVec.Year,UpVec.LicensePlate,UpVec.VehicleModelId);
+                var UpState = vehicle.Update(UpVec.Year, UpVec.LicensePlate, UpVec.VehicleModelId);
                 if (UpState.IsError)
                 {
                     return UpState.Errors;
-                }   
+                }
 
             }
             else
-            {             
+            {
                 this._vehicles.Add(UpVec);
-            } 
+            }
         }
         return Result.Updated;
     }

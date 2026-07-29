@@ -24,7 +24,7 @@ public class GetRepairTasksQueryHandler(ILogger<GetRepairTasksQuery> logger, IAp
             Name = r.Name,
             EstimatedDurationInMins = r.EstimatedDuration,
             LaborCost = r.LaborCost,
-            Parts = r.Parts.Select(p => new PartDto(p.Id,p.Name,p.Costs,p.Quantity)).ToList()
+            Parts = r.Parts.Select(p => new PartDto(p.Id, p.Name, p.Costs, p.Quantity)).ToList()
 
         }).ToListAsync(cancellationToken);
 

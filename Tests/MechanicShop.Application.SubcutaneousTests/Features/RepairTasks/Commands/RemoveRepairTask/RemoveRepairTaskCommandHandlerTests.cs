@@ -53,11 +53,11 @@ public class RemoveRepairTaskCommandHandlerTests(WebAppFactory factory)
     {
         // Arrange
         var repairTask = RepairTaskFactory.CreateRepairTask().Value;
-        
+
         var make = VehicleMakeFactory.CreateVehicleMake().Value;
         var customer = MechanicShop.Tests.Common.Customers.CustomerFactory.CreateCustomer(email: "remove_rt@localhost.com", vehicles: [MechanicShop.Tests.Common.Customers.VehicleFactory.CreateVehicle(vehicleModelId: make.VehicleModels.First().Id).Value]).Value;
         var vehicle = customer.vehicles.First();
-        
+
         var employee = MechanicShop.Tests.Common.Employees.EmployeeFactory.CreateEmployee().Value;
 
         await _context.VehicleMakes.AddAsync(make);

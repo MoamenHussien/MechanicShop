@@ -5,7 +5,7 @@ public class WorkOrderConfiguration : IEntityTypeConfiguration<WorkOrder>
 {
     public void Configure(EntityTypeBuilder<WorkOrder> builder)
     {
-        builder.HasKey(n=>n.Id).IsClustered(false);
+        builder.HasKey(n => n.Id).IsClustered(false);
         builder.Property(n => n.Id).ValueGeneratedNever();
         builder.HasOne(n => n.Invoice).WithOne(n => n.WorkOrder).HasForeignKey<Invoice>(n => n.WorkOrderId).OnDelete(DeleteBehavior.Restrict);
         builder.HasOne(n => n.Vehicle).WithMany(n => n.WorkOrders).HasForeignKey(n => n.VehicleId);
@@ -22,8 +22,8 @@ public class WorkOrderConfiguration : IEntityTypeConfiguration<WorkOrder>
         builder.Ignore(w => w.Total);
         builder.Ignore(w => w.TotalLaborCost);
         builder.Ignore(w => w.TotalPartsCost);
-        builder.Ignore(n=>n.IsDeletable);
-        builder.Ignore(n=>n.IsEditable);
+        builder.Ignore(n => n.IsDeletable);
+        builder.Ignore(n => n.IsEditable);
 
     }
 }

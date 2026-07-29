@@ -5,7 +5,7 @@ using System.Reflection;
 
 public static class ApplicationDI
 {
-    public static IServiceCollection AddApplication (this IServiceCollection  services)
+    public static IServiceCollection AddApplication(this IServiceCollection services)
     {
         var assembly = typeof(ApplicationDI).Assembly;
 

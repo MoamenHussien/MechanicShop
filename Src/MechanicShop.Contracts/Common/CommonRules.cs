@@ -35,10 +35,10 @@ public static class CommonRules
     }
 
     public static IRuleBuilderOptions<T, Guid> IdRequired<T>(
-        this IRuleBuilder<T, Guid> ruleBuilder,string TypeName)
+        this IRuleBuilder<T, Guid> ruleBuilder, string TypeName)
     {
         return ruleBuilder
             .NotEmpty().WithErrorCode($"{TypeName}_Id_Is_Required").WithMessage($"{TypeName} Id Is Required");
-            
+
     }
 }
