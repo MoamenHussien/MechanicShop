@@ -13,7 +13,7 @@ public class CachingBehavior<TRequest, TResponse>
         {
             return await next(cancellationToken);
         }
-        
+
         logger.LogInformation(
             "🔍 HybridCache CHECK - Evaluating request '{RequestName}' with key '{CacheKey}'.",
             typeof(TRequest).Name,

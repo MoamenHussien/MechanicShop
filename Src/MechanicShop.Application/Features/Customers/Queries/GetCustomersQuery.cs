@@ -16,7 +16,7 @@ public sealed record GetCustomersQuery() : ICachedQuery<Result<List<CustomerDto>
 }
 
 public class GetCustomersQueryHandler(ILogger<GetCustomersQueryHandler> logger, IAppDbContext context)
-: IRequestHandler<GetCustomersQuery,Result<List<CustomerDto>>>
+: IRequestHandler<GetCustomersQuery, Result<List<CustomerDto>>>
 {
     public async Task<Result<List<CustomerDto>>> Handle(GetCustomersQuery request, CancellationToken cancellationToken)
     {
@@ -24,7 +24,7 @@ public class GetCustomersQueryHandler(ILogger<GetCustomersQueryHandler> logger, 
         if (customers.Count == 0)
         {
             logger.LogWarning("No customers were found.");
-           return ApplicationErrors.NotFoundAnyCustomers;
+            return ApplicationErrors.NotFoundAnyCustomers;
         }
 
         logger.LogInformation("Cache miss, returning all customers With Count: {Count}", customers.Count);

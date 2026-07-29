@@ -34,12 +34,12 @@ public class WorkOrderPolicy(AppDbContext context, IOptions<AppSettings> options
 
     public async Task<bool> IsThisCustomerHasAnyRequestForWorkOrderBeforeAsync(Guid CustomerId, CancellationToken ct = default)
     {
-        return await context.WorkOrders.AnyAsync(n => n.Vehicle.CustomerId == CustomerId && n.State != WorkOrderState.Cancelled,ct);
+        return await context.WorkOrders.AnyAsync(n => n.Vehicle.CustomerId == CustomerId && n.State != WorkOrderState.Cancelled, ct);
     }
 
     public async Task<bool> IsVehicleAlreadyScheduled(Guid vehicleId, DateTimeOffset startAt, DateTimeOffset endAt, Guid? excludedWorkOrderId = null, CancellationToken ct = default)
     {
-        return await context.WorkOrders.AnyAsync(n => n.VehicleId == vehicleId && n.StartAtUtc < endAt && n.EndAtUtc > startAt && n.State != WorkOrderState.Cancelled && (!excludedWorkOrderId.HasValue || n.Id != excludedWorkOrderId ), ct);
+        return await context.WorkOrders.AnyAsync(n => n.VehicleId == vehicleId && n.StartAtUtc < endAt && n.EndAtUtc > startAt && n.State != WorkOrderState.Cancelled && (!excludedWorkOrderId.HasValue || n.Id != excludedWorkOrderId), ct);
     }
 
     public Result<Success> ValidateMinimumRequirement(DateTimeOffset startAt, DateTimeOffset endAt)

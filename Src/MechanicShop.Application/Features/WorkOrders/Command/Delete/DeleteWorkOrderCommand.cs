@@ -36,9 +36,9 @@ public class DeleteWorkOrderCommandHandler(ILogger<DeleteCustomerCommandHandler>
             logger.LogWarning("The Work Order Not Found For This Id {id}", request.id);
             return ApplicationErrors.NotFoundTheWorkOrder;
         }
-        
-        var IsDeletedState =WorkOrder.MarkAsDeleted();
-        
+
+        var IsDeletedState = WorkOrder.MarkAsDeleted();
+
         if (IsDeletedState.IsError)
         {
             logger.LogWarning("Cannot delete this work order id :{id} because its current status is '{state}', which does not allow deletion", request.id, WorkOrder.State);
@@ -49,7 +49,7 @@ public class DeleteWorkOrderCommandHandler(ILogger<DeleteCustomerCommandHandler>
         await context.SaveChangesAsync(cancellationToken);
         await cacheInvalidator.EvictByTagAsync(CacheTags.WorkOrders, cancellationToken);
 
-        logger.LogInformation("WorkOrder with Id '{WorkOrderId}' was successfully removed, and cache tag 'WorkOrders' was cleared",request.id);
+        logger.LogInformation("WorkOrder with Id '{WorkOrderId}' was successfully removed, and cache tag 'WorkOrders' was cleared", request.id);
 
         return Result.Deleted;
     }

@@ -8,7 +8,7 @@ namespace MechanicShop.Api.Controllers;
 
 [Route("api/settings")]
 [ApiVersionNeutral]
-[Tags("Settings")] 
+[Tags("Settings")]
 public sealed class SettingsController(IOptions<AppSettings> options) : ApiController
 {
     [HttpGet("operating-hours")]

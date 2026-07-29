@@ -20,7 +20,7 @@ public class GetDailyScheduleQueryHandlerTests(WebAppFactory factory)
         // Arrange
         var scheduleDate = DateOnly.FromDateTime(DateTime.UtcNow.AddDays(1));
         var timeZone = TimeZoneInfo.Utc;
-        
+
         var employee = Employee.Create(Guid.NewGuid(), "John", "Doe").Value;
         var make = VehicleMakeFactory.CreateVehicleMake().Value;
         var customer = CustomerFactory.CreateCustomer(vehicles: [VehicleFactory.CreateVehicle(vehicleModelId: make.VehicleModels.First().Id).Value]).Value;

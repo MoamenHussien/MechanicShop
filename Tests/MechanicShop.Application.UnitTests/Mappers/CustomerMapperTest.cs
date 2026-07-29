@@ -66,4 +66,4 @@ public class CustomerMapperTests
         Assert.Contains(customerDtos, dto => dto.CustomerId == firstCustomer.Id);
         Assert.Contains(customerDtos, dto => dto.CustomerId == secondCustomer.Id);
     }
-}
+}

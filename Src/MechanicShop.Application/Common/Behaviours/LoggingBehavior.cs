@@ -14,8 +14,8 @@ where TRequest : notnull
         {
             UserName = await identity.GetUserNameAsync(User.Id.Value);
         }
-        
-         logger.LogInformation("Request : Name : {RequestName} Values : {@RequestValues} User Id : {Userid} User Name : {UserName}",typeof(TRequest).Name,request,User.Id,UserName);
+
+        logger.LogInformation("Request : Name : {RequestName} Values : {@RequestValues} User Id : {Userid} User Name : {UserName}", typeof(TRequest).Name, request, User.Id, UserName);
 
     }
 }

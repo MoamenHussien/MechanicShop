@@ -1,4 +1,4 @@
 using System.Transactions;
 using MediatR;
 
-public abstract class  DomainEvents : INotification;
+public abstract class DomainEvents : INotification;

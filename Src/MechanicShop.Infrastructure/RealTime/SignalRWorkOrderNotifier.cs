@@ -5,6 +5,6 @@ public class SignalRWorkOrderNotifier(IHubContext<WorkOrderHub> hub) : IWorkOrde
 {
     public async Task NotifyWorkOrdersChangedAsync(CancellationToken ct = default)
     {
-       await hub.Clients.All.SendAsync("WorkOrderChanged",cancellationToken: ct);
+        await hub.Clients.All.SendAsync("WorkOrderChanged", cancellationToken: ct);
     }
 }

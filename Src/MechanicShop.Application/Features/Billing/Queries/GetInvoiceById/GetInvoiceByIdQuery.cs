@@ -29,7 +29,7 @@ public class GetInvoiceByIdQueryHandler(ILogger<GetInvoiceByIdQueryHandler> logg
     public async Task<Result<InvoiceDto>> Handle(GetInvoiceByIdQuery request, CancellationToken cancellationToken)
     {
         var invoice = await context.Invoices.Select(InvoiceMapper.InvoiceProjection)
-                                            .FirstOrDefaultAsync(n=>n.InvoiceId == request.invoiceId, cancellationToken);
+                                            .FirstOrDefaultAsync(n => n.InvoiceId == request.invoiceId, cancellationToken);
 
         if (invoice is null)
         {

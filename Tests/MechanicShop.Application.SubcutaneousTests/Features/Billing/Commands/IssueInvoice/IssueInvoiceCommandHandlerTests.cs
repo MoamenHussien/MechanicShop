@@ -21,7 +21,7 @@ public class IssueInvoiceCommandHandlerTests(WebAppFactory factory)
         var vehicle = VehicleFactory.CreateVehicle().Value;
         var customer = CustomerFactory.CreateCustomer().Value;
         customer.UpSertVehicles([vehicle]);
-        
+
         var employee = MechanicShop.Tests.Common.Employees.EmployeeFactory.CreateEmployee().Value;
         var repairTask = RepairTaskFactory.CreateRepairTask().Value;
 
@@ -67,7 +67,7 @@ public class IssueInvoiceCommandHandlerTests(WebAppFactory factory)
         var vehicle = VehicleFactory.CreateVehicle().Value;
         var customer = CustomerFactory.CreateCustomer(email: "incomplete_wo@localhost.com").Value;
         customer.UpSertVehicles([vehicle]);
-        
+
         var employee = MechanicShop.Tests.Common.Employees.EmployeeFactory.CreateEmployee().Value;
         var repairTask = RepairTaskFactory.CreateRepairTask().Value;
 
@@ -97,7 +97,7 @@ public class IssueInvoiceCommandHandlerTests(WebAppFactory factory)
         var vehicle = VehicleFactory.CreateVehicle().Value;
         var customer = CustomerFactory.CreateCustomer(email: "already_issued@localhost.com").Value;
         customer.UpSertVehicles([vehicle]);
-        
+
         var employee = MechanicShop.Tests.Common.Employees.EmployeeFactory.CreateEmployee().Value;
         var repairTask = RepairTaskFactory.CreateRepairTask().Value;
 

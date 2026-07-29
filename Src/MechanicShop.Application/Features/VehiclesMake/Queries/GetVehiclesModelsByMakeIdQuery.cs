@@ -19,7 +19,7 @@ public class GetVehiclesModelsByMakeIdQueryValidator : AbstractValidator<GetVehi
 {
     public GetVehiclesModelsByMakeIdQueryValidator()
     {
-        RuleFor(n=>n.MakeId).IdRequired("Make");
+        RuleFor(n => n.MakeId).IdRequired("Make");
     }
 }
 
@@ -28,15 +28,15 @@ public class GetVehiclesModelsByMakeIdQueryHandler(IAppDbContext context, ILogge
 {
     public async Task<Result<List<VehicleModelDto>>> Handle(GetVehiclesModelsByMakeIdQuery request, CancellationToken cancellationToken)
     {
-        var models = await context.VehicleModels.AsNoTracking().Where(x=>x.VehicleMakeId==request.MakeId)
-                                                .Select(x=>new VehicleModelDto(x.Id,x.Model)).ToListAsync(cancellationToken);
+        var models = await context.VehicleModels.AsNoTracking().Where(x => x.VehicleMakeId == request.MakeId)
+                                                .Select(x => new VehicleModelDto(x.Id, x.Model)).ToListAsync(cancellationToken);
         if (models.Count == 0)
         {
-          logger.LogWarning("Not Found Any Models To This Make Id : {id}",request.MakeId);
-          return  ApplicationErrors.NotFoundAnyModelsToThisMakeId;
+            logger.LogWarning("Not Found Any Models To This Make Id : {id}", request.MakeId);
+            return ApplicationErrors.NotFoundAnyModelsToThisMakeId;
         }
 
-        logger.LogInformation("Returning And Caching Vehicles Models To This Make Id : {id}",request.MakeId);
+        logger.LogInformation("Returning And Caching Vehicles Models To This Make Id : {id}", request.MakeId);
 
         return models;
 

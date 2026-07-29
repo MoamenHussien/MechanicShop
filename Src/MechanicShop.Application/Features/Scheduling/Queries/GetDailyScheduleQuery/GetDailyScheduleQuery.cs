@@ -27,18 +27,18 @@ public class GetDailyScheduleQueryHandler(IAppDbContext context, TimeProvider ti
 
         var WorkOrders = await context.WorkOrders.AsNoTracking().Where(n => n.StartAtUtc < UtcEndDay && n.EndAtUtc > UtcStartDay &&
                                                                       (request.LaborId == null || n.LaborId == request.LaborId))
-                                                                .Include(n => n.Vehicle).ThenInclude(n => n.VehicleModel).ThenInclude(n=>n.VehicleMake)
+                                                                .Include(n => n.Vehicle).ThenInclude(n => n.VehicleModel).ThenInclude(n => n.VehicleMake)
                                                                 .Include(n => n.Labor)
                                                                 .Include(n => n.RepairTasks).ToListAsync(cancellationToken);
 
-         var LocalTimeNow = TimeZoneInfo.ConvertTime(time.GetUtcNow(), request.TimeZone);
+        var LocalTimeNow = TimeZoneInfo.ConvertTime(time.GetUtcNow(), request.TimeZone);
 
 
         var ScheduleDto = new ScheduleDto
         {
             OnDate = request.ScheduleDate,
             EndOfDay = LocalEndDayConst < LocalTimeNow,
-            Spots=[]
+            Spots = []
         };
 
 
@@ -71,7 +71,7 @@ public class GetDailyScheduleQueryHandler(IAppDbContext context, TimeProvider ti
                             Spot = spotEn,
                             StartAt = WorkOrderInThisTime.StartAtUtc.ToLocal(request.TimeZone),
                             EndAt = WorkOrderInThisTime.EndAtUtc.ToLocal(request.TimeZone),
-                            Vehicle = WorkOrderInThisTime.Vehicle?.VehicleModel?.VehicleMake?.Make +" | "+WorkOrderInThisTime.Vehicle?.LicensePlate,
+                            Vehicle = WorkOrderInThisTime.Vehicle?.VehicleModel?.VehicleMake?.Make + " | " + WorkOrderInThisTime.Vehicle?.LicensePlate,
                             Labor = WorkOrderInThisTime.Labor.ToDto(),
                             IsOccupied = true,
                             IsAvailable = false,

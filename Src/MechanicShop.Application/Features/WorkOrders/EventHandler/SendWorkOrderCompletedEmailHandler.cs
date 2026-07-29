@@ -3,7 +3,7 @@ using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
-public sealed class SendWorkOrderCompletedEmailHandler(INotificationService notificationService, IAppDbContext context,ILogger<SendWorkOrderCompletedEmailHandler> logger)
+public sealed class SendWorkOrderCompletedEmailHandler(INotificationService notificationService, IAppDbContext context, ILogger<SendWorkOrderCompletedEmailHandler> logger)
 : INotificationHandler<WorkOrderCompleted>
 {
     public async Task Handle(WorkOrderCompleted notification, CancellationToken cancellationToken)
@@ -12,21 +12,21 @@ public sealed class SendWorkOrderCompletedEmailHandler(INotificationService noti
                            .FirstOrDefaultAsync(n => n.Id == notification.WorkOrderId, cancellationToken);
         if (WorkOrder is null)
         {
-            logger.LogError("The Work Order Is Not Found For This Id : {id}",notification.WorkOrderId);
+            logger.LogError("The Work Order Is Not Found For This Id : {id}", notification.WorkOrderId);
             return;
         }
 
         var CustomerName = WorkOrder.Vehicle.Customer.Name!;
-        
+
         _ = Task.Run(async () =>
         {
             try
             {
-                 await notificationService.SendEmailAsync(WorkOrder.Vehicle.Customer.Email!,CustomerName ,"Your Vehicle Maintenance is Complete", Body(CustomerName), cancellationToken);
+                await notificationService.SendEmailAsync(WorkOrder.Vehicle.Customer.Email!, CustomerName, "Your Vehicle Maintenance is Complete", Body(CustomerName), cancellationToken);
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
-                logger.LogError(ex,"Failed to send email in the background");
+                logger.LogError(ex, "Failed to send email in the background");
             }
         });
 
@@ -34,11 +34,11 @@ public sealed class SendWorkOrderCompletedEmailHandler(INotificationService noti
         {
             try
             {
-                 await notificationService.SendSmsAsync(WorkOrder!.Vehicle.Customer.PhoneNumber! , CustomerName, Body(CustomerName), cancellationToken);
+                await notificationService.SendSmsAsync(WorkOrder!.Vehicle.Customer.PhoneNumber!, CustomerName, Body(CustomerName), cancellationToken);
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
-                logger.LogError(ex,"Failed to send SMS in the background");
+                logger.LogError(ex, "Failed to send SMS in the background");
             }
         });
     }
@@ -54,5 +54,5 @@ public sealed class SendWorkOrderCompletedEmailHandler(INotificationService noti
                         
                         Best regards";
     }
-   
+
 }

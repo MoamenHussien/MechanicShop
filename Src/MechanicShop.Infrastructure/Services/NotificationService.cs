@@ -7,13 +7,13 @@ using MimeKit;
 
 public sealed class NotificationService(ILogger<NotificationService> logger, IOptions<MailSettings> mailsettings) : INotificationService
 {
-    public async Task SendEmailAsync(string CustomerEmail,string CustomerName, string subject, string body,CancellationToken cancellationToken)
+    public async Task SendEmailAsync(string CustomerEmail, string CustomerName, string subject, string body, CancellationToken cancellationToken)
     {
         var message = new MimeMessage();
         message.From.Add(new MailboxAddress("Mechanic Shop", "no-reply@mechanicshop.com"));
         message.To.Add(new MailboxAddress(CustomerName, CustomerEmail));
         message.Subject = subject;
-        
+
         message.Body = new TextPart("plain")
         {
             Text = body
@@ -34,7 +34,7 @@ public sealed class NotificationService(ILogger<NotificationService> logger, IOp
             ? new string('*', CustomerPhoneNum.Length - 4) + CustomerPhoneNum[^4..]
             : "****";
 
-        logger.LogInformation("[SMS] To: {cusotmername} With Phone Num : {Phone} | Message: {Message}",CustomerName ,masked, body);
+        logger.LogInformation("[SMS] To: {cusotmername} With Phone Num : {Phone} | Message: {Message}", CustomerName, masked, body);
 
         // Simulated SMS send
         await Task.CompletedTask;

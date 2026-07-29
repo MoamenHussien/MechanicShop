@@ -1,1 +1,1 @@
-public sealed record VehicleMakeResponse(Guid MakeId,string vehicleMake);
+public sealed record VehicleMakeResponse(Guid MakeId, string vehicleMake);

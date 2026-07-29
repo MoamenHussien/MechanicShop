@@ -23,7 +23,7 @@ public class TestUser : IUser
 public class WebAppFactory : WebApplicationFactory<IAssemblyMarker>, IAsyncLifetime
 {
     private readonly MsSqlContainer _dbContainer = new MsSqlBuilder("mcr.microsoft.com/mssql/server:2022-latest").Build();
-    
+
     public IMediator CreateMediator()
     {
         var serviceScope = Services.CreateScope();

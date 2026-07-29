@@ -19,7 +19,7 @@ public sealed class GetUserByIdCommandValidator : AbstractValidator<GetUserByIdC
 {
     public GetUserByIdCommandValidator()
     {
-        RuleFor(n=>n.id).IdRequired("User");
+        RuleFor(n => n.id).IdRequired("User");
     }
 }
 
@@ -28,16 +28,16 @@ public sealed class GetUserByIdCommandHandler(ILogger<GetUserByIdCommandHandler>
 {
     public async Task<Result<AppUserDto>> Handle(GetUserByIdCommand request, CancellationToken cancellationToken)
     {
-        var UserInfo = await identity.GetUserByIdAsync(request.id );
+        var UserInfo = await identity.GetUserByIdAsync(request.id);
 
         if (UserInfo.IsError)
         {
-            logger.LogWarning("Cannot get User info For This Id : {id} , And This Is Errors: {@Errors}",request.id, UserInfo.Errors);
+            logger.LogWarning("Cannot get User info For This Id : {id} , And This Is Errors: {@Errors}", request.id, UserInfo.Errors);
             return UserInfo.Errors;
         }
 
         logger.LogInformation("User info retrieved successfully for Id: {UserId}", request.id);
 
-        return UserInfo.Value;  
+        return UserInfo.Value;
     }
 }

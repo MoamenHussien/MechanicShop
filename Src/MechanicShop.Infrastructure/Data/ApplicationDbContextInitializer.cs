@@ -77,7 +77,7 @@ public class ApplicationDbContextInitializer(UserManager<AppUser> user, RoleMana
             await user.AddToRolesAsync(Labor1, [LaborRole.Name!]);
         }
 
-         var Labor2 = new AppUser
+        var Labor2 = new AppUser
         {
             Id = "8104AB20-26C2-4651-B1DE-C0BAF04DBBD9".ToGuid().Value,
             Email = "peter.labor@localhost",

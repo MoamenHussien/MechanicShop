@@ -1,1 +1,1 @@
-public class IAssemblyMarker{}
+public class IAssemblyMarker { }

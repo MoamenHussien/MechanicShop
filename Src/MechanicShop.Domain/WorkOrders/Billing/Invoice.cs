@@ -54,7 +54,7 @@ public sealed class Invoice : AuditableEntity
             return InvoiceErrors.WorkOrderIdInvalid;
         }
 
-        if (InvoiceLineItems is null || InvoiceLineItems.Count==0)
+        if (InvoiceLineItems is null || InvoiceLineItems.Count == 0)
         {
             return InvoiceErrors.LineItemsEmpty;
         }

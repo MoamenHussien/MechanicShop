@@ -17,7 +17,7 @@ public class CreateWorkOrderCommandValidator : AbstractValidator<CreateWorkOrder
     {
         RuleFor(n => n.LaborId).IdRequired("Labor");
         RuleFor(n => n.VehicleId).IdRequired("Vehicle");
-        RuleFor(n => n.repairTasksIds).NotEmpty().WithMessage("The Repair Task Is Required").Must(n => n.Count> 0).WithMessage("At Least One Repair Task Required");
+        RuleFor(n => n.repairTasksIds).NotEmpty().WithMessage("The Repair Task Is Required").Must(n => n.Count > 0).WithMessage("At Least One Repair Task Required");
         RuleFor(n => n.spot).IsInEnum().WithErrorCode("Spot_Invalid").WithMessage("Spot must be a valid Spot value. [A, B, C, D]");
         RuleFor(n => n.StartAtUtc).GreaterThan(DateTimeOffset.UtcNow).WithMessage("Start time must be in the future");
         RuleFor(n => n.repairTasksIds).NotEmpty().WithMessage("At Least One Repair Task Required");
@@ -39,7 +39,7 @@ public class CreateWorkOrderCommandHandler(ILogger<CreateWorkOrderCommandHandler
         //     return ApplicationErrors.NotAllowed;
         // }
 
-        var Selected_Repair_Tasks = await context.RepairTasks.Where(n => request.repairTasksIds.Contains(n.Id)).Include(n=>n.Parts).ToListAsync(cancellationToken);
+        var Selected_Repair_Tasks = await context.RepairTasks.Where(n => request.repairTasksIds.Contains(n.Id)).Include(n => n.Parts).ToListAsync(cancellationToken);
         if (!Selected_Repair_Tasks.Any())
         {
             logger.LogError("Not Found Any Repair Tasks For These Ids : {ids}", string.Join(" , ", request.repairTasksIds));
@@ -78,7 +78,7 @@ public class CreateWorkOrderCommandHandler(ILogger<CreateWorkOrderCommandHandler
             return ApplicationErrors.RangeTimeIsAlreadyTakenByAnotherWorkOrderAtThisSpot;
         }
 
-        var VehicleId_exists = await context.Vehicles.Where(n => n.Id == request.VehicleId).Include(n=>n.VehicleModel).ThenInclude(n=>n.VehicleMake).Include(n => n.Customer).FirstOrDefaultAsync(cancellationToken);
+        var VehicleId_exists = await context.Vehicles.Where(n => n.Id == request.VehicleId).Include(n => n.VehicleModel).ThenInclude(n => n.VehicleMake).Include(n => n.Customer).FirstOrDefaultAsync(cancellationToken);
         if (VehicleId_exists is null)
         {
             logger.LogError("Vehicle with Id '{VehicleId}' does not exist.", request.VehicleId);
@@ -92,14 +92,14 @@ public class CreateWorkOrderCommandHandler(ILogger<CreateWorkOrderCommandHandler
             return ApplicationErrors.NotFoundTheLabor;
         }
 
-        var IsLaborAvailable = await policy.IsLaborOccupiedDuringRange(request.StartAtUtc, EndAt, request.LaborId,null,cancellationToken);
+        var IsLaborAvailable = await policy.IsLaborOccupiedDuringRange(request.StartAtUtc, EndAt, request.LaborId, null, cancellationToken);
         if (IsLaborAvailable)
         {
             logger.LogError("Labor with Id '{LaborId}' is already occupied during the requested time.", request.LaborId);
             return ApplicationErrors.ThisLaborHasAnotherWorkOrderAtThisRangeTime;
         }
 
-        var is_VehicleId_Has_Active_WorkOrder_Now = await policy.IsVehicleAlreadyScheduled(request.VehicleId, request.StartAtUtc, EndAt,null,cancellationToken);
+        var is_VehicleId_Has_Active_WorkOrder_Now = await policy.IsVehicleAlreadyScheduled(request.VehicleId, request.StartAtUtc, EndAt, null, cancellationToken);
         if (is_VehicleId_Has_Active_WorkOrder_Now)
         {
             logger.LogError("Vehicle with Id '{VehicleId}' already has an overlapping WorkOrder.", request.VehicleId);
@@ -116,12 +116,12 @@ public class CreateWorkOrderCommandHandler(ILogger<CreateWorkOrderCommandHandler
         }
 
         await context.WorkOrders.AddAsync(CreateWorkOrderStatus.Value, cancellationToken);
-        
+
         await context.SaveChangesAsync(cancellationToken);
 
         await cacheInvalidator.EvictByTagAsync(CacheTags.WorkOrders, cancellationToken);
 
-        logger.LogInformation("Created WorkOrder with Id: {WorkOrderId}, saved changes to database, and removed cache tag 'WorkOrders'. VehicleId: {VehicleId}, LaborId: {LaborId}, StartAtUtc: {StartAt}, EndAtUtc: {EndAt}",CreateWorkOrderStatus.Value.Id,CreateWorkOrderStatus.Value.VehicleId,CreateWorkOrderStatus.Value.LaborId,CreateWorkOrderStatus.Value.StartAtUtc,CreateWorkOrderStatus.Value.EndAtUtc );
+        logger.LogInformation("Created WorkOrder with Id: {WorkOrderId}, saved changes to database, and removed cache tag 'WorkOrders'. VehicleId: {VehicleId}, LaborId: {LaborId}, StartAtUtc: {StartAt}, EndAtUtc: {EndAt}", CreateWorkOrderStatus.Value.Id, CreateWorkOrderStatus.Value.VehicleId, CreateWorkOrderStatus.Value.LaborId, CreateWorkOrderStatus.Value.StartAtUtc, CreateWorkOrderStatus.Value.EndAtUtc);
 
         CreateWorkOrderStatus.Value.Labor = SelectedLabor;
         CreateWorkOrderStatus.Value.Vehicle = VehicleId_exists;

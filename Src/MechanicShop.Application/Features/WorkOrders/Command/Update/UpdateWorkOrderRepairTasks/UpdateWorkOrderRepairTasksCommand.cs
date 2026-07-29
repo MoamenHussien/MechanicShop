@@ -28,7 +28,7 @@ public class UpdateWorkOrderRepairTasksCommandHandler(ILogger<UpdateWorkOrderRep
             return ApplicationErrors.NotAllowed;
         }
 
-        var WorkOrder = await context.WorkOrders.Include(n => n.RepairTasks).FirstOrDefaultAsync(n => n.Id == request.WorkOrderid,cancellationToken);
+        var WorkOrder = await context.WorkOrders.Include(n => n.RepairTasks).FirstOrDefaultAsync(n => n.Id == request.WorkOrderid, cancellationToken);
 
         if (WorkOrder is null)
         {
@@ -42,7 +42,7 @@ public class UpdateWorkOrderRepairTasksCommandHandler(ILogger<UpdateWorkOrderRep
 
         if (currentIds.SetEquals(newIds))
         {
-            logger.LogInformation( "No changes detected for WorkOrder {WorkOrderId}",request.WorkOrderid);
+            logger.LogInformation("No changes detected for WorkOrder {WorkOrderId}", request.WorkOrderid);
             return Result.Updated;
         }
 
@@ -80,7 +80,7 @@ public class UpdateWorkOrderRepairTasksCommandHandler(ILogger<UpdateWorkOrderRep
             return MinimumRequirementResult.Errors;
         }
 
-        if (await policy.IsLaborOccupiedDuringRange(WorkOrder.StartAtUtc, NewEndAt, WorkOrder.LaborId, WorkOrder.Id,cancellationToken))
+        if (await policy.IsLaborOccupiedDuringRange(WorkOrder.StartAtUtc, NewEndAt, WorkOrder.LaborId, WorkOrder.Id, cancellationToken))
         {
             logger.LogError("Labor with Id '{LaborId}' is occupied during the new calculated duration.", WorkOrder.LaborId);
             return ApplicationErrors.ThisLaborHasAnotherWorkOrderAtThisRangeTime;

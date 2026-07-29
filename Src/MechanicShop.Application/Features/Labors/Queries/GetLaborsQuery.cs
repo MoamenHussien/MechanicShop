@@ -34,7 +34,7 @@ public class GetLaborsQueryHandler(ILogger<GetLaborsQueryHandler> logger, IAppDb
 
         if (!labors.Any())
         {
-            logger.LogWarning("No active labor employees were found for role '{Role}'.",Role.Labor);
+            logger.LogWarning("No active labor employees were found for role '{Role}'.", Role.Labor);
             return ApplicationErrors.NotFoundAnyLabors;
         }
 

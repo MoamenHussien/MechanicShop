@@ -28,7 +28,7 @@ public class VehicleMakeTests
     public void CreateVehicleMake_ShouldSucceed_WithEmptyId()
     {
         // Act
-        var result = VehicleMake.Create(Guid.Empty,  $"Make-{Guid.NewGuid().ToString().Substring(0, 8)}", [VehicleModelFactory.CreateVehiclModel().Value]);
+        var result = VehicleMake.Create(Guid.Empty, $"Make-{Guid.NewGuid().ToString().Substring(0, 8)}", [VehicleModelFactory.CreateVehiclModel().Value]);
 
 
         // Assert
@@ -46,7 +46,7 @@ public class VehicleMakeTests
     public void CreateVehicleMake_ShouldFail_WhenEnterInvalidMakeName(string? make)
     {
         // Act
-        var result = VehicleMake.Create(Guid.NewGuid(),  make!, [VehicleModelFactory.CreateVehiclModel().Value]);
+        var result = VehicleMake.Create(Guid.NewGuid(), make!, [VehicleModelFactory.CreateVehiclModel().Value]);
 
         // Assert
         Assert.True(result.IsError);
@@ -58,7 +58,7 @@ public class VehicleMakeTests
     public void CreateVehicleMake_ShouldFail_WhenEnterInvalidModels(List<VehicleModel>? models)
     {
         // Act
-        var result = VehicleMake.Create(Guid.NewGuid(),  $"Make-{Guid.NewGuid().ToString().Substring(0, 8)}", models!);
+        var result = VehicleMake.Create(Guid.NewGuid(), $"Make-{Guid.NewGuid().ToString().Substring(0, 8)}", models!);
 
 
         // Assert
@@ -79,7 +79,7 @@ public class VehicleMakeTests
         Assert.Equal(VehicleMakeErrors.ModelRequired.Code, result.TopError.Code);
     }
 
-    
+
     [Fact]
     public void UpdateVehicleMake_ShouldUpdateMake_WhenInputIsValid()
     {

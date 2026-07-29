@@ -122,23 +122,23 @@ public class WorkOrderMapperTests
     }
 
     [Fact]
-public void ToListItemDto_WhenWorkOrderIsValid_ShouldMapSummaryProperties()
-{
-    // Arrange
-    var workOrder = CreateWorkOrder(repairTaskName: "Oil Change");
+    public void ToListItemDto_WhenWorkOrderIsValid_ShouldMapSummaryProperties()
+    {
+        // Arrange
+        var workOrder = CreateWorkOrder(repairTaskName: "Oil Change");
 
-    // Act
-    var listItemDto = workOrder.ToListItemDto();
+        // Act
+        var listItemDto = workOrder.ToListItemDto();
 
-    // Assert
-    Assert.Equal(workOrder.Id, listItemDto.WorkOrderId);
-    Assert.Equal(workOrder.Spot, listItemDto.Spot);
-    Assert.Equal(workOrder.StartAtUtc, listItemDto.StartAtUtc);
-    Assert.Equal(workOrder.EndAtUtc, listItemDto.EndAtUtc);
-    Assert.Equal(workOrder.State, listItemDto.State);
-    Assert.Equal(workOrder.Labor.FullName, listItemDto.Labor);
-    Assert.Single(listItemDto.RepairTasks);
-    Assert.Equal("Oil Change", listItemDto.RepairTasks.Single());
-}
+        // Assert
+        Assert.Equal(workOrder.Id, listItemDto.WorkOrderId);
+        Assert.Equal(workOrder.Spot, listItemDto.Spot);
+        Assert.Equal(workOrder.StartAtUtc, listItemDto.StartAtUtc);
+        Assert.Equal(workOrder.EndAtUtc, listItemDto.EndAtUtc);
+        Assert.Equal(workOrder.State, listItemDto.State);
+        Assert.Equal(workOrder.Labor.FullName, listItemDto.Labor);
+        Assert.Single(listItemDto.RepairTasks);
+        Assert.Equal("Oil Change", listItemDto.RepairTasks.Single());
+    }
 };
 

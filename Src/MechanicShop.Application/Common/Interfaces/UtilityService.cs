@@ -39,7 +39,7 @@ public static class UtilityService
     {
         if (string.IsNullOrWhiteSpace(stringGuidId))
         {
-            return Error.Failure("Invalid_Guid","Guid value is null or empty");
+            return Error.Failure("Invalid_Guid", "Guid value is null or empty");
         }
 
         if (Guid.TryParse(stringGuidId, out var guidId))
@@ -47,7 +47,7 @@ public static class UtilityService
             return guidId;
         }
 
-        return Error.Failure("Invalid_Guid",$"'{stringGuidId}' is not a valid Guid");
+        return Error.Failure("Invalid_Guid", $"'{stringGuidId}' is not a valid Guid");
     }
 
 

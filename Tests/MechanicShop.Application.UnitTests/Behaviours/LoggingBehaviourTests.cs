@@ -47,7 +47,7 @@ public class LoggingBehaviourTests
         await _identityServiceMock
             .Received(1)   //اتأكد إن الميثود دى اتنادت مرة واحدة
             .GetUserNameAsync(currentUserId);   // GetUserNameAsync(currentUserId) هل فعلاً الـ LoggingBehavior عمل
- 
+
         // Verify that an information log entry was written for the processed request.
 
         _loggerMock.Received(1).Log(  //اتأكد إن الـ Logger عمل Log مرة واحدة

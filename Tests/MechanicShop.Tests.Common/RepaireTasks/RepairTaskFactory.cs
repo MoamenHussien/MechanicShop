@@ -15,6 +15,6 @@ public static class RepairTaskFactory
             name ?? "Brake Inspection",
             laborCost ?? 100,
             repairDurationInMinutes ?? RepairDurationInMinutes.Min30,
-            parts ?? [PartFactory.CreatePart(name:"Brake pads",cost:50,quantity:1).Value]);
+            parts ?? [PartFactory.CreatePart(name: "Brake pads", cost: 50, quantity: 1).Value]);
     }
 }

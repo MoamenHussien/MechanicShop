@@ -41,11 +41,11 @@ public class CustomerTests
         // var result = CustomerFactory.CreateCustomer(id: Guid.Empty);
 
         var result = Customer.Create(
-            id :Guid.Empty,
-            name :"Customer #1",
-            email : "customer01@localhost",
-            phone : "5555555555",
-            vehicles :[VehicleFactory.CreateVehicle().Value, VehicleFactory.CreateVehicle().Value]);
+            id: Guid.Empty,
+            name: "Customer #1",
+            email: "customer01@localhost",
+            phone: "5555555555",
+            vehicles: [VehicleFactory.CreateVehicle().Value, VehicleFactory.CreateVehicle().Value]);
 
         // Assert
         Assert.True(result.IsSuccess);
@@ -100,11 +100,11 @@ public class CustomerTests
         // Act
         // var result = CustomerFactory.CreateCustomer(vehicles: null);
         var result = Customer.Create(
-            id :Guid.NewGuid(),
-            name :"Customer #1",
-            email : "customer01@localhost",
-            phone : "5555555555",
-            vehicles :null!);
+            id: Guid.NewGuid(),
+            name: "Customer #1",
+            email: "customer01@localhost",
+            phone: "5555555555",
+            vehicles: null!);
 
         // Assert
         Assert.True(result.IsError);

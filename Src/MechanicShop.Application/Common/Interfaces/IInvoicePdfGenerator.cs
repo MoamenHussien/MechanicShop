@@ -1,4 +1,4 @@
 public interface IInvoicePdfGenerator
 {
-    byte [] Generate(Invoice invoice);
+    byte[] Generate(Invoice invoice);
 }

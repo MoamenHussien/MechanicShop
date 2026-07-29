@@ -23,7 +23,7 @@ public class VehicleModelTests
     public void CreateVehicleModel_ShouldSucceed_WithEmptyId()
     {
         // Act
-        var result = VehicleModel.Create(id:Guid.Empty,"Model-#1");
+        var result = VehicleModel.Create(id: Guid.Empty, "Model-#1");
 
         // Assert
         Assert.True(result.IsSuccess);
@@ -38,7 +38,7 @@ public class VehicleModelTests
     public void CreateVehicleModel_ShouldFail_WithInvalidModelName(string? value)
     {
         // Act
-        var result = VehicleModel.Create(id:Guid.NewGuid(),value!);
+        var result = VehicleModel.Create(id: Guid.NewGuid(), value!);
 
         // Assert
         Assert.True(result.IsError);

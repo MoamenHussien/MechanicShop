@@ -34,11 +34,11 @@ public class VehicleTests
     public void CreateVehicle_ShouldSucceed_WithEmptyId()
     {
         // Act
-        var result =  Vehicle.Create(
-            id : Guid.Empty,
-            Year : 2024,
-            LicensePlate : "ABC 123",
-            VehicleModelId : "11111111-1111-1111-1111-222222222221".ToGuid().Value
+        var result = Vehicle.Create(
+            id: Guid.Empty,
+            Year: 2024,
+            LicensePlate: "ABC 123",
+            VehicleModelId: "11111111-1111-1111-1111-222222222221".ToGuid().Value
             );
 
         // Assert
@@ -69,11 +69,11 @@ public class VehicleTests
     public void CreateVehicle_ShouldFail_WithInvalidLicensePlate(string? value)
     {
         // Act
-        var result =  Vehicle.Create(
-            id : Guid.Empty,
-            Year : 2024,
-            LicensePlate : value!,
-            VehicleModelId : "11111111-1111-1111-1111-222222222221".ToGuid().Value
+        var result = Vehicle.Create(
+            id: Guid.Empty,
+            Year: 2024,
+            LicensePlate: value!,
+            VehicleModelId: "11111111-1111-1111-1111-222222222221".ToGuid().Value
             );
 
         // Assert
@@ -87,11 +87,11 @@ public class VehicleTests
     public void CreateVehicle_ShouldFail_WithInvalidVehicleModelId()
     {
         // Act
-        var result =  Vehicle.Create(
-            id : Guid.Empty,
-            Year : 2024,
-            LicensePlate : "ABC 123",
-            VehicleModelId : Guid.Empty
+        var result = Vehicle.Create(
+            id: Guid.Empty,
+            Year: 2024,
+            LicensePlate: "ABC 123",
+            VehicleModelId: Guid.Empty
             );
 
         // Assert

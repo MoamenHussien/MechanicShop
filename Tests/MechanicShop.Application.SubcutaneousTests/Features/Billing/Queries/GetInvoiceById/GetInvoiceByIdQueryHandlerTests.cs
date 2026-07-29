@@ -20,7 +20,7 @@ public class GetInvoiceByIdQueryHandlerTests(WebAppFactory factory)
         var vehicle = VehicleFactory.CreateVehicle().Value;
         var customer = CustomerFactory.CreateCustomer(email: "getinvoice1@localhost.com").Value;
         customer.UpSertVehicles([vehicle]);
-        
+
         var employee = MechanicShop.Tests.Common.Employees.EmployeeFactory.CreateEmployee().Value;
         var repairTask = MechanicShop.Tests.Common.RepaireTasks.RepairTaskFactory.CreateRepairTask().Value;
 
@@ -37,7 +37,7 @@ public class GetInvoiceByIdQueryHandlerTests(WebAppFactory factory)
         var issueCommand = new IssueInvoiceCommand(workOrder.Id);
         var issueResult = await _mediator.Send(issueCommand);
         Assert.True(issueResult.IsSuccess);
-        
+
         var invoiceId = issueResult.Value.InvoiceId;
 
         var query = new GetInvoiceByIdQuery(invoiceId);

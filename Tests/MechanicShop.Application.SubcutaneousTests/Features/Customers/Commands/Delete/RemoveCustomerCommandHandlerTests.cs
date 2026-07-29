@@ -19,7 +19,7 @@ public class RemoveCustomerCommandHandlerTests(WebAppFactory factory)
         // Arrange
         var make = VehicleMakeFactory.CreateVehicleMake().Value;
         var customer = CustomerFactory.CreateCustomer(email: "delete1@localhost.com", vehicles: [VehicleFactory.CreateVehicle(vehicleModelId: make.VehicleModels.First().Id).Value]).Value;
-        
+
         await _context.VehicleMakes.AddAsync(make);
         await _context.Customers.AddAsync(customer);
         await _context.SaveChangesAsync(default);
@@ -31,7 +31,7 @@ public class RemoveCustomerCommandHandlerTests(WebAppFactory factory)
 
         // Assert
         Assert.True(result.IsSuccess);
-        
+
         var deletedCustomer = await _context.Customers.AsNoTracking().FirstOrDefaultAsync(c => c.Id == customer.Id);
         Assert.Null(deletedCustomer);
     }
@@ -56,7 +56,7 @@ public class RemoveCustomerCommandHandlerTests(WebAppFactory factory)
         // Arrange
         var make = VehicleMakeFactory.CreateVehicleMake().Value;
         var customer = CustomerFactory.CreateCustomer(email: "delete2@localhost.com").Value;
-        
+
         var vehicle = VehicleFactory.CreateVehicle(vehicleModelId: make.VehicleModels.First().Id).Value;
         customer.UpSertVehicles([vehicle]);
 

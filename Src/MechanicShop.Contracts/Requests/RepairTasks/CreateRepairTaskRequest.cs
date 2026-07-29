@@ -14,7 +14,7 @@ public class CreateRepairTaskRequest
     public decimal LaborCost { get; set; }
 
 
-    [EnumDataType(typeof(RepairDurationInMinutes),ErrorMessage =("You Must Enter Valid Duration"))]
+    [EnumDataType(typeof(RepairDurationInMinutes), ErrorMessage = ("You Must Enter Valid Duration"))]
     [Required(ErrorMessage = "Estimated duration is required.")]
     public RepairDurationInMinutes? EstimatedDurationInMins { get; set; }
 

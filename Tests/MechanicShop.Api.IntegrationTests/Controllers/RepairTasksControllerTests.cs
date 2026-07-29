@@ -155,7 +155,7 @@ public class RepairTasksControllerTests
             Name = "Forbidden Task",
             LaborCost = 100.00m,
             EstimatedDurationInMins = MechanicShop.Contracts.Common.RepairDurationInMinutes.Min60,
-            Parts = [ new() { Name = "Valid Part", Cost = 10m, Quantity = 1 } ]
+            Parts = [new() { Name = "Valid Part", Cost = 10m, Quantity = 1 }]
         };
 
         var response = await _client.PostAsJsonAsync("/api/v1.0/repair-tasks", request);
@@ -188,7 +188,7 @@ public class RepairTasksControllerTests
         {
             var createResponse = await _client.PostAsJsonAsync("/api/v1.0/repair-tasks", createRequest);
             createResponse.EnsureSuccessStatusCode();
-            
+
             // Extract the created ID from the Location header
             var location = createResponse.Headers.Location;
             Assert.NotNull(location);
@@ -229,7 +229,7 @@ public class RepairTasksControllerTests
             Name = "NonExistent Update",
             LaborCost = 100.00m,
             EstimatedDurationInMins = MechanicShop.Contracts.Common.RepairDurationInMinutes.Min60,
-            Parts = [ new() { Name = "Valid Part", Cost = 10m, Quantity = 1 } ]
+            Parts = [new() { Name = "Valid Part", Cost = 10m, Quantity = 1 }]
         };
 
         var response = await _client.PutAsJsonAsync($"/api/v1.0/repair-tasks/{nonExistentId}", request);
@@ -251,7 +251,7 @@ public class RepairTasksControllerTests
             Name = "Forbidden Update",
             LaborCost = 100.00m,
             EstimatedDurationInMins = MechanicShop.Contracts.Common.RepairDurationInMinutes.Min60,
-            Parts = [ new() { Name = "Valid Part", Cost = 10m, Quantity = 1 } ]
+            Parts = [new() { Name = "Valid Part", Cost = 10m, Quantity = 1 }]
         };
 
         var response = await _client.PutAsJsonAsync($"/api/v1.0/repair-tasks/{task!.Id}", request);
@@ -274,7 +274,7 @@ public class RepairTasksControllerTests
             Name = "Task To Delete",
             LaborCost = 25.00m,
             EstimatedDurationInMins = MechanicShop.Contracts.Common.RepairDurationInMinutes.Min30,
-            Parts = [ new() { Name = "Valid Part", Cost = 10m, Quantity = 1 } ]
+            Parts = [new() { Name = "Valid Part", Cost = 10m, Quantity = 1 }]
         };
 
         try

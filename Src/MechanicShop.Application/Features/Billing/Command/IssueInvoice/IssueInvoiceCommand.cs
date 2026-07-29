@@ -18,7 +18,7 @@ public sealed class IssueInvoiceCommandValidator : AbstractValidator<IssueInvoic
     }
 }
 
-public sealed class IssueInvoiceCommandHandler(ILogger<IssueInvoiceCommand> logger,IMediator mediator , IAppDbContext context, ICacheInvalidator cacheInvalidator,TimeProvider time)
+public sealed class IssueInvoiceCommandHandler(ILogger<IssueInvoiceCommand> logger, IMediator mediator, IAppDbContext context, ICacheInvalidator cacheInvalidator, TimeProvider time)
 : IRequestHandler<IssueInvoiceCommand, Result<InvoiceDto>>
 {
     public async Task<Result<InvoiceDto>> Handle(IssueInvoiceCommand request, CancellationToken cancellationToken)
@@ -29,7 +29,7 @@ public sealed class IssueInvoiceCommandHandler(ILogger<IssueInvoiceCommand> logg
         //     return ApplicationErrors.NotAllowed;
         // }
 
-        if (await context.Invoices.AnyAsync(n => n.WorkOrderId == request.workOrderId,cancellationToken))
+        if (await context.Invoices.AnyAsync(n => n.WorkOrderId == request.workOrderId, cancellationToken))
         {
             logger.LogWarning("Issue Invoice Cancelled: Invoice has already been issued for WorkOrder Id '{WorkOrderId}'.", request.workOrderId);
             return ApplicationErrors.InvoiceAlreadyIssued;
@@ -37,7 +37,7 @@ public sealed class IssueInvoiceCommandHandler(ILogger<IssueInvoiceCommand> logg
 
         var WorkOrder = await context.WorkOrders.AsNoTracking()
                                           .Include(n => n.RepairTasks).ThenInclude(n => n.Parts).
-                                           FirstOrDefaultAsync(n => n.Id == request.workOrderId,cancellationToken);
+                                           FirstOrDefaultAsync(n => n.Id == request.workOrderId, cancellationToken);
 
         if (WorkOrder is null)
         {
@@ -84,7 +84,7 @@ public sealed class IssueInvoiceCommandHandler(ILogger<IssueInvoiceCommand> logg
             InvoiceLineItems.Add(invoiceLineItem.Value);
 
         }
-        var SubTotal = InvoiceLineItems.Sum(n=>n.LineTotal);
+        var SubTotal = InvoiceLineItems.Sum(n => n.LineTotal);
 
         var TaxAmount = SubTotal * MechanicShopConstants.TaxRate;
         var DiscountAmount = WorkOrder.Discount ?? 0m;
@@ -100,9 +100,9 @@ public sealed class IssueInvoiceCommandHandler(ILogger<IssueInvoiceCommand> logg
 
         await cacheInvalidator.EvictByTagsAsync(cancellationToken, CacheTags.Invoices, CacheTags.WorkOrders);
 
-        logger.LogInformation("Invoice issued successfully for WorkOrder {WorkOrderId}. Cache 'Invoices' was invalidated. InvoiceId: {InvoiceId}",request.workOrderId,invoiceID);
+        logger.LogInformation("Invoice issued successfully for WorkOrder {WorkOrderId}. Cache 'Invoices' was invalidated. InvoiceId: {InvoiceId}", request.workOrderId, invoiceID);
 
-        return await mediator.Send(new GetInvoiceByIdQuery(invoice.Value.Id),cancellationToken);
+        return await mediator.Send(new GetInvoiceByIdQuery(invoice.Value.Id), cancellationToken);
 
     }
 }

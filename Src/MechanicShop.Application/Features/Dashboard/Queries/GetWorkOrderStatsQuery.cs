@@ -29,9 +29,9 @@ public class GetWorkOrderStatsQueryHandler(IAppDbContext context) : IRequestHand
         var endDayTimeUtc = localEndDayConst.ToUtc(timeZone);
 
         var WorkOrders = context.WorkOrders.AsNoTracking().Where(n => n.StartAtUtc >= startDayTimeUtc && n.StartAtUtc < endDayTimeUtc)
-                                                          .Include(n=>n.RepairTasks).ThenInclude(n=>n.Parts)
-                                                          .Include(n=>n.Vehicle)
-                                                          .Include(n=>n.Invoice);
+                                                          .Include(n => n.RepairTasks).ThenInclude(n => n.Parts)
+                                                          .Include(n => n.Vehicle)
+                                                          .Include(n => n.Invoice);
 
         var WorkOrderCount = await WorkOrders.CountAsync(cancellationToken);
 
@@ -57,11 +57,11 @@ public class GetWorkOrderStatsQueryHandler(IAppDbContext context) : IRequestHand
 
         var result = await WorkOrders.ToListAsync(cancellationToken);
 
-        var TotalRevenue = result.Sum(n=>n.Invoice?.Total??0) ;
-        var totalPartCost = result.Where(n=>n.Invoice != null).Sum(n=>n.TotalPartsCost);
-        var totalLaborCost = result.Where(n=>n.Invoice != null).Sum(n=>n.TotalLaborCost);
-        var uniqueVehicles = result.Select(n=>n.VehicleId).Distinct().Count();
-        var uniqueCustomers = result.Select(n=>n.Vehicle.CustomerId).Distinct().Count();
+        var TotalRevenue = result.Sum(n => n.Invoice?.Total ?? 0);
+        var totalPartCost = result.Where(n => n.Invoice != null).Sum(n => n.TotalPartsCost);
+        var totalLaborCost = result.Where(n => n.Invoice != null).Sum(n => n.TotalLaborCost);
+        var uniqueVehicles = result.Select(n => n.VehicleId).Distinct().Count();
+        var uniqueCustomers = result.Select(n => n.Vehicle.CustomerId).Distinct().Count();
         var netProfit = TotalRevenue - totalLaborCost - totalPartCost;
 
 
@@ -69,23 +69,23 @@ public class GetWorkOrderStatsQueryHandler(IAppDbContext context) : IRequestHand
         {
             Date = request.Date,
             Total = WorkOrderCount,
-            Scheduled =    result.Count(n => n.State == WorkOrderState.Scheduled),
-            InProgress =   result.Count(n => n.State == WorkOrderState.InProgress),
-            Completed =    result.Count(n => n.State == WorkOrderState.Completed),
-            Cancelled =    result.Count(n => n.State == WorkOrderState.Cancelled),
-            TotalRevenue =  TotalRevenue,
-            TotalPartsCost = totalPartCost  ,
+            Scheduled = result.Count(n => n.State == WorkOrderState.Scheduled),
+            InProgress = result.Count(n => n.State == WorkOrderState.InProgress),
+            Completed = result.Count(n => n.State == WorkOrderState.Completed),
+            Cancelled = result.Count(n => n.State == WorkOrderState.Cancelled),
+            TotalRevenue = TotalRevenue,
+            TotalPartsCost = totalPartCost,
             TotalLaborCost = totalLaborCost,
             UniqueVehicles = uniqueVehicles,
-            UniqueCustomers =uniqueCustomers ,
+            UniqueCustomers = uniqueCustomers,
             NetProfit = netProfit,
-            ProfitMargin = TotalRevenue > 0 ? (netProfit / TotalRevenue) * 100 : 0 ,
-            CompletionRate = WorkOrderCount > 0 ? ((decimal) result.Count(n => n.State == WorkOrderState.Completed) / WorkOrderCount ) * 100 : 0 ,
+            ProfitMargin = TotalRevenue > 0 ? (netProfit / TotalRevenue) * 100 : 0,
+            CompletionRate = WorkOrderCount > 0 ? ((decimal)result.Count(n => n.State == WorkOrderState.Completed) / WorkOrderCount) * 100 : 0,
             AverageRevenuePerOrder = WorkOrderCount > 0 ? (TotalRevenue / WorkOrderCount) : 0,
-            OrdersPerVehicle =  uniqueVehicles > 0 ? (decimal)WorkOrderCount / uniqueVehicles : 0,
+            OrdersPerVehicle = uniqueVehicles > 0 ? (decimal)WorkOrderCount / uniqueVehicles : 0,
             PartsCostRatio = TotalRevenue > 0 ? (totalPartCost / TotalRevenue) * 100 : 0,
-            LaborCostRatio =  TotalRevenue > 0 ? (totalLaborCost / TotalRevenue) * 100 : 0,
-            CancellationRate = WorkOrderCount > 0 ? ( (decimal) result.Count(n => n.State == WorkOrderState.Cancelled) / WorkOrderCount ) * 100 : 0
+            LaborCostRatio = TotalRevenue > 0 ? (totalLaborCost / TotalRevenue) * 100 : 0,
+            CancellationRate = WorkOrderCount > 0 ? ((decimal)result.Count(n => n.State == WorkOrderState.Cancelled) / WorkOrderCount) * 100 : 0
         };
 
     }

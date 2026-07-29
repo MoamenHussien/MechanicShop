@@ -52,7 +52,7 @@ public class UnhandledExceptionBehaviourTests
             Arg.Is<object>(state => state != null && state.ToString()!.Contains("UnHandle Exception")),
             exception,
             Arg.Any<Func<object, Exception?, string>>());
-            
+
     }
 
     public class DummyRequest;

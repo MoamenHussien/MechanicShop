@@ -20,7 +20,7 @@ public class SettleInvoiceCommandHandlerTests(WebAppFactory factory)
         var vehicle = VehicleFactory.CreateVehicle().Value;
         var customer = CustomerFactory.CreateCustomer(email: "settle1@localhost.com").Value;
         customer.UpSertVehicles([vehicle]);
-        
+
         var employee = MechanicShop.Tests.Common.Employees.EmployeeFactory.CreateEmployee().Value;
         var repairTask = MechanicShop.Tests.Common.RepaireTasks.RepairTaskFactory.CreateRepairTask().Value;
 
@@ -37,7 +37,7 @@ public class SettleInvoiceCommandHandlerTests(WebAppFactory factory)
         var issueCommand = new IssueInvoiceCommand(workOrder.Id);
         var issueResult = await _mediator.Send(issueCommand);
         Assert.True(issueResult.IsSuccess);
-        
+
         var invoiceId = issueResult.Value.InvoiceId;
 
         var command = new SettleInvoiceCommand(invoiceId);
@@ -47,7 +47,7 @@ public class SettleInvoiceCommandHandlerTests(WebAppFactory factory)
 
         // Assert
         Assert.True(result.IsSuccess);
-        
+
         var settledInvoice = await _context.Invoices.FindAsync(invoiceId);
         Assert.NotNull(settledInvoice);
         Assert.Equal(InvoiceStatus.Paid, settledInvoice.Status);
@@ -74,7 +74,7 @@ public class SettleInvoiceCommandHandlerTests(WebAppFactory factory)
         var vehicle = VehicleFactory.CreateVehicle().Value;
         var customer = CustomerFactory.CreateCustomer(email: "settle2@localhost.com").Value;
         customer.UpSertVehicles([vehicle]);
-        
+
         var employee = MechanicShop.Tests.Common.Employees.EmployeeFactory.CreateEmployee().Value;
         var repairTask = MechanicShop.Tests.Common.RepaireTasks.RepairTaskFactory.CreateRepairTask().Value;
 
@@ -91,7 +91,7 @@ public class SettleInvoiceCommandHandlerTests(WebAppFactory factory)
         var issueCommand = new IssueInvoiceCommand(workOrder.Id);
         var issueResult = await _mediator.Send(issueCommand);
         Assert.True(issueResult.IsSuccess);
-        
+
         var invoiceId = issueResult.Value.InvoiceId;
 
         // Pay the first time

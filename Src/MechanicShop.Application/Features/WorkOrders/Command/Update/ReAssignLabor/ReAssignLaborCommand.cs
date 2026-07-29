@@ -21,7 +21,7 @@ public class ReAssignLaborCommandValidator : AbstractValidator<ReAssignLaborComm
 
 
 
-public class ReAssignLaborCommandHandler(ILogger<ReAssignLaborCommandHandler> logger, IAppDbContext context, ICacheInvalidator cacheInvalidator,IUser user ,IWorkOrderPolicy policy)
+public class ReAssignLaborCommandHandler(ILogger<ReAssignLaborCommandHandler> logger, IAppDbContext context, ICacheInvalidator cacheInvalidator, IUser user, IWorkOrderPolicy policy)
 : IRequestHandler<ReAssignLaborCommand, Result<Updated>>
 {
     public async Task<Result<Updated>> Handle(ReAssignLaborCommand request, CancellationToken cancellationToken)
@@ -32,7 +32,7 @@ public class ReAssignLaborCommandHandler(ILogger<ReAssignLaborCommandHandler> lo
         //     return ApplicationErrors.NotAllowed;
         // }
 
-        var WordOrder = await context.WorkOrders.FindAsync([request.WorkOrderId],cancellationToken);
+        var WordOrder = await context.WorkOrders.FindAsync([request.WorkOrderId], cancellationToken);
 
         if (WordOrder is null)
         {
@@ -45,7 +45,7 @@ public class ReAssignLaborCommandHandler(ILogger<ReAssignLaborCommandHandler> lo
             return ApplicationErrors.NothingIsChanged;
         }
 
-        var laborExits = await context.Employees.FindAsync([request.LaborId],cancellationToken);
+        var laborExits = await context.Employees.FindAsync([request.LaborId], cancellationToken);
 
         if (laborExits is null)
         {
@@ -53,16 +53,16 @@ public class ReAssignLaborCommandHandler(ILogger<ReAssignLaborCommandHandler> lo
             return ApplicationErrors.NotFoundTheLabor;
         }
 
-        if (await policy.IsLaborOccupiedDuringRange(WordOrder.StartAtUtc, WordOrder.EndAtUtc, request.LaborId,request.WorkOrderId,cancellationToken))
+        if (await policy.IsLaborOccupiedDuringRange(WordOrder.StartAtUtc, WordOrder.EndAtUtc, request.LaborId, request.WorkOrderId, cancellationToken))
         {
             logger.LogWarning("ReAssignLabor: Labor {LaborId} is already occupied during the work order time range.", request.LaborId);
             return ApplicationErrors.ThisLaborHasAnotherWorkOrderAtThisRangeTime;
         }
-    
+
         var ReAssignState = WordOrder.ReAssignLabor(request.LaborId);
         if (ReAssignState.IsError)
         {
-            logger.LogWarning("ReAssignLabor: WorkOrder {WorkOrderId} is in state {State}, cannot reassign labor",request.WorkOrderId, WordOrder.State);
+            logger.LogWarning("ReAssignLabor: WorkOrder {WorkOrderId} is in state {State}, cannot reassign labor", request.WorkOrderId, WordOrder.State);
             return ReAssignState.Errors;
         }
 

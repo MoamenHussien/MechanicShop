@@ -14,7 +14,7 @@ public sealed class CacheInvalidator(
     {
         if (string.IsNullOrWhiteSpace(tag)) return;
 
-        logger.LogInformation("🗑️  HybridCache & OutputCache EVICT - Cache tag '{Tag}' evicted successfully.",tag);
+        logger.LogInformation("🗑️  HybridCache & OutputCache EVICT - Cache tag '{Tag}' evicted successfully.", tag);
 
         await hybridCache.RemoveByTagAsync(tag, cancellationToken);
         await outputCacheStore.EvictByTagAsync(tag, cancellationToken);

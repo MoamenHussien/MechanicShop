@@ -23,7 +23,7 @@ public class DeleteRepairTaskCommandHandler(ILogger<DeleteCustomerCommandHandler
 {
     public async Task<Result<Deleted>> Handle(DeleteRepairTaskCommand request, CancellationToken cancellationToken)
     {
-        var RepairTask = await context.RepairTasks.FindAsync(request.id,cancellationToken);
+        var RepairTask = await context.RepairTasks.FindAsync(request.id, cancellationToken);
         if (RepairTask is null)
         {
             logger.LogWarning("The Repair Task Is Not Found , For This Id : {id}", request.id);
@@ -34,7 +34,7 @@ public class DeleteRepairTaskCommandHandler(ILogger<DeleteCustomerCommandHandler
 
         if (IsUsed)
         {
-            logger.LogWarning("The Repair Task Cant Deleted Because Is Used At Work Orders : {id}",request.id);
+            logger.LogWarning("The Repair Task Cant Deleted Because Is Used At Work Orders : {id}", request.id);
             return RepairTaskErrors.InUse;
         }
 
