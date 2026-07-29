@@ -20,7 +20,10 @@ public class AuditableEntityInterceptor(IUser user, TimeProvider time) : SaveCha
 
     private void UpdateEntities(DbContext? context)
     {
-        if (context == null) { return; }
+        if (context == null)
+        {
+            return;
+        }
 
         var userId = user.Id?.ToString() ?? "System";
         var now = time.GetUtcNow();

@@ -68,7 +68,6 @@ public class TokenProvider(IOptions<JwtSettings> JwtConfigSettings, IAppDbContex
 
             return principal;
         }
-
         catch (SecurityTokenException)
         {
             return ApplicationErrors.InvalidAccessToken;

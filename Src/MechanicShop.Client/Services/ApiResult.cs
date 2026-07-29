@@ -1,4 +1,4 @@
-﻿namespace MechanicShop.Client.Services
+namespace MechanicShop.Client.Services
 {
     public class ApiResult<T>
     {
@@ -44,7 +44,7 @@
             };
         }
 
-        public new static ApiResult Failure(string? message, string? detail = null, int statusCode = 0, Dictionary<string, string[]>? validationErrors = null)
+        public static new ApiResult Failure(string? message, string? detail = null, int statusCode = 0, Dictionary<string, string[]>? validationErrors = null)
         {
             return new ApiResult
             {

@@ -45,7 +45,9 @@ dotnet_diagnostic.SA1201.severity = none  # member ordering — reordering risks
 dotnet_diagnostic.SA1202.severity = none  # ordering by access modifier — same reason
 dotnet_diagnostic.SA1204.severity = none  # static-before-instance ordering — same reason
 dotnet_diagnostic.SA1208.severity = none  # System-usings-first ordering (cosmetic only)
+dotnet_diagnostic.SA1210.severity = none  # Using directives ordering
 dotnet_diagnostic.SA1309.severity = none  # "no underscore prefix" — contradicts the _camelCase convention chosen above
+dotnet_diagnostic.SA1312.severity = none  # Local variable naming
 dotnet_diagnostic.SA1402.severity = none  # one type per file — many valid patterns (CQRS command+validator+handler) intentionally group types
 dotnet_diagnostic.SA1649.severity = none  # filename must match type name — same reason as SA1402
 
@@ -64,9 +66,50 @@ dotnet_diagnostic.SA1311.severity = none  # static readonly field should begin w
 dotnet_diagnostic.SA1313.severity = none  # parameter should begin with lowercase
 dotnet_diagnostic.SA1314.severity = none  # type parameter should begin with T
 
-#### GROUP D — Everything else stays at its default (usually warning) severity and gets auto-fixed in Step 5 ####
-# SA1000-SA1028 (spacing), SA1110-SA1137 (layout), SA1206 (modifiers), SA1119 (parens),
-# SA1122 (strings), SA1210 (using order), SA1413 (trailing commas), SA1500-SA1518
-# (braces/blank lines), SA1312 (local variables), IDE0005/0007/0008/0009/0011/0028/
-# 0032/0055/0090/0130/0161/0044 — all pure formatting/syntax, zero behavior risk,
-# and the formatter genuinely can fix all of them.
+#### GROUP D — Formatting, spacing & layout opinion rules without automated Roslyn code fixers: silenced ####
+dotnet_diagnostic.SA1000.severity = none  # Spacing
+dotnet_diagnostic.SA1001.severity = none
+dotnet_diagnostic.SA1002.severity = none
+dotnet_diagnostic.SA1003.severity = none
+dotnet_diagnostic.SA1004.severity = none
+dotnet_diagnostic.SA1005.severity = none
+dotnet_diagnostic.SA1008.severity = none
+dotnet_diagnostic.SA1009.severity = none
+dotnet_diagnostic.SA1010.severity = none
+dotnet_diagnostic.SA1011.severity = none
+dotnet_diagnostic.SA1012.severity = none
+dotnet_diagnostic.SA1013.severity = none
+dotnet_diagnostic.SA1015.severity = none
+dotnet_diagnostic.SA1024.severity = none
+dotnet_diagnostic.SA1025.severity = none
+dotnet_diagnostic.SA1028.severity = none
+
+dotnet_diagnostic.SA1106.severity = none  # Layout & Parameters
+dotnet_diagnostic.SA1110.severity = none
+dotnet_diagnostic.SA1111.severity = none
+dotnet_diagnostic.SA1114.severity = none
+dotnet_diagnostic.SA1115.severity = none
+dotnet_diagnostic.SA1116.severity = none
+dotnet_diagnostic.SA1117.severity = none
+dotnet_diagnostic.SA1118.severity = none
+dotnet_diagnostic.SA1119.severity = none
+dotnet_diagnostic.SA1122.severity = none
+dotnet_diagnostic.SA1124.severity = none
+dotnet_diagnostic.SA1127.severity = none
+dotnet_diagnostic.SA1128.severity = none
+dotnet_diagnostic.SA1137.severity = none
+
+dotnet_diagnostic.SA1413.severity = none  # Trailing commas
+dotnet_diagnostic.SA1500.severity = none  # Blank lines & braces
+dotnet_diagnostic.SA1502.severity = none
+dotnet_diagnostic.SA1503.severity = none
+dotnet_diagnostic.SA1505.severity = none
+dotnet_diagnostic.SA1507.severity = none
+dotnet_diagnostic.SA1508.severity = none
+dotnet_diagnostic.SA1512.severity = none
+dotnet_diagnostic.SA1513.severity = none
+dotnet_diagnostic.SA1514.severity = none
+dotnet_diagnostic.SA1515.severity = none
+dotnet_diagnostic.SA1516.severity = none
+dotnet_diagnostic.SA1517.severity = none
+dotnet_diagnostic.SA1518.severity = none
