@@ -308,6 +308,8 @@ public static class ApiDI
         app.MapControllers();
 
 
+        app.MapGet("/health/live", () => Results.Ok(new { status = "Healthy" })).AllowAnonymous();
+
         app.MapHealthChecks("/health", new HealthCheckOptions
         {
             ResponseWriter = UIResponseWriter.WriteHealthCheckUIResponse
