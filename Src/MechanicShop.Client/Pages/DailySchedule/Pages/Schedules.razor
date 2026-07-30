@@ -70,13 +70,9 @@
                     <div class="col ps-0">
                         @foreach (var slot in spot.Slots)
                         {
-
-                            var closingTime = _selectedDate.Add(operateHours.ClosingTime.ToTimeSpan());
-                            if (slot.EndAt > closingTime)
-                            {
-                                slot.EndAt = closingTime;
-                            }
+                            var effectiveEndAt = GetEffectiveEndAt(slot);
                             <AvailabilitySlotComponent Slot="slot"
+                            EffectiveEndAt="effectiveEndAt"
                             OnDeleteWorkOrder="DeleteWorkOrder"
                             OnNewWorkOrderDialog="() => ShowNewWorkOrderDialog(slot)"
                             OnEditWorkOrderLaborDialog="() => ShowEditLaborDialog(slot)"
@@ -259,10 +255,19 @@
         }
     }
 
+    private DateTimeOffset GetEffectiveEndAt(AvailabilitySlotModel slot)
+    {
+        if (operateHours is null) return slot.EndAt;
+        var closingDateTime = _selectedDate.Date.Add(operateHours.ClosingTime.ToTimeSpan());
+        var closingTime = new DateTimeOffset(closingDateTime, slot.EndAt.Offset);
+        return slot.EndAt > closingTime ? closingTime : slot.EndAt;
+    }
+
     private void ShowNewWorkOrderDialog(AvailabilitySlotModel slot)
     {
         SelectedSlot = slot;
-        _maxAllowedDuration = slot.EndAt - slot.StartAt;
+        var effectiveEndAt = GetEffectiveEndAt(slot);
+        _maxAllowedDuration = effectiveEndAt - slot.StartAt;
 
         _dialogTitle = builder =>
         {
@@ -274,7 +279,7 @@
           builder.OpenElement(0, "div");
           builder.AddAttribute(1, "class", "bg-body-tertiary text-light border border-secondary rounded-2 px-3 py-2 mb-3 small d-flex flex-wrap gap-4 align-items-center");
 
-          builder.AddMarkupContent(2, $"<span>⏰ <strong>Time:</strong> {slot.StartAt:HH\\:mm} ➔ {slot.EndAt:HH\\:mm}</span>");
+          builder.AddMarkupContent(2, $"<span>⏰ <strong>Time:</strong> {slot.StartAt:HH\\:mm} ➔ {effectiveEndAt:HH\\:mm}</span>");
 
           builder.CloseElement();
       };
@@ -294,6 +299,7 @@
 
     private void ShowEditLaborDialog(AvailabilitySlotModel slot)
     {
+        var effectiveEndAt = GetEffectiveEndAt(slot);
         _dialogTitle = builder =>
         {
             builder.AddContent(0, $"Reassign Labor");
@@ -305,8 +311,8 @@
         builder.AddAttribute(1, "class", "bg-body-tertiary text-light border border-secondary rounded-2 px-3 py-2 mb-3 small d-flex flex-wrap gap-4 align-items-center");
 
         builder.AddMarkupContent(2, $"<span>🏷️ <strong>Workorder:</strong> {slot.WorkOrderId.ToString()?.Substring(0, 8)}</span>");
-        builder.AddMarkupContent(2, $"<span>⏰ <strong>Time:</strong> {slot.StartAt:HH\\:mm} ➔ {slot.EndAt:HH\\:mm}</span>");
-        builder.AddMarkupContent(3, $"<span>�� <strong>Vehicle:</strong> {slot.Vehicle}</span>");
+        builder.AddMarkupContent(2, $"<span>⏰ <strong>Time:</strong> {slot.StartAt:HH\\:mm} ➔ {effectiveEndAt:HH\\:mm}</span>");
+        builder.AddMarkupContent(3, $"<span>🚗 <strong>Vehicle:</strong> {slot.Vehicle}</span>");
         builder.AddMarkupContent(4, $"<span>👷 <strong>Labor:</strong> {slot.Labor?.Name}</span>");
 
         builder.CloseElement();
@@ -324,6 +330,7 @@
 
     private void ShowEditRepairTasksDialog(AvailabilitySlotModel slot)
     {
+        var effectiveEndAt = GetEffectiveEndAt(slot);
         _dialogTitle = builder =>
         {
             builder.AddContent(0, $"Modify Workorder Tasks");
@@ -335,7 +342,7 @@
         builder.AddAttribute(1, "class", "bg-body-tertiary text-light border border-secondary rounded-2 px-3 py-2 mb-3 small d-flex flex-wrap gap-4 align-items-center");
 
         builder.AddMarkupContent(2, $"<span>🏷️ <strong>Workorder:</strong> {slot.WorkOrderId.ToString()?.Substring(0, 8)}</span>");
-        builder.AddMarkupContent(2, $"<span>⏰ <strong>Time:</strong> {slot.StartAt:HH\\:mm} ➔ {slot.EndAt:HH\\:mm}</span>");
+        builder.AddMarkupContent(2, $"<span>⏰ <strong>Time:</strong> {slot.StartAt:HH\\:mm} ➔ {effectiveEndAt:HH\\:mm}</span>");
         builder.AddMarkupContent(3, $"<span>🚗 <strong>Vehicle:</strong> {slot.Vehicle}</span>");
         builder.AddMarkupContent(4, $"<span>👷 <strong>Labor:</strong> {slot.Labor?.Name}</span>");
 
@@ -354,6 +361,7 @@
 
     private void ShowEditStateDialog(AvailabilitySlotModel slot)
     {
+        var effectiveEndAt = GetEffectiveEndAt(slot);
         _dialogTitle = builder =>
       {
           builder.AddContent(0, $"Update Workorder State");
@@ -365,7 +373,7 @@
           builder.AddAttribute(1, "class", "bg-body-tertiary text-light border border-secondary rounded-2 px-3 py-2 mb-3 small d-flex flex-wrap gap-4 align-items-center");
 
           builder.AddMarkupContent(2, $"<span>🏷️ <strong>Workorder:</strong> {slot.WorkOrderId.ToString()?.Substring(0, 8)}</span>");
-          builder.AddMarkupContent(2, $"<span>⏰ <strong>Time:</strong> {slot.StartAt:HH\\:mm} ➔ {slot.EndAt:HH\\:mm}</span>");
+          builder.AddMarkupContent(2, $"<span>⏰ <strong>Time:</strong> {slot.StartAt:HH\\:mm} ➔ {effectiveEndAt:HH\\:mm}</span>");
           builder.AddMarkupContent(3, $"<span>🚗 <strong>Vehicle:</strong> {slot.Vehicle}</span>");
           builder.AddMarkupContent(4, $"<span>👷 <strong>Labor:</strong> {slot.Labor?.Name}</span>");
 
@@ -400,6 +408,7 @@
 
         var maxEndTime = nextFreeSlot?.EndAt;
         var maxAllowedDuration = maxEndTime - slot.StartAt;
+        var effectiveEndAt = GetEffectiveEndAt(slot);
 
         _dialogTitle = builder =>
       {
@@ -412,7 +421,7 @@
           builder.AddAttribute(1, "class", "bg-body-tertiary text-light border border-secondary rounded-2 px-3 py-2 mb-3 small d-flex flex-wrap gap-4 align-items-center");
 
           builder.AddMarkupContent(2, $"<span>🏷️ <strong>Workorder:</strong> {slot.WorkOrderId.ToString()?.Substring(0, 8)}</span>");
-          builder.AddMarkupContent(2, $"<span>⏰ <strong>Time:</strong> {slot.StartAt:HH\\:mm} ➔ {slot.EndAt:HH\\:mm}</span>");
+          builder.AddMarkupContent(2, $"<span>⏰ <strong>Time:</strong> {slot.StartAt:HH\\:mm} ➔ {effectiveEndAt:HH\\:mm}</span>");
           builder.AddMarkupContent(3, $"<span>🚗 <strong>Vehicle:</strong> {slot.Vehicle}</span>");
           builder.AddMarkupContent(4, $"<span>👷 <strong>Labor:</strong> {slot.Labor?.Name}</span>");
 
