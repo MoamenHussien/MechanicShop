@@ -5,8 +5,8 @@ docker-compose.override.yml
 .env
 
 # Build outputs and intermediate files
-bin/
-obj/
+**/bin/
+**/obj/
 
 # Source control and IDE metadata
 .git/

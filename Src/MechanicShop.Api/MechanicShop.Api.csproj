@@ -1,5 +1,9 @@
 <Project Sdk="Microsoft.NET.Sdk.Web">
 
+  <PropertyGroup>
+    <EnableRequestDelegateGenerator>false</EnableRequestDelegateGenerator>
+  </PropertyGroup>
+
   <ItemGroup>
     <ProjectReference Include="..\MechanicShop.Application\MechanicShop.Application.csproj" />
     <ProjectReference Include="..\MechanicShop.Client\MechanicShop.Client.csproj" />

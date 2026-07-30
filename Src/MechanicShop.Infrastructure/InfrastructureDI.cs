@@ -60,7 +60,7 @@ public static class InfrastructureDI
              .AddDbContextCheck<AppDbContext>(
                  name: "SQL Server",
                  failureStatus: HealthStatus.Unhealthy,
-                 tags: ["database", "ready"])
+                 tags: ["db", "ready"])
              // Redis
              .AddRedis(
                  redisConnectionString: config.GetConnectionString("Redis")!,
@@ -72,18 +72,18 @@ public static class InfrastructureDI
              .AddCheck<MailHealthCheck>(
                  name: "SMTP",
                  failureStatus: HealthStatus.Unhealthy,
-                 tags: ["mail", "ready"],
+                 tags: ["external", "ready"],
                  timeout: TimeSpan.FromSeconds(5))
              // Memory
              .AddCheck<MemoryHealthCheck>(
                  name: "Memory",
                  failureStatus: HealthStatus.Degraded,
-                 tags: ["system"])
+                 tags: ["system", "diagnostics"])
              // Disk
              .AddCheck<DiskHealthCheck>(
                  name: "Disk",
                  failureStatus: HealthStatus.Degraded,
-                 tags: ["system"]);
+                 tags: ["system", "diagnostics"]);
 
         // Security & Identity
 
@@ -129,7 +129,7 @@ public static class InfrastructureDI
 
         }).AddRoles<IdentityRole<Guid>>().AddEntityFrameworkStores<AppDbContext>().AddDefaultTokenProviders();
 
-        // Caching & Rides
+        //Caching & Rides
 
         // services.AddStackExchangeRedisCache(options =>
         // {

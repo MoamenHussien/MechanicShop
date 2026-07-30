@@ -1,5 +1,5 @@
 # Stage 1: Build & Publish (SDK)
-FROM mcr.microsoft.com/dotnet/sdk:10.0-preview AS build
+FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build
 WORKDIR /src
 
 # Copy solution and configuration files first for layer caching
@@ -21,10 +21,10 @@ COPY Src/ Src/
 
 # Build and publish application
 WORKDIR /src/Src/MechanicShop.Api
-RUN dotnet publish MechanicShop.Api.csproj -c Release -o /app/publish /p:UseAppHost=false
+RUN dotnet publish MechanicShop.Api.csproj -c Release -o /app/publish /p:UseAppHost=false /p:EnableRequestDelegateGenerator=false
 
 # Stage 2: Runtime Environment
-FROM mcr.microsoft.com/dotnet/aspnet:10.0-preview AS final
+FROM mcr.microsoft.com/dotnet/aspnet:10.0 AS final
 WORKDIR /app
 
 # OCI Labels
