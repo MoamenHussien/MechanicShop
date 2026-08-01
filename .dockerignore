@@ -12,6 +12,7 @@ docker-compose.override.yml
 .git/
 .vs/
 .vscode/
+AI/
 
 # Project-specific test project directories
 Tests/MechanicShop.Api.IntegrationTests/

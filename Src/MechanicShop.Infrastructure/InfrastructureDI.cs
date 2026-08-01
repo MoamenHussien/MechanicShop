@@ -131,11 +131,11 @@ public static class InfrastructureDI
 
         //Caching & Rides
 
-        // services.AddStackExchangeRedisCache(options =>
-        // {
-        //     options.Configuration = config.GetConnectionString("Redis");
-        //     options.InstanceName = "MechanicShop:";
-        // });
+        services.AddStackExchangeRedisCache(options =>
+        {
+            options.Configuration = config.GetConnectionString("Redis");
+            options.InstanceName = "MechanicShop:";
+        });
 
         services.AddHybridCache(options => options.DefaultEntryOptions = new HybridCacheEntryOptions
         {

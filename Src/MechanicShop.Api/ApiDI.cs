@@ -326,6 +326,8 @@ public static class ApiDI
         .RequireAuthorization()
         .RequireHost("localhost");
 
+        app.MapPrometheusScrapingEndpoint();
+        
         return app;
     }
 }

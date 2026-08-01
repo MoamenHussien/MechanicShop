@@ -139,7 +139,6 @@ services:
       pull: true
     environment:
       ASPNETCORE_ENVIRONMENT: "Development"
-      ASPNETCORE_HTTP_PORTS: "8080"
       ASPNETCORE_URLS: "http://0.0.0.0:8080"
       ConnectionStrings__DefaultConnection: "Server=sqlserver,1433;Database=MechanicShop;User Id=sa;Password=${SA_PASSWORD};TrustServerCertificate=True;MultipleActiveResultSets=true;"
       ConnectionStrings__Redis: "redis:6379"
@@ -153,6 +152,8 @@ services:
         required: false
     ports:
       - "5001:8080"
+    volumes:
+      - dataprotection-keys:/home/app/.aspnet/DataProtection-Keys
     mem_limit: 1g
     cpus: 2.0
     restart: unless-stopped
@@ -172,12 +173,6 @@ services:
       sqlserver:
         condition: service_healthy
       redis:
-        condition: service_healthy
-      seq:
-        condition: service_healthy
-      prometheus:
-        condition: service_healthy
-      jaeger:
         condition: service_healthy
     networks:
       - mechanicshop-network
@@ -222,3 +217,4 @@ volumes:
   seq-data:
   prometheus-data:
   grafana-data:
+  dataprotection-keys:
