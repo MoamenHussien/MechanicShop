@@ -65,12 +65,14 @@ public class GetDailyScheduleQueryHandler(IAppDbContext context, TimeProvider ti
                 {
                     if (Hash.Add(WorkOrderInThisTime.Id))
                     {
+                        var startLocal = TimeZoneInfo.ConvertTimeFromUtc(WorkOrderInThisTime.StartAtUtc.DateTime, request.TimeZone);
+                        var endLocal = TimeZoneInfo.ConvertTimeFromUtc(WorkOrderInThisTime.EndAtUtc.DateTime, request.TimeZone);
                         SpotDto.Slots.Add(new AvailabilitySlotDto
                         {
                             WorkOrderId = WorkOrderInThisTime.Id,
                             Spot = spotEn,
-                            StartAt = WorkOrderInThisTime.StartAtUtc.ToLocal(request.TimeZone),
-                            EndAt = WorkOrderInThisTime.EndAtUtc.ToLocal(request.TimeZone),
+                            StartAt = new DateTimeOffset(startLocal, request.TimeZone.GetUtcOffset(startLocal)),
+                            EndAt = new DateTimeOffset(endLocal, request.TimeZone.GetUtcOffset(endLocal)),
                             Vehicle = WorkOrderInThisTime.Vehicle?.VehicleModel?.VehicleMake?.Make + " | " + WorkOrderInThisTime.Vehicle?.LicensePlate,
                             Labor = WorkOrderInThisTime.Labor.ToDto(),
                             IsOccupied = true,
@@ -87,8 +89,8 @@ public class GetDailyScheduleQueryHandler(IAppDbContext context, TimeProvider ti
                     {
                         WorkOrderId = null,
                         Spot = spotEn,
-                        StartAt = startRangeLocal,
-                        EndAt = EndRangeLocal,
+                        StartAt = new DateTimeOffset(startRangeLocal, request.TimeZone.GetUtcOffset(startRangeLocal)),
+                        EndAt = new DateTimeOffset(EndRangeLocal, request.TimeZone.GetUtcOffset(EndRangeLocal)),
                         Vehicle = null,
                         Labor = null,
                         IsOccupied = false,

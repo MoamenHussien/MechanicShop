@@ -1,0 +1,34 @@
+# .dockerignore - Exact files and directories excluded from build context
+Dockerfile
+docker-compose.yml
+docker-compose.override.yml
+.env
+
+# Build outputs and intermediate files
+**/bin/
+**/obj/
+
+# Source control and IDE metadata
+.git/
+.vs/
+.vscode/
+AI/
+
+# Project-specific test project directories
+Tests/MechanicShop.Api.IntegrationTests/
+Tests/MechanicShop.Application.SubcutaneousTests/
+Tests/MechanicShop.Application.UnitTests/
+Tests/MechanicShop.Domain.UnitTests/
+Tests/MechanicShop.Tests.Common/
+Tests/
+
+# Test results and temporary build artifacts
+TestResults/
+coverage/
+artifacts/
+
+# User-specific configuration files
+*.rsuser
+*.suo
+*.user
+*.userosscache

@@ -1,7 +1,7 @@
-﻿<div class="@GetDynamicClasses()" style="@GetDynamicStyle()" title="@Slot.RepairTasks">
+<div class="@GetDynamicClasses()" style="@GetDynamicStyle()" title="@Slot.RepairTasks">
     <div class="d-flex flex-column justify-content-between h-100" style="font-size: 0.90rem;">
         <div class="mt-1">
-            <span class="badge">@($"{Slot.StartAt:HH\\:mm} ➔ {Slot.EndAt:HH\\:mm}")</span>
+            <span class="badge">@($"{Slot.StartAt:HH\\:mm} ➔ {GetEffectiveEndAt():HH\\:mm}")</span>
         </div>
         <div class="d-flex justify-content-between align-items-center">
             @if (Slot.IsOccupied)
@@ -60,6 +60,7 @@
     [Inject] private IJSRuntime JSRuntime { get; set; } = default!;
 
     [Parameter] public AvailabilitySlotModel Slot { get; set; } = default!;
+    [Parameter] public DateTimeOffset? EffectiveEndAt { get; set; }
 
     [Parameter, EditorRequired] public EventCallback<AvailabilitySlotModel> OnNewWorkOrderDialog { get; set; } = default!;
     [Parameter, EditorRequired]
@@ -76,6 +77,8 @@
     default!;
     [Parameter] public EventCallback<Guid> OnDeleteWorkOrder { get; set; } = default!;
 
+    private DateTimeOffset GetEffectiveEndAt() => EffectiveEndAt ?? Slot.EndAt;
+
     public string GetDynamicClasses()
     {
         var baseClasses = "booking-container w-100 fw-semibold bg-opacity-25 ";
@@ -91,17 +94,20 @@
 
     public string GetDynamicStyle()
     {
-        var duration = (Slot.EndAt - Slot.StartAt).TotalMinutes;
+        var endAt = GetEffectiveEndAt();
+        var duration = (endAt - Slot.StartAt).TotalMinutes;
         var height = duration * 4;
 
         return $"height: {height}px; outline: 2px solid #212529; outline-offset: -1px; padding:0!important;";
     }
+
     private async Task ConfirmDeleteAsync(AvailabilitySlotModel slot)
     {
         if (slot.WorkOrderId is not null)
         {
+            var endAt = GetEffectiveEndAt();
             var message = $"Delete WorkOrder?\n\n" +
-            $"⏰ Time: {slot.StartAt:hh\\:mm} ➔ {slot.EndAt:hh\\:mm}\n" +
+            $"⏰ Time: {slot.StartAt:hh\\:mm} ➔ {endAt:hh\\:mm}\n" +
             $"🚗 Vehicle: {slot.Vehicle}\n" +
             $"👷 Labor: {slot.Labor!.Name}\n";
 

@@ -276,7 +276,7 @@ public static class ApiDI
         app.UseStatusCodePages();
 
         // 3. HTTPS redirection (before any other middleware that might generate URLs)
-        app.UseHttpsRedirection();
+        // app.UseHttpsRedirection();
 
         // 4. Serilog request logging (early to log all requests)
         app.UseSerilogRequestLogging();
@@ -307,6 +307,17 @@ public static class ApiDI
     {
         app.MapControllers();
 
+        app.MapHealthChecks("/health/live", new HealthCheckOptions
+        {
+            Predicate = _ => false
+        }).AllowAnonymous();
+
+        app.MapHealthChecks("/health/ready", new HealthCheckOptions
+        {
+            Predicate = check => check.Tags.Contains("ready"),
+            ResponseWriter = UIResponseWriter.WriteHealthCheckUIResponse
+        })
+        .AllowAnonymous();
 
         app.MapHealthChecks("/health", new HealthCheckOptions
         {
@@ -315,6 +326,8 @@ public static class ApiDI
         .RequireAuthorization()
         .RequireHost("localhost");
 
+        app.MapPrometheusScrapingEndpoint();
+        
         return app;
     }
 }
