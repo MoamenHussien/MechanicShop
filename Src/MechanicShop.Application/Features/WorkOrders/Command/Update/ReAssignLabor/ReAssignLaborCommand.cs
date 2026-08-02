@@ -1,12 +1,12 @@
 using System.Net.Cache;
 using System.Security.Cryptography.X509Certificates;
 using FluentValidation;
+using MechanicShop.Application.Common.Constants;
+using MechanicShop.Application.Common.Interfaces;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Hybrid;
 using Microsoft.Extensions.Logging;
-using MechanicShop.Application.Common.Constants;
-using MechanicShop.Application.Common.Interfaces;
 
 public sealed record ReAssignLaborCommand(Guid WorkOrderId, Guid LaborId) : IRequest<Result<Updated>>;
 
@@ -19,8 +19,6 @@ public class ReAssignLaborCommandValidator : AbstractValidator<ReAssignLaborComm
     }
 }
 
-
-
 public class ReAssignLaborCommandHandler(ILogger<ReAssignLaborCommandHandler> logger, IAppDbContext context, ICacheInvalidator cacheInvalidator, IUser user, IWorkOrderPolicy policy)
 : IRequestHandler<ReAssignLaborCommand, Result<Updated>>
 {
@@ -31,16 +29,15 @@ public class ReAssignLaborCommandHandler(ILogger<ReAssignLaborCommandHandler> lo
         //     logger.LogWarning("ReAssignLabor: (Forbidden) , This User {UserId} is not allowed to reassign labor", user.Id);
         //     return ApplicationErrors.NotAllowed;
         // }
+        var wordOrder = await context.WorkOrders.FindAsync([request.WorkOrderId], cancellationToken);
 
-        var WordOrder = await context.WorkOrders.FindAsync([request.WorkOrderId], cancellationToken);
-
-        if (WordOrder is null)
+        if (wordOrder is null)
         {
             logger.LogWarning("ReAssignLabor: WorkOrder not found. WorkOrderId={WorkOrderId}", request.WorkOrderId);
             return ApplicationErrors.NotFoundTheWorkOrder;
         }
 
-        if (WordOrder.LaborId == request.LaborId)
+        if (wordOrder.LaborId == request.LaborId)
         {
             return ApplicationErrors.NothingIsChanged;
         }
@@ -53,17 +50,17 @@ public class ReAssignLaborCommandHandler(ILogger<ReAssignLaborCommandHandler> lo
             return ApplicationErrors.NotFoundTheLabor;
         }
 
-        if (await policy.IsLaborOccupiedDuringRange(WordOrder.StartAtUtc, WordOrder.EndAtUtc, request.LaborId, request.WorkOrderId, cancellationToken))
+        if (await policy.IsLaborOccupiedDuringRange(wordOrder.StartAtUtc, wordOrder.EndAtUtc, request.LaborId, request.WorkOrderId, cancellationToken))
         {
             logger.LogWarning("ReAssignLabor: Labor {LaborId} is already occupied during the work order time range.", request.LaborId);
             return ApplicationErrors.ThisLaborHasAnotherWorkOrderAtThisRangeTime;
         }
 
-        var ReAssignState = WordOrder.ReAssignLabor(request.LaborId);
-        if (ReAssignState.IsError)
+        var reAssignState = wordOrder.ReAssignLabor(request.LaborId);
+        if (reAssignState.IsError)
         {
-            logger.LogWarning("ReAssignLabor: WorkOrder {WorkOrderId} is in state {State}, cannot reassign labor", request.WorkOrderId, WordOrder.State);
-            return ReAssignState.Errors;
+            logger.LogWarning("ReAssignLabor: WorkOrder {WorkOrderId} is in state {State}, cannot reassign labor", request.WorkOrderId, wordOrder.State);
+            return reAssignState.Errors;
         }
 
         await context.SaveChangesAsync(cancellationToken);

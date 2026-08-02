@@ -46,7 +46,7 @@ public class BearerTokenHandler(IAccountManagement accountManagement) : Delegati
         var newRequest = new HttpRequestMessage(request.Method, request.RequestUri)
         {
             Version = request.Version,
-            VersionPolicy = request.VersionPolicy // copy الـ VersionPolicy (.NET 5+)
+            VersionPolicy = request.VersionPolicy, // copy الـ VersionPolicy (.NET 5+)
         };
 
         // 1. copy الـ Options if exsits

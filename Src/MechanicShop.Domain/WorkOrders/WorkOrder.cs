@@ -1,38 +1,53 @@
-
 using System.Runtime.CompilerServices;
 using Microsoft.VisualBasic;
 
 public class WorkOrder : AuditableEntity
 {
     private readonly List<RepairTask> _RepairTasks = [];
+
     public IReadOnlyList<RepairTask> RepairTasks => _RepairTasks;
+
     public Invoice? Invoice { get; set; }
+
     public Employee Labor { get; set; } = null!;
+
     public Guid LaborId { get; private set; }
+
     public Vehicle Vehicle { get; set; } = null!;
+
     public Guid VehicleId { get; init; }
+
     public WorkOrderState State { get; private set; }
+
     public decimal? Discount { get; private set; }
+
     public decimal? Tax { get; private set; }
+
     public decimal Total => _RepairTasks.Sum(n => n.TotalCost);
+
     // public decimal Total => _RepairTasks.Sum(n => n.TotalCost) + (Tax ?? 0) - (Discount ?? 0);
     public decimal TotalPartsCost => _RepairTasks.Sum(n => n.TotalPartsCost);
+
     public decimal TotalLaborCost => _RepairTasks.Sum(n => n.LaborCost);
+
     public bool IsEditable => State is not (WorkOrderState.Cancelled or WorkOrderState.Completed or WorkOrderState.InProgress);
+
     public bool IsDeletable => State is (WorkOrderState.Scheduled or WorkOrderState.Cancelled);
+
     public Spot Spot { get; private set; }
+
     public DateTimeOffset EndAtUtc { get; private set; }
+
     public DateTimeOffset StartAtUtc { get; private set; }
 
 #pragma warning disable CS8618
     private WorkOrder()
     {
-
     }
 #pragma warning restore CS8618
 
-
-    private WorkOrder(Guid id, Guid LaborId, Guid VehicleId, Spot spot, DateTimeOffset StartAtUtc, DateTimeOffset EndAt, WorkOrderState status, List<RepairTask> repairTasks) : base(id)
+    private WorkOrder(Guid id, Guid LaborId, Guid VehicleId, Spot spot, DateTimeOffset StartAtUtc, DateTimeOffset EndAt, WorkOrderState status, List<RepairTask> repairTasks)
+        : base(id)
     {
         this.LaborId = LaborId;
         this.Spot = spot;
@@ -89,7 +104,7 @@ public class WorkOrder : AuditableEntity
 
     public Result<Updated> ReAssignLabor(Guid LaborID)
     {
-        if (this.State is (WorkOrderState.Scheduled))
+        if (this.State is WorkOrderState.Scheduled)
         {
             this.LaborId = LaborID;
             this.AddDomainEvent(new WorkOrderCollectionModified());
@@ -104,7 +119,9 @@ public class WorkOrder : AuditableEntity
     public Result<Deleted> MarkAsDeleted()
     {
         if (!this.IsDeletable)
+        {
             return WorkOrderErrors.CantDeleteWorkOrder(this.State);
+        }
 
         this.AddDomainEvent(new WorkOrderCollectionModified());
         return Result.Deleted;
@@ -182,10 +199,10 @@ public class WorkOrder : AuditableEntity
 
         this.Spot = NewSpot;
 
-        var UpdateTimeState = this.UpdateTiming(NewStartDatetimeUtc, NewEndDateTimeUtc);
-        if (UpdateTimeState.IsError)
+        var updateTimeState = this.UpdateTiming(NewStartDatetimeUtc, NewEndDateTimeUtc);
+        if (updateTimeState.IsError)
         {
-            return UpdateTimeState.Errors;
+            return updateTimeState.Errors;
         }
 
         return Result.Updated;
@@ -214,9 +231,4 @@ public class WorkOrder : AuditableEntity
 
         return Result.Updated;
     }
-
-
-
-
-
 }

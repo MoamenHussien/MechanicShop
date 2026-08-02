@@ -1,5 +1,4 @@
-﻿
-namespace MechanicShop.Tests.Common.RepaireTasks;
+﻿namespace MechanicShop.Tests.Common.RepaireTasks;
 
 public static class RepairTaskFactory
 {

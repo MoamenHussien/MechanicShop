@@ -29,4 +29,3 @@ public class IssueInvoiceCommandValidatorTests
         result.ShouldNotHaveValidationErrorFor(c => c.workOrderId);
     }
 }
-

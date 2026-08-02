@@ -32,11 +32,11 @@ public class GetInvoicePdfQueryHandler(ILogger<GetInvoicePdfQueryHandler> logger
 
         try
         {
-            var PdfBytes = pdfGenerator.Generate(invoice);
+            var pdfBytes = pdfGenerator.Generate(invoice);
             return new InvoicePdfDto
             {
-                Content = PdfBytes,
-                FileName = $"Invoice-{request.InvoiceId}.Pdf"
+                Content = pdfBytes,
+                FileName = $"Invoice-{request.InvoiceId}.Pdf",
             };
         }
         catch (Exception ex)
@@ -46,5 +46,3 @@ public class GetInvoicePdfQueryHandler(ILogger<GetInvoicePdfQueryHandler> logger
         }
     }
 }
-
-

@@ -13,5 +13,4 @@ public class UpdateVehicleCommandValidator : AbstractValidator<UpdateVehicleComm
           .Length(3, 8).WithMessage("The LicensePlate Length From 3 To 8 Char");
         RuleFor(n => n.VehicleModelId).IdRequired("VehicleMode");
     }
-
 }

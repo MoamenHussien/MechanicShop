@@ -7,24 +7,24 @@ public class RefreshTokenTests
     public void CreateRefreshToken_ShouldSucceed_WhenEnterValidInfo()
     {
         // Arrange
-        Guid Id = Guid.NewGuid();
+        Guid id = Guid.NewGuid();
         const string tokenValue = "Token";
-        Guid UserId = Guid.NewGuid();
-        var ExpiresOnUtc = DateTimeOffset.UtcNow.AddDays(7);
+        Guid userId = Guid.NewGuid();
+        var expiresOnUtc = DateTimeOffset.UtcNow.AddDays(7);
 
         // Act
-        var result = RefreshTokenFactory.CreateRefreshToken(Id, tokenValue, UserId, ExpiresOnUtc);
+        var result = RefreshTokenFactory.CreateRefreshToken(id, tokenValue, userId, expiresOnUtc);
 
         // Assert
         Assert.True(result.IsSuccess);
-        var Token = result.Value;
+        var token = result.Value;
         Assert.NotNull(tokenValue);
-        Assert.Equal(Id, Token.Id);
-        Assert.False(string.IsNullOrWhiteSpace(Token.Token));
-        Assert.Equal(tokenValue, Token.Token);
-        Assert.Equal(UserId, Token.UserId);
-        Assert.True(ExpiresOnUtc > DateTimeOffset.UtcNow);
-        Assert.Equal(ExpiresOnUtc, Token.ExpiresOnUtc);
+        Assert.Equal(id, token.Id);
+        Assert.False(string.IsNullOrWhiteSpace(token.Token));
+        Assert.Equal(tokenValue, token.Token);
+        Assert.Equal(userId, token.UserId);
+        Assert.True(expiresOnUtc > DateTimeOffset.UtcNow);
+        Assert.Equal(expiresOnUtc, token.ExpiresOnUtc);
     }
 
     [Fact]
@@ -53,8 +53,8 @@ public class RefreshTokenTests
               token: tokenValue!,
               userid: Guid.NewGuid(),
               ExpirationOnUtc: DateTime.UtcNow.AddDays(7));
-        // Assert
 
+        // Assert
         Assert.True(result.IsError);
         Assert.Equal(RefreshTokenErrors.TokenRequired.Code, result.TopError.Code);
     }
@@ -77,14 +77,14 @@ public class RefreshTokenTests
     [Fact]
     public void CreateRefreshToken_ShouldFail_WhenExpiresOnUtcIsInPast()
     {
-        // Arrage 
-        var TheDayBefor = DateTimeOffset.UtcNow.Subtract(TimeSpan.FromDays(1));
+        // Arrage
+        var theDayBefor = DateTimeOffset.UtcNow.Subtract(TimeSpan.FromDays(1));
+
         // Act
-        var result = RefreshTokenFactory.CreateRefreshToken(expiresOnUtc: TheDayBefor);
+        var result = RefreshTokenFactory.CreateRefreshToken(expiresOnUtc: theDayBefor);
+
         // Assert
         Assert.True(result.IsError);
         Assert.Equal(RefreshTokenErrors.ExpiryInvalid.Code, result.TopError.Code);
     }
 }
-
-

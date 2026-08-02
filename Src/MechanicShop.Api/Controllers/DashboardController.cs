@@ -45,6 +45,3 @@ public class DashboardController(ISender sender) : ApiController
         return result.Match(success => Ok(success), Problem);
     }
 }
-
-
-

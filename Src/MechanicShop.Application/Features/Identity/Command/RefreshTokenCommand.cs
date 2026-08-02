@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
 public sealed record RefreshTokenCommand(string ExpiredAccessToken) : IRequest<Result<TokenResponse>>;
+
 public class RefreshTokenCommandValidator : AbstractValidator<RefreshTokenCommand>
 {
     public RefreshTokenCommandValidator()
@@ -13,20 +14,20 @@ public class RefreshTokenCommandValidator : AbstractValidator<RefreshTokenComman
     }
 }
 
-public class RefreshTokenCommandHandler(ILogger<RefreshTokenCommandHandler> logger, IAppDbContext context, IIdentityService identity, ITokenProvider token)
+public class RefreshTokenCommandHandler(ILogger<RefreshTokenCommandHandler> logger, IAppDbContext context, IIdentityService identity, ITokenProvider tokenProvider)
 : IRequestHandler<RefreshTokenCommand, Result<TokenResponse>>
 {
     public async Task<Result<TokenResponse>> Handle(RefreshTokenCommand request, CancellationToken cancellationToken)
     {
-        var ClaimsPrincipal = token.GetPrincipalFromExpiredToken(request.ExpiredAccessToken);
+        var claimsPrincipal = tokenProvider.GetPrincipalFromExpiredToken(request.ExpiredAccessToken);
 
-        if (ClaimsPrincipal.IsError)
+        if (claimsPrincipal.IsError)
         {
             logger.LogWarning("The Expired Access Token Is Invalid : {token}", request.ExpiredAccessToken);
             return ApplicationErrors.InvalidAccessToken;
         }
 
-        var userClaim = ClaimsPrincipal.Value.FindFirst(ClaimTypes.NameIdentifier);
+        var userClaim = claimsPrincipal.Value.FindFirst(ClaimTypes.NameIdentifier);
 
         if (userClaim is null)
         {
@@ -42,7 +43,7 @@ public class RefreshTokenCommandHandler(ILogger<RefreshTokenCommandHandler> logg
             return ApplicationErrors.UserIdClaimInvalid;
         }
 
-        Guid UserId = userIdResult.Value;
+        Guid userId = userIdResult.Value;
 
         var RefreshToken = identity.GetRefreshTokenFromCookies();
 
@@ -52,7 +53,7 @@ public class RefreshTokenCommandHandler(ILogger<RefreshTokenCommandHandler> logg
             return RefreshToken.Errors;
         }
 
-        var refreshToken = await context.RefreshTokens.FirstOrDefaultAsync(n => n.UserId == UserId && n.Token == RefreshToken.Value);
+        var refreshToken = await context.RefreshTokens.FirstOrDefaultAsync(n => n.UserId == userId && n.Token == RefreshToken.Value);
 
         if (refreshToken is null || refreshToken.IsExpired())
         {
@@ -60,23 +61,23 @@ public class RefreshTokenCommandHandler(ILogger<RefreshTokenCommandHandler> logg
             return ApplicationErrors.RefreshTokenExpiredOrInvalid;
         }
 
-        var UserInfo = await identity.GetUserByIdAsync(UserId);
+        var userInfo = await identity.GetUserByIdAsync(userId);
 
-        if (UserInfo.IsError)
+        if (userInfo.IsError)
         {
-            logger.LogWarning("Cant Get User Info From User Id : {id} , With This Errors : {@errors}", UserId, UserInfo.Errors);
-            return UserInfo.Errors;
+            logger.LogWarning("Cant Get User Info From User Id : {id} , With This Errors : {@errors}", userId, userInfo.Errors);
+            return userInfo.Errors;
         }
 
-        var Token = await token.GenerateJwtTokenAsync(UserInfo.Value);
-        if (Token.IsError)
+        var token = await tokenProvider.GenerateJwtTokenAsync(userInfo.Value);
+        if (token.IsError)
         {
-            logger.LogWarning("Is An Error During Generate JWT Token For This Id User : {id}", UserId);
-            return Token.Errors;
+            logger.LogWarning("Is An Error During Generate JWT Token For This Id User : {id}", userId);
+            return token.Errors;
         }
 
-        logger.LogInformation("Generate Access Token For User Id : {id} ", UserId);
+        logger.LogInformation("Generate Access Token For User Id : {id} ", userId);
 
-        return Token.Value;
+        return token.Value;
     }
 }

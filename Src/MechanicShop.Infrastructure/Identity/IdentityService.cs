@@ -42,7 +42,7 @@ public class IdentityService(IHttpContextAccessor httpContextAccessor, UserManag
             Id = Guid.NewGuid(),
             Email = email,
             UserName = email,
-            EmailConfirmed = true
+            EmailConfirmed = true,
         };
 
         var result = await user.CreateAsync(userinfo, password);
@@ -69,6 +69,7 @@ public class IdentityService(IHttpContextAccessor httpContextAccessor, UserManag
             await user.DeleteAsync(userinfo);
             return Error.Conflict("Add_Roles_Failed", string.Join(", ", addRolesResult.Errors.Select(x => x.Description)));
         }
+
         return userinfo.Id;
     }
 
@@ -84,6 +85,7 @@ public class IdentityService(IHttpContextAccessor httpContextAccessor, UserManag
         {
             return Error.NotFound("User_Not_Found", $"User with id {userid} not found");
         }
+
         var deleteResult = await user.DeleteAsync(result);
 
         if (!deleteResult.Succeeded)
@@ -168,6 +170,7 @@ public class IdentityService(IHttpContextAccessor httpContextAccessor, UserManag
         {
             return false;
         }
+
         return await user.IsInRoleAsync(userInfo, role);
     }
 
@@ -236,7 +239,6 @@ public class IdentityService(IHttpContextAccessor httpContextAccessor, UserManag
             var currentUserClaims = await context.UserClaims.Where(uc => uc.UserId == userId).ToListAsync(ct);
 
             // (Roles)
-
             var currentUserRoleIds = currentUserRoles.Select(ur => ur.RoleId).ToList();
 
             var currentUserrolesToRemove = currentUserRoles.Where(ur => !newRoleIds.Contains(ur.RoleId)).ToList();
@@ -244,11 +246,17 @@ public class IdentityService(IHttpContextAccessor httpContextAccessor, UserManag
                 .Select(roleId => new IdentityUserRole<Guid> { UserId = userId, RoleId = roleId })
                 .ToList();
 
-            if (currentUserrolesToRemove.Count > 0) context.UserRoles.RemoveRange(currentUserrolesToRemove);
-            if (rolesToAdd.Count > 0) context.UserRoles.AddRange(rolesToAdd);
+            if (currentUserrolesToRemove.Count > 0)
+            {
+                context.UserRoles.RemoveRange(currentUserrolesToRemove);
+            }
 
-            //(Claims) 
+            if (rolesToAdd.Count > 0)
+            {
+                context.UserRoles.AddRange(rolesToAdd);
+            }
 
+            // (Claims)
             var claimsToRemove = currentUserClaims
                 .Where(c => !claims.Any(nc => nc.Type == c.ClaimType && nc.Value == c.ClaimValue))
                 .ToList();
@@ -258,8 +266,15 @@ public class IdentityService(IHttpContextAccessor httpContextAccessor, UserManag
                 .Select(nc => new IdentityUserClaim<Guid> { UserId = userId, ClaimType = nc.Type, ClaimValue = nc.Value })
                 .ToList();
 
-            if (claimsToRemove.Count > 0) context.UserClaims.RemoveRange(claimsToRemove);
-            if (claimsToAdd.Count > 0) context.UserClaims.AddRange(claimsToAdd);
+            if (claimsToRemove.Count > 0)
+            {
+                context.UserClaims.RemoveRange(claimsToRemove);
+            }
+
+            if (claimsToAdd.Count > 0)
+            {
+                context.UserClaims.AddRange(claimsToAdd);
+            }
 
             await context.SaveChangesAsync(ct);
             await transaction.CommitAsync(ct);
@@ -285,15 +300,15 @@ public class IdentityService(IHttpContextAccessor httpContextAccessor, UserManag
                     from userRole in context.UserRoles
                     join role in context.Roles on userRole.RoleId equals role.Id
                     where role.Name == Role.Manager.ToString()
-                    select userRole.UserId
-                ).Contains(appUser.Id)
+                    select userRole.UserId)
+                .Contains(appUser.Id)
                 select new
                 {
                     appUser.Id,
                     appUser.Email,
                     employee.FirstName,
                     employee.LastName,
-                    employee.IsActive
+                    employee.IsActive,
                 })
                 .ToListAsync(ct);
 
@@ -303,7 +318,7 @@ public class IdentityService(IHttpContextAccessor httpContextAccessor, UserManag
                 select new
                 {
                     userRole.UserId,
-                    RoleName = role.Name!
+                    RoleName = role.Name!,
                 })
                 .GroupBy(x => x.UserId)
                 .ToDictionaryAsync(

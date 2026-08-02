@@ -1,13 +1,14 @@
 using System.Data;
 using System.Net.Http.Headers;
 using FluentValidation;
-using MediatR;
-using Microsoft.EntityFrameworkCore;
 using MechanicShop.Application.Common.Constants;
 using MechanicShop.Application.Common.Interfaces;
+using MediatR;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
 public sealed record UpdateMakeCommand(Guid id, string Make, List<UpdateModelCommand> Models) : IRequest<Result<Updated>>;
+
 public class UpdateMakeCommandValidator : AbstractValidator<UpdateMakeCommand>
 {
     public UpdateMakeCommandValidator()
@@ -18,15 +19,16 @@ public class UpdateMakeCommandValidator : AbstractValidator<UpdateMakeCommand>
         RuleForEach(n => n.Models).SetValidator(new UpdateModelCommandValidator());
     }
 }
+
 public class UpdateMakeCommandHandler(IAppDbContext context, ILogger<CreateMakeCommandHandler> logger, ICacheInvalidator cacheInvalidator)
           : IRequestHandler<UpdateMakeCommand, Result<Updated>>
 {
     public async Task<Result<Updated>> Handle(UpdateMakeCommand request, CancellationToken cancellationToken)
     {
-        var Make = await context.VehicleMakes.Include(n => n.VehicleModels)
+        var make = await context.VehicleMakes.Include(n => n.VehicleModels)
                                       .FirstOrDefaultAsync(n => n.Id == request.id, cancellationToken);
 
-        if (Make is not null)
+        if (make is not null)
         {
             var isMakeExists = await context.VehicleMakes.AnyAsync(n => n.Id != request.id && n.Make.ToLower() == request.Make.ToLower(), cancellationToken);
 
@@ -36,7 +38,7 @@ public class UpdateMakeCommandHandler(IAppDbContext context, ILogger<CreateMakeC
                 return VehicleMakeErrors.MakeIsAlreadyExists;
             }
 
-            var updateResult = Make.Update(request.Make);
+            var updateResult = make.Update(request.Make);
 
             if (updateResult.IsError)
             {
@@ -44,7 +46,7 @@ public class UpdateMakeCommandHandler(IAppDbContext context, ILogger<CreateMakeC
                 return updateResult.Errors;
             }
 
-            var UpVehicleModel = new List<VehicleModel>();
+            var upVehicleModel = new List<VehicleModel>();
 
             foreach (var item in request.Models)
             {
@@ -54,17 +56,17 @@ public class UpdateMakeCommandHandler(IAppDbContext context, ILogger<CreateMakeC
                     logger.LogWarning("VehicleModel creation failed during UpdateMake for Model '{Model}': {Error}", item.model, upModel.TopError.Description);
 
                     return upModel.Errors;
-
                 }
-                UpVehicleModel.Add(upModel.Value);
+
+                upVehicleModel.Add(upModel.Value);
             }
 
-            var UpdateModelsResult = Make.UpSertModels(UpVehicleModel);
-            if (UpdateModelsResult.IsError)
+            var updateModelsResult = make.UpSertModels(upVehicleModel);
+            if (updateModelsResult.IsError)
             {
                 logger.LogWarning("Upsert Models failed for Make Id = {id}", request.id);
 
-                return UpdateModelsResult.Errors;
+                return updateModelsResult.Errors;
             }
 
             await context.SaveChangesAsync(cancellationToken);

@@ -27,7 +27,6 @@ public class PerformanceBehaviourTests
     public async Task Handle_WhenRequestCompletesWithinThreshold_ShouldNotLogWarning()
     {
         // Arrange
-
         var request = new TestRequest { Name = "Test" };
         var expectedResponse = new TestResponse { Result = "Success" };
 
@@ -57,7 +56,6 @@ public class PerformanceBehaviourTests
     public async Task Handle_WhenRequestExceedsThreshold_ShouldLogWarningWithUserInformation()
     {
         // Arrange
-
         var request = new TestRequest { Name = "Test" };
         var expectedResponse = new TestResponse { Result = "Success" };
 
@@ -106,7 +104,6 @@ public class PerformanceBehaviourTests
     public async Task Handle_WhenUserIdIsNull_ShouldLogWarningWithoutResolvingUserName()
     {
         // Arrange
-
         var request = new TestRequest { Name = "Test" };
         var expectedResponse = new TestResponse { Result = "Success" };
 
@@ -152,7 +149,6 @@ public class PerformanceBehaviourTests
     public async Task Handle_WhenUserIdIsGuidEmpty_ShouldLogWarningWithoutResolvingUserName()
     {
         // Arrange
-
         var request = new TestRequest { Name = "Test" };
         var expectedResponse = new TestResponse { Result = "Success" };
 
@@ -196,7 +192,6 @@ public class PerformanceBehaviourTests
     public async Task Handle_WhenIdentityServiceReturnsNull_ShouldLogWarningWithEmptyUserName()
     {
         // Arrange
-
         var request = new TestRequest { Name = "Test" };
         var expectedResponse = new TestResponse { Result = "Success" };
 
@@ -240,7 +235,6 @@ public class PerformanceBehaviourTests
     public async Task Handle_ShouldAlwaysReturnHandlerResponse()
     {
         // Arrange
-
         var request = new TestRequest { Name = "Test" };
         var expectedResponse = new TestResponse { Result = "Success" };
 
@@ -262,7 +256,6 @@ public class PerformanceBehaviourTests
     public async Task Handle_WhenHandlerThrowsException_ShouldPropagateException()
     {
         // Arrange
-
         var request = new TestRequest { Name = "Test" };
         var expectedException = new InvalidOperationException("Test exception");
 

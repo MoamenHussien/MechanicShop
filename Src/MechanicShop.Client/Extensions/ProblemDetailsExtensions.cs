@@ -11,7 +11,7 @@ public static class ProblemDetailsExtensions
         return source switch
         {
             null => DefaultErrorMessage,
-            _ => source.Title!
+            _ => source.Title!,
         };
     }
 }

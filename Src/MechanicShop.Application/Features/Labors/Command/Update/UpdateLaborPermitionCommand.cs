@@ -1,9 +1,9 @@
 using System.Security.Claims;
 using FluentValidation;
-using MediatR;
-using Microsoft.Extensions.Logging;
 using MechanicShop.Application.Common.Constants;
 using MechanicShop.Application.Common.Interfaces;
+using MediatR;
+using Microsoft.Extensions.Logging;
 
 public sealed record UpdateLaborPermissionsCommand(Guid LaborId, List<string> Roles, List<Claim> Claims)
 : IRequest<Result<Updated>>;

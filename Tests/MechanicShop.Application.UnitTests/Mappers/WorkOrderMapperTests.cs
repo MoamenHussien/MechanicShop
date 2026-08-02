@@ -140,5 +140,4 @@ public class WorkOrderMapperTests
         Assert.Single(listItemDto.RepairTasks);
         Assert.Equal("Oil Change", listItemDto.RepairTasks.Single());
     }
-};
-
+}

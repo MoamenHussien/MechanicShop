@@ -1,4 +1,5 @@
 using Xunit;
+
 public class InvoiceLineItemTests
 {
     [Fact]

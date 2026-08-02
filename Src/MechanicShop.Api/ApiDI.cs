@@ -21,7 +21,6 @@ public static class ApiDI
 {
     public static IServiceCollection AddPresentation(this IServiceCollection services, IConfiguration configuration)
     {
-
         services.AddCustomProblemDetails()
                 .AddCustomApiVersioning()
                 .AddApiDocumentation()
@@ -52,7 +51,7 @@ public static class ApiDI
                 "text/html",
                 "application/xml",
                 "application/octet-stream", // 👈 مهم جداً لملفات DLLs الخاصة بـ Blazor
-                "application/wasm"          // 👈 مهم جداً لملفات WebAssembly
+                "application/wasm",          // 👈 مهم جداً لملفات WebAssembly
             };
         });
 
@@ -68,8 +67,6 @@ public static class ApiDI
 
         return services;
     }
-
-
 
     private static IServiceCollection AddAppOutputCaching(this IServiceCollection services)
     {
@@ -92,7 +89,6 @@ public static class ApiDI
                 builder.AddPolicy<AuthenticatedRequestCachingPolicy>();
                 builder.Cache()
                        .Expire(TimeSpan.FromSeconds((int)DurationInSeconds.TenMinutes));
-
             }, excludeDefaultPolicy: true);
 
             // Separate cache for each authenticated user.
@@ -152,9 +148,8 @@ public static class ApiDI
                     Window = TimeSpan.FromMinutes(1),
                     SegmentsPerWindow = 6,
                     QueueLimit = 0,
-                    AutoReplenishment = true
-                })
-            );
+                    AutoReplenishment = true,
+                }));
 
             options.AddSlidingWindowLimiter("SlidingWindow", limiterOptions =>
             {
@@ -229,6 +224,7 @@ public static class ApiDI
     private static IServiceCollection AddControllersWithJsonOptions(this IServiceCollection services)
     {
         services.AddControllers()
+
         // .AddJsonOptions(options =>
         // {
         //     options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
@@ -309,25 +305,25 @@ public static class ApiDI
 
         app.MapHealthChecks("/health/live", new HealthCheckOptions
         {
-            Predicate = _ => false
+            Predicate = _ => false,
         }).AllowAnonymous();
 
         app.MapHealthChecks("/health/ready", new HealthCheckOptions
         {
             Predicate = check => check.Tags.Contains("ready"),
-            ResponseWriter = UIResponseWriter.WriteHealthCheckUIResponse
+            ResponseWriter = UIResponseWriter.WriteHealthCheckUIResponse,
         })
         .AllowAnonymous();
 
         app.MapHealthChecks("/health", new HealthCheckOptions
         {
-            ResponseWriter = UIResponseWriter.WriteHealthCheckUIResponse
+            ResponseWriter = UIResponseWriter.WriteHealthCheckUIResponse,
         })
         .RequireAuthorization()
         .RequireHost("localhost");
 
         app.MapPrometheusScrapingEndpoint();
-        
+
         return app;
     }
 }

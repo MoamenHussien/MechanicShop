@@ -20,7 +20,7 @@ public class UpdateLaborPasswordCommandValidator : AbstractValidator<UpdateLabor
     }
 }
 
-internal class UpdateLaborPasswordCommandHandler(IIdentityService identity, IUser user, ILogger<UpdateLaborPasswordCommandHandler> logger) : IRequestHandler<UpdateLaborPasswordCommand, Result<Success>>
+internal sealed class UpdateLaborPasswordCommandHandler(IIdentityService identity, IUser user, ILogger<UpdateLaborPasswordCommandHandler> logger) : IRequestHandler<UpdateLaborPasswordCommand, Result<Success>>
 {
     public async Task<Result<Success>> Handle(UpdateLaborPasswordCommand request, CancellationToken ct)
     {

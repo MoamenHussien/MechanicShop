@@ -1,13 +1,14 @@
 using System.ComponentModel.Design.Serialization;
 using FluentValidation;
+using MechanicShop.Application.Common.Constants;
+using MechanicShop.Application.Common.Interfaces;
 using MediatR;
 using MediatR.Pipeline;
 using Microsoft.EntityFrameworkCore;
-using MechanicShop.Application.Common.Constants;
-using MechanicShop.Application.Common.Interfaces;
 using Microsoft.Extensions.Logging;
 
 public sealed record CreateRepairTaskCommand(string name, decimal LaborCost, RepairDurationInMinutes duration, List<CreateRepairTaskPartCommand> Parts) : IRequest<Result<RepairTaskDto>>;
+
 public class CreateRepairTaskCommandValidator : AbstractValidator<CreateRepairTaskCommand>
 {
     public CreateRepairTaskCommandValidator()
@@ -25,12 +26,12 @@ public class CreateRepairTaskCommandHandler(ILogger<CreateRepairTaskCommandHandl
 {
     public async Task<Result<RepairTaskDto>> Handle(CreateRepairTaskCommand request, CancellationToken cancellationToken)
     {
-        string RepairTaskName = request.name.CapitalizeFirstLetter();
+        string repairTaskName = request.name.CapitalizeFirstLetter();
 
-        var IsRepairTaskNameExists = await context.RepairTasks.AnyAsync(n => EF.Functions.Like(n.Name, RepairTaskName), cancellationToken);
-        if (IsRepairTaskNameExists)
+        var isRepairTaskNameExists = await context.RepairTasks.AnyAsync(n => EF.Functions.Like(n.Name, repairTaskName), cancellationToken);
+        if (isRepairTaskNameExists)
         {
-            logger.LogWarning("The Repair Task Name Is Already Exists : {name}", RepairTaskName);
+            logger.LogWarning("The Repair Task Name Is Already Exists : {name}", repairTaskName);
             return RepairTaskErrors.DuplicateName;
         }
 
@@ -38,30 +39,31 @@ public class CreateRepairTaskCommandHandler(ILogger<CreateRepairTaskCommandHandl
 
         foreach (var item in request.Parts)
         {
-            var CretePartStatus = Part.Create(Guid.NewGuid(), item.cost, item.name, item.Quantity);
-            if (CretePartStatus.IsError)
+            var cretePartStatus = Part.Create(Guid.NewGuid(), item.cost, item.name, item.Quantity);
+            if (cretePartStatus.IsError)
             {
-                logger.LogWarning("It Has An Error During Creating New Repair Task Part : {error}", CretePartStatus.Errors);
-                return CretePartStatus.Errors;
+                logger.LogWarning("It Has An Error During Creating New Repair Task Part : {error}", cretePartStatus.Errors);
+                return cretePartStatus.Errors;
             }
-            parts.Add(CretePartStatus.Value);
+
+            parts.Add(cretePartStatus.Value);
         }
 
-        var CreteRepairTaskStatus = RepairTask.Create(Guid.NewGuid(), request.name, request.LaborCost, request.duration, parts);
+        var creteRepairTaskStatus = RepairTask.Create(Guid.NewGuid(), request.name, request.LaborCost, request.duration, parts);
 
-        if (CreteRepairTaskStatus.IsError)
+        if (creteRepairTaskStatus.IsError)
         {
-            logger.LogWarning("It Has An Error During Creating New Repair Task : {error}", CreteRepairTaskStatus.Errors);
-            return CreteRepairTaskStatus.Errors;
+            logger.LogWarning("It Has An Error During Creating New Repair Task : {error}", creteRepairTaskStatus.Errors);
+            return creteRepairTaskStatus.Errors;
         }
 
-        await context.RepairTasks.AddAsync(CreteRepairTaskStatus.Value, cancellationToken);
+        await context.RepairTasks.AddAsync(creteRepairTaskStatus.Value, cancellationToken);
         await context.SaveChangesAsync(cancellationToken);
 
         await cacheInvalidator.EvictByTagAsync(CacheTags.RepairTasks, cancellationToken);
 
-        logger.LogInformation("Created and saved new Repair Task successfully with Id: {Id} and removed the cache tag 'RepairTasks'", CreteRepairTaskStatus.Value.Id);
+        logger.LogInformation("Created and saved new Repair Task successfully with Id: {Id} and removed the cache tag 'RepairTasks'", creteRepairTaskStatus.Value.Id);
 
-        return CreteRepairTaskStatus.Value.ToDto();
+        return creteRepairTaskStatus.Value.ToDto();
     }
 }

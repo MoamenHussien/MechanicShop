@@ -1,9 +1,8 @@
 using FluentValidation;
+using MechanicShop.Application.Common.Constants;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-
-using MechanicShop.Application.Common.Constants;
 
 public sealed record GetCustomerByIdQuery(Guid CustomerId) : ICachedQuery<Result<CustomerDto>>
 {

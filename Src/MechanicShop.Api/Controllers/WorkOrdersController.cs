@@ -23,8 +23,8 @@ public sealed class WorkOrdersController(ISender sender) : ApiController
     [ProducesResponseType(typeof(PaginatedList<WorkOrderListItemDto>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
     [OutputCache(PolicyName = nameof(Policies.SharedAuthCache), Duration = (int)DurationInSeconds.FiveMinutes, Tags = [CacheTags.WorkOrders], VaryByQueryKeys = ["*"])]
-    public async Task<IActionResult> Get
-    ([FromQuery] WorkOrderFilterRequest filters, [FromQuery] PageRequest pageRequest, CancellationToken ct)
+    public async Task<IActionResult> Get(
+    [FromQuery] WorkOrderFilterRequest filters, [FromQuery] PageRequest pageRequest, CancellationToken ct)
     {
         if (pageRequest.Page <= 0)
         {
@@ -87,10 +87,8 @@ public sealed class WorkOrdersController(ISender sender) : ApiController
             request.VehicleId,
             (Spot)(int)request.Spot,
             request.StartAtUtc,
-            request.RepairTaskIds
-            ),
+            request.RepairTaskIds),
             ct);
-
 
         return result.Match(success => CreatedAtRoute(routeName: "GetWorkOrderById", routeValues: new { version = "1.0", workOrderId = success.WorkOrderId }, value: success), Problem);
     }
@@ -112,7 +110,6 @@ public sealed class WorkOrdersController(ISender sender) : ApiController
             (Spot)(int)request.NewSpot);
 
         var result = await sender.Send(command, ct);
-
 
         return result.Match(_ => NoContent(), Problem);
     }
@@ -170,7 +167,6 @@ public sealed class WorkOrdersController(ISender sender) : ApiController
 
         var result = await sender.Send(command, ct);
 
-
         return result.Match(_ => NoContent(), Problem);
     }
 
@@ -185,8 +181,6 @@ public sealed class WorkOrdersController(ISender sender) : ApiController
     public async Task<IActionResult> Delete([FromRoute] Guid workOrderId, CancellationToken ct)
     {
         var result = await sender.Send(new DeleteWorkOrderCommand(workOrderId), ct);
-
-
 
         return result.Match(_ => NoContent(), Problem);
     }

@@ -24,7 +24,6 @@ public class LoggingBehaviourTests
     public async Task Process_WhenUserIdExists_ShouldResolveUserNameAndLogRequest()
     {
         // Arrange
-
         var dummyRequest = new DummyRequest();
         var currentUserId = Guid.NewGuid();
 
@@ -45,15 +44,14 @@ public class LoggingBehaviourTests
 
         // Verify that the user's name was resolved from the identity service.
         await _identityServiceMock
-            .Received(1)   //اتأكد إن الميثود دى اتنادت مرة واحدة
+            .Received(1) // اتأكد إن الميثود دى اتنادت مرة واحدة
             .GetUserNameAsync(currentUserId);   // GetUserNameAsync(currentUserId) هل فعلاً الـ LoggingBehavior عمل
 
         // Verify that an information log entry was written for the processed request.
-
-        _loggerMock.Received(1).Log(  //اتأكد إن الـ Logger عمل Log مرة واحدة
+        _loggerMock.Received(1).Log(// اتأكد إن الـ Logger عمل Log مرة واحدة
             LogLevel.Information,
             Arg.Any<EventId>(),
-            Arg.Is<object>(state => state!.ToString()!.Contains("Request")), //هات الرسالة اللى اتكتبت حولها String. هل فيها كلمة Request
+            Arg.Is<object>(state => state!.ToString()!.Contains("Request")), // هات الرسالة اللى اتكتبت حولها String. هل فيها كلمة Request
             Arg.Any<Exception>(),
             Arg.Any<Func<object, Exception?, string>>());
     }
@@ -62,7 +60,6 @@ public class LoggingBehaviourTests
     public async Task Process_WhenUserIdIsMissing_ShouldSkipUserLookupAndLogRequest()
     {
         // Arrange
-
         var dummyRequest = new DummyRequest();
         Guid? currentUserId = null;
 

@@ -1,10 +1,10 @@
 using System.Security.Claims;
 using FluentValidation;
+using MechanicShop.Application.Common.Constants;
+using MechanicShop.Application.Common.Interfaces;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-using MechanicShop.Application.Common.Constants;
-using MechanicShop.Application.Common.Interfaces;
 
 public sealed record UpdateLaborInfoCommand(Guid id, string FirstName, string LastName, bool IsActive) : IRequest<Result<Updated>>;
 
@@ -19,7 +19,6 @@ public class UpdateLaborInfoCommandValidator : AbstractValidator<UpdateLaborInfo
     }
 }
 
-
 public class UpdateLaborInfoCommandHandler(ILogger<UpdateLaborInfoCommandHandler> logger, IAppDbContext context, ICacheInvalidator cacheInvalidator)
 : IRequestHandler<UpdateLaborInfoCommand, Result<Updated>>
 {
@@ -32,12 +31,12 @@ public class UpdateLaborInfoCommandHandler(ILogger<UpdateLaborInfoCommandHandler
             return ApplicationErrors.NotFoundTheLabor;
         }
 
-        var UpdateStatus = labor.Update(request.FirstName, request.LastName, request.IsActive);
+        var updateStatus = labor.Update(request.FirstName, request.LastName, request.IsActive);
 
-        if (UpdateStatus.IsError)
+        if (updateStatus.IsError)
         {
-            logger.LogWarning("The Labor Failed To Update To This Id : {id} , This Is Errors : {@errors}", request.id, UpdateStatus.Errors);
-            return UpdateStatus.Errors;
+            logger.LogWarning("The Labor Failed To Update To This Id : {id} , This Is Errors : {@errors}", request.id, updateStatus.Errors);
+            return updateStatus.Errors;
         }
 
         await context.SaveChangesAsync(cancellationToken);

@@ -1,4 +1,3 @@
-
 using MechanicShop.Tests.Common.RepaireTasks;
 
 namespace MechanicShop.Tests.Common.WorkOrders;

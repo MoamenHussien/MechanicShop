@@ -1,8 +1,8 @@
 using FluentValidation;
-using MediatR;
-using Microsoft.EntityFrameworkCore;
 using MechanicShop.Application.Common.Constants;
 using MechanicShop.Application.Common.Interfaces;
+using MediatR;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
 public sealed record UpdateCustomerCommand(Guid id, string name, string email, string PhoneNumber, List<UpdateVehicleCommand> Vehicles) : IRequest<Result<Updated>>;
@@ -28,19 +28,19 @@ public class UpdateCustomerCommandHandler(ILogger<UpdateCustomerCommandHandler> 
 {
     public async Task<Result<Updated>> Handle(UpdateCustomerCommand request, CancellationToken cancellationToken)
     {
-        var Customer = await context.Customers.Where(n => n.Id == request.id).Include(n => n.vehicles).FirstOrDefaultAsync(cancellationToken);
-        if (Customer is null)
+        var customer = await context.Customers.Where(n => n.Id == request.id).Include(n => n.vehicles).FirstOrDefaultAsync(cancellationToken);
+        if (customer is null)
         {
             logger.LogWarning("The Customer Is Not Found With ID : {id} For Update", request.id);
             return ApplicationErrors.TheCustomerNotFound;
         }
 
-        var Email = request.email.Trim().ToLower();
+        var email = request.email.Trim().ToLower();
 
-        var IFExists = await context.Customers.AnyAsync(n => n.Id != request.id && n.Email == Email);
-        if (IFExists)
+        var iFExists = await context.Customers.AnyAsync(n => n.Id != request.id && n.Email == email);
+        if (iFExists)
         {
-            logger.LogWarning("Customer creation aborted. Email already exists : {email}", Email);
+            logger.LogWarning("Customer creation aborted. Email already exists : {email}", email);
             return ApplicationErrors.CustomerWithThisEmailIsAlreadyExists;
         }
 
@@ -58,33 +58,33 @@ public class UpdateCustomerCommandHandler(ILogger<UpdateCustomerCommandHandler> 
 
         foreach (var vehicle in request.Vehicles)
         {
-            var VehicleId = vehicle.id ?? Guid.NewGuid();
-            var CreatedVehicle = Vehicle.Create(VehicleId, vehicle.year, vehicle.LicensePlate, vehicle.VehicleModelId);
+            var vehicleId = vehicle.id ?? Guid.NewGuid();
+            var createdVehicle = Vehicle.Create(vehicleId, vehicle.year, vehicle.LicensePlate, vehicle.VehicleModelId);
 
-            if (CreatedVehicle.IsError)
+            if (createdVehicle.IsError)
             {
-                logger.LogWarning("Error During Create Customer Vehicles : {@Errors}", CreatedVehicle.Errors);
-                return CreatedVehicle.Errors;
+                logger.LogWarning("Error During Create Customer Vehicles : {@Errors}", createdVehicle.Errors);
+                return createdVehicle.Errors;
             }
 
-            vehicles.Add(CreatedVehicle.Value);
+            vehicles.Add(createdVehicle.Value);
         }
 
-        var UpdateCustomer = Customer.Update(request.name, Email, request.PhoneNumber);
+        var updateCustomer = customer.Update(request.name, email, request.PhoneNumber);
 
-        if (UpdateCustomer.IsError)
+        if (updateCustomer.IsError)
         {
-            logger.LogWarning("Error During Update Customer Info: {@Errors}", UpdateCustomer.Errors);
-            return UpdateCustomer.Errors;
+            logger.LogWarning("Error During Update Customer Info: {@Errors}", updateCustomer.Errors);
+            return updateCustomer.Errors;
         }
 
-        var UpSertVehicles = Customer.UpSertVehicles(vehicles);
+        var upSertVehicles = customer.UpSertVehicles(vehicles);
 
-        if (UpSertVehicles.IsError)
+        if (upSertVehicles.IsError)
         {
-            logger.LogWarning("Error During UpSert Customer Vehicles : {@Errors}", UpSertVehicles.Errors);
+            logger.LogWarning("Error During UpSert Customer Vehicles : {@Errors}", upSertVehicles.Errors);
 
-            return UpSertVehicles.Errors;
+            return upSertVehicles.Errors;
         }
 
         await context.SaveChangesAsync(cancellationToken);

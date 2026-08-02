@@ -1,9 +1,9 @@
 using System.Security.AccessControl;
 using FluentValidation;
-using MediatR;
-using Microsoft.EntityFrameworkCore;
 using MechanicShop.Application.Common.Constants;
 using MechanicShop.Application.Common.Interfaces;
+using MediatR;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
 public sealed record UpdateRepairTaskCommand(Guid id, string name, decimal LaborCost, RepairDurationInMinutes duration, List<UpdatePartCommand> Parts) : IRequest<Result<Updated>>;
@@ -26,20 +26,20 @@ public class UpdateRepairTaskCommandHandler(ILogger<UpdateRepairTaskCommandHandl
 {
     public async Task<Result<Updated>> Handle(UpdateRepairTaskCommand request, CancellationToken cancellationToken)
     {
-        var RepairTask = await context.RepairTasks.Where(n => n.Id == request.id).Include(n => n.Parts).FirstOrDefaultAsync(cancellationToken);
+        var repairTask = await context.RepairTasks.Where(n => n.Id == request.id).Include(n => n.Parts).FirstOrDefaultAsync(cancellationToken);
 
-        if (RepairTask is null)
+        if (repairTask is null)
         {
             logger.LogWarning("The Repair Task Is Not Found , For This Id : {id}", request.id);
             return ApplicationErrors.NotFoundThisRepairTaskId;
         }
 
-        var RepairTaskName = request.name.CapitalizeFirstLetter();
-        var nameIsExists = await context.RepairTasks.AnyAsync(n => n.Id != request.id && EF.Functions.Like(n.Name, RepairTaskName));
+        var repairTaskName = request.name.CapitalizeFirstLetter();
+        var nameIsExists = await context.RepairTasks.AnyAsync(n => n.Id != request.id && EF.Functions.Like(n.Name, repairTaskName));
 
         if (nameIsExists)
         {
-            logger.LogWarning("The Repair Task Name Is Already Exists : {name}", RepairTaskName);
+            logger.LogWarning("The Repair Task Name Is Already Exists : {name}", repairTaskName);
             return RepairTaskErrors.DuplicateName;
         }
 
@@ -47,32 +47,32 @@ public class UpdateRepairTaskCommandHandler(ILogger<UpdateRepairTaskCommandHandl
 
         foreach (var part in request.Parts)
         {
-            var PartId = part.id ?? Guid.NewGuid();
-            var CretePartStatus = Part.Create(PartId, part.cost, part.name, part.Quantity);
+            var partId = part.id ?? Guid.NewGuid();
+            var cretePartStatus = Part.Create(partId, part.cost, part.name, part.Quantity);
 
-            if (CretePartStatus.IsError)
+            if (cretePartStatus.IsError)
             {
-                logger.LogWarning("It Has An Error During Creating New Repair Task Part : {@error}", CretePartStatus.Errors);
-                return CretePartStatus.Errors;
+                logger.LogWarning("It Has An Error During Creating New Repair Task Part : {@error}", cretePartStatus.Errors);
+                return cretePartStatus.Errors;
             }
 
-            parts.Add(CretePartStatus.Value);
+            parts.Add(cretePartStatus.Value);
         }
 
-        var UpdateRepairTaskStatus = RepairTask.Update(request.name, request.LaborCost, request.duration);
+        var updateRepairTaskStatus = repairTask.Update(request.name, request.LaborCost, request.duration);
 
-        if (UpdateRepairTaskStatus.IsError)
+        if (updateRepairTaskStatus.IsError)
         {
-            logger.LogWarning("It Has An Error During Updating The Repair Task Info : {@error}", UpdateRepairTaskStatus.Errors);
-            return UpdateRepairTaskStatus.Errors;
+            logger.LogWarning("It Has An Error During Updating The Repair Task Info : {@error}", updateRepairTaskStatus.Errors);
+            return updateRepairTaskStatus.Errors;
         }
 
-        var UpsertRepairTaskStatus = RepairTask.UpSert(parts);
+        var upsertRepairTaskStatus = repairTask.UpSert(parts);
 
-        if (UpsertRepairTaskStatus.IsError)
+        if (upsertRepairTaskStatus.IsError)
         {
-            logger.LogWarning("It Has An Error During UpSert The Repair Task Parts : {@error}", UpsertRepairTaskStatus.Errors);
-            return UpsertRepairTaskStatus.Errors;
+            logger.LogWarning("It Has An Error During UpSert The Repair Task Parts : {@error}", upsertRepairTaskStatus.Errors);
+            return upsertRepairTaskStatus.Errors;
         }
 
         await context.SaveChangesAsync(cancellationToken);

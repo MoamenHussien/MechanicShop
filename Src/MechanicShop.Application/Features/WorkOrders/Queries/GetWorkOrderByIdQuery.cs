@@ -1,9 +1,8 @@
 using FluentValidation;
+using MechanicShop.Application.Common.Constants;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-
-using MechanicShop.Application.Common.Constants;
 
 public sealed record GetWorkOrderByIdQuery(Guid id) : ICachedQuery<Result<WorkOrderDto>>
 {
@@ -27,7 +26,6 @@ public class GetWorkOrderByIdQueryHandler(ILogger<GetWorkOrderByIdQueryHandler> 
 {
     public async Task<Result<WorkOrderDto>> Handle(GetWorkOrderByIdQuery request, CancellationToken cancellationToken)
     {
-
         // var WorkOrder = await context.WorkOrders.AsNoTracking()
         //                                   .Include(n=>n.Vehicle).ThenInclude(n=>n.VehicleModel).ThenInclude(n=>n.VehicleMake).Include(n=>n.Vehicle.Customer)
         //                                   .Include(n=>n.Invoice)
@@ -47,8 +45,7 @@ public class GetWorkOrderByIdQueryHandler(ILogger<GetWorkOrderByIdQueryHandler> 
                         w.Vehicle.VehicleModel.VehicleMake.Make,
                         w.Vehicle.VehicleModel.Model,
                         w.Vehicle.Year,
-                        w.Vehicle.LicensePlate
-                        ),
+                        w.Vehicle.LicensePlate),
 
                    StartAtUtc = w.StartAtUtc,
                    EndAtUtc = w.EndAtUtc,
@@ -66,18 +63,16 @@ public class GetWorkOrderByIdQueryHandler(ILogger<GetWorkOrderByIdQueryHandler> 
                                p.Name,
                                p.Costs,
                                p.Quantity))
-                           .ToList()
-
+                           .ToList(),
                    }).ToList(),
 
                    Labor = new LaborDto(w.Labor.Id, w.Labor.FullName),
 
                    State = w.State,
 
-                   CreatedAt = w.CreatedAtUtc
+                   CreatedAt = w.CreatedAtUtc,
                })
                 .FirstOrDefaultAsync(cancellationToken);
-
 
         if (workOrder is null)
         {

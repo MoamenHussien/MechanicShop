@@ -1,5 +1,4 @@
-﻿
-namespace MechanicShop.Tests.Common.Auth;
+﻿namespace MechanicShop.Tests.Common.Auth;
 
 public static class RefreshTokenFactory
 {

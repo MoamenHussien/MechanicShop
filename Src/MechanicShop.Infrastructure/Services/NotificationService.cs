@@ -1,9 +1,8 @@
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
 using System.Net;
 using MailKit.Net.Smtp;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using MimeKit;
-
 
 public sealed class NotificationService(ILogger<NotificationService> logger, IOptions<MailSettings> mailsettings) : INotificationService
 {
@@ -16,7 +15,7 @@ public sealed class NotificationService(ILogger<NotificationService> logger, IOp
 
         message.Body = new TextPart("plain")
         {
-            Text = body
+            Text = body,
         };
 
         using var client = new SmtpClient();
@@ -26,7 +25,6 @@ public sealed class NotificationService(ILogger<NotificationService> logger, IOp
         await client.SendAsync(message, cancellationToken);
         await client.DisconnectAsync(true, cancellationToken);
     }
-
 
     public async Task SendSmsAsync(string CustomerPhoneNum, string CustomerName, string body, CancellationToken cancellationToken)
     {

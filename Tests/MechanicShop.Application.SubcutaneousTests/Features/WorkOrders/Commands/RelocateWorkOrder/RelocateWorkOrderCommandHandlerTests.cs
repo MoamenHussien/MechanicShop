@@ -1,11 +1,11 @@
 using MechanicShop.Application.SubcutaneousTests.Common;
 using MechanicShop.Tests.Common.Customers;
 using MechanicShop.Tests.Common.Employees;
+using MechanicShop.Tests.Common.RepaireTasks;
 using MechanicShop.Tests.Common.WorkOrders;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Xunit;
-using MechanicShop.Tests.Common.RepaireTasks;
 
 namespace MechanicShop.Application.SubcutaneousTests.Features.WorkOrders.Commands.RelocateWorkOrder;
 
@@ -43,8 +43,7 @@ public class RelocateWorkOrderCommandHandlerTests(WebAppFactory factory)
         await _context.RepairTasks.AddAsync(repairTask);
 
         var customer = CustomerFactory.CreateCustomer(
-            vehicles: [VehicleFactory.CreateVehicle(vehicleModelId: vehicleModel.Id).Value]
-        ).Value;
+            vehicles: [VehicleFactory.CreateVehicle(vehicleModelId: vehicleModel.Id).Value]).Value;
 
         var employee = EmployeeFactory.CreateEmployee().Value;
 
@@ -83,8 +82,7 @@ public class RelocateWorkOrderCommandHandlerTests(WebAppFactory factory)
         await _context.RepairTasks.AddAsync(repairTask);
 
         var customer = CustomerFactory.CreateCustomer(
-            vehicles: [VehicleFactory.CreateVehicle(vehicleModelId: vehicleModel.Id).Value]
-        ).Value;
+            vehicles: [VehicleFactory.CreateVehicle(vehicleModelId: vehicleModel.Id).Value]).Value;
 
         var employee = EmployeeFactory.CreateEmployee().Value;
 
@@ -123,8 +121,7 @@ public class RelocateWorkOrderCommandHandlerTests(WebAppFactory factory)
         await _context.RepairTasks.AddAsync(repairTask);
 
         var customer = CustomerFactory.CreateCustomer(
-            vehicles: [VehicleFactory.CreateVehicle(vehicleModelId: vehicleModel.Id).Value]
-        ).Value;
+            vehicles: [VehicleFactory.CreateVehicle(vehicleModelId: vehicleModel.Id).Value]).Value;
 
         var employee1 = EmployeeFactory.CreateEmployee().Value;
         var employee2 = EmployeeFactory.CreateEmployee().Value;
@@ -176,12 +173,10 @@ public class RelocateWorkOrderCommandHandlerTests(WebAppFactory factory)
         await _context.RepairTasks.AddAsync(repairTask);
 
         var customer1 = CustomerFactory.CreateCustomer(
-            vehicles: [VehicleFactory.CreateVehicle(vehicleModelId: vehicleModel.Id).Value]
-        ).Value;
+            vehicles: [VehicleFactory.CreateVehicle(vehicleModelId: vehicleModel.Id).Value]).Value;
 
         var customer2 = CustomerFactory.CreateCustomer(
-            vehicles: [VehicleFactory.CreateVehicle(vehicleModelId: vehicleModel.Id).Value]
-        ).Value;
+            vehicles: [VehicleFactory.CreateVehicle(vehicleModelId: vehicleModel.Id).Value]).Value;
 
         var employee = EmployeeFactory.CreateEmployee().Value;
 
@@ -232,12 +227,10 @@ public class RelocateWorkOrderCommandHandlerTests(WebAppFactory factory)
         await _context.RepairTasks.AddAsync(repairTask);
 
         var customer1 = CustomerFactory.CreateCustomer(
-            vehicles: [VehicleFactory.CreateVehicle(vehicleModelId: vehicleModel.Id).Value]
-        ).Value;
+            vehicles: [VehicleFactory.CreateVehicle(vehicleModelId: vehicleModel.Id).Value]).Value;
 
         var customer2 = CustomerFactory.CreateCustomer(
-            vehicles: [VehicleFactory.CreateVehicle(vehicleModelId: vehicleModel.Id).Value]
-        ).Value;
+            vehicles: [VehicleFactory.CreateVehicle(vehicleModelId: vehicleModel.Id).Value]).Value;
 
         var employee1 = EmployeeFactory.CreateEmployee().Value;
         var employee2 = EmployeeFactory.CreateEmployee().Value;
@@ -290,8 +283,7 @@ public class RelocateWorkOrderCommandHandlerTests(WebAppFactory factory)
         await _context.RepairTasks.AddAsync(repairTask);
 
         var customer = CustomerFactory.CreateCustomer(
-            vehicles: [VehicleFactory.CreateVehicle(vehicleModelId: vehicleModel.Id).Value]
-        ).Value;
+            vehicles: [VehicleFactory.CreateVehicle(vehicleModelId: vehicleModel.Id).Value]).Value;
 
         var employee = EmployeeFactory.CreateEmployee().Value;
 
@@ -317,7 +309,7 @@ public class RelocateWorkOrderCommandHandlerTests(WebAppFactory factory)
         var result = await _mediator.Send(command);
 
         // Assert
-        Assert.True(result.IsSuccess, result.IsError ? result.TopError.Description : "");
+        Assert.True(result.IsSuccess, result.IsError ? result.TopError.Description : string.Empty);
 
         ((DbContext)_context).ChangeTracker.Clear();
 
@@ -337,8 +329,7 @@ public class RelocateWorkOrderCommandHandlerTests(WebAppFactory factory)
         await _context.RepairTasks.AddAsync(repairTask);
 
         var customer = CustomerFactory.CreateCustomer(
-            vehicles: [VehicleFactory.CreateVehicle(vehicleModelId: vehicleModel.Id).Value]
-        ).Value;
+            vehicles: [VehicleFactory.CreateVehicle(vehicleModelId: vehicleModel.Id).Value]).Value;
 
         var employee = EmployeeFactory.CreateEmployee().Value;
 

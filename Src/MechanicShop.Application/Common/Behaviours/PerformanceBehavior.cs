@@ -37,4 +37,3 @@ public class PerformanceBehavior<TRequest, TResponse>(ILogger<TRequest> logger, 
         return response;
     }
 }
-

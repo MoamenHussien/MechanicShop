@@ -23,8 +23,7 @@ public class UpdateRepairTaskCommandValidatorTests
             name ?? "Valid Name",
             laborCost ?? 100m,
             duration ?? RepairDurationInMinutes.Min30,
-            parts ?? [new UpdatePartCommand(Guid.NewGuid(), "Valid Part", 50m, 1)]
-        );
+            parts ?? [new UpdatePartCommand(Guid.NewGuid(), "Valid Part", 50m, 1)]);
     }
 
     [Fact]

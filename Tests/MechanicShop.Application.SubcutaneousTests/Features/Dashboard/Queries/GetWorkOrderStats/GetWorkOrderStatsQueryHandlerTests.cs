@@ -57,8 +57,7 @@ public class GetWorkOrderStatsQueryHandlerTests(WebAppFactory factory)
             laborId: employee.Id,
             repairTasks: [repairTask],
             startAt: startOfUtcDay.AddHours(10),
-            endAt: startOfUtcDay.AddHours(12)
-        ).Value;
+            endAt: startOfUtcDay.AddHours(12)).Value;
 
         await _context.WorkOrders.AddAsync(workOrder);
         await _context.SaveChangesAsync(default);

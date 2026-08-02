@@ -12,7 +12,7 @@ public class ResetLaborPasswordCommandValidator : AbstractValidator<ResetLaborPa
     }
 }
 
-internal class ResetLaborPasswordCommandHandler(IIdentityService identity, ILogger<ResetLaborPasswordCommandHandler> logger) : IRequestHandler<ResetLaborPasswordCommand, Result<Success>>
+internal sealed class ResetLaborPasswordCommandHandler(IIdentityService identity, ILogger<ResetLaborPasswordCommandHandler> logger) : IRequestHandler<ResetLaborPasswordCommand, Result<Success>>
 {
     public async Task<Result<Success>> Handle(ResetLaborPasswordCommand request, CancellationToken ct)
     {
@@ -22,6 +22,7 @@ internal class ResetLaborPasswordCommandHandler(IIdentityService identity, ILogg
             logger.LogInformation("Password reset completed For Labor {LaborId}", request.LaborId);
             return Result.Success;
         }
+
         logger.LogError("Password reset failed for Labor {LaborId}", request.LaborId);
         return result.Errors;
     }

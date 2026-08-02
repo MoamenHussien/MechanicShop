@@ -126,6 +126,4 @@ public sealed class LaborsController(ISender sender) : ApiController
 
         return result.Match(_ => NoContent(), Problem);
     }
-
-
 }

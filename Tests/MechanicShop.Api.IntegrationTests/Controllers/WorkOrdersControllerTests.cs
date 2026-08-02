@@ -167,7 +167,7 @@ public class WorkOrdersControllerTests(WebAppFactory webAppFactory)
             VehicleId = vehicle.Id,
             StartAtUtc = DateTimeOffset.UtcNow.Date.AddDays(1).AddHours(12),
             LaborId = laborId,
-            RepairTaskIds = repairTaskIds
+            RepairTaskIds = repairTaskIds,
         };
 
         WorkOrderDto? dto = null;
@@ -203,7 +203,7 @@ public class WorkOrdersControllerTests(WebAppFactory webAppFactory)
         {
             VehicleId = Guid.Empty,
             StartAtUtc = default,
-            RepairTaskIds = []
+            RepairTaskIds = [],
         };
 
         var response = await _client.PostAsJsonAsync("/api/v1.0/workorders", request);
@@ -224,7 +224,7 @@ public class WorkOrdersControllerTests(WebAppFactory webAppFactory)
             VehicleId = Guid.NewGuid(),
             StartAtUtc = DateTime.UtcNow.AddHours(1),
             RepairTaskIds = [Guid.NewGuid()],
-            LaborId = Guid.NewGuid()
+            LaborId = Guid.NewGuid(),
         };
 
         var response = await _client.PostAsJsonAsync("/api/v1.0/workorders", request);
@@ -256,7 +256,7 @@ public class WorkOrdersControllerTests(WebAppFactory webAppFactory)
         var request = new RelocateWorkOrderRequest
         {
             NewStartAtUtc = futureDate.AddHours(13),
-            NewSpot = Contracts.Common.Spot.C
+            NewSpot = Contracts.Common.Spot.C,
         };
 
         try
@@ -285,7 +285,7 @@ public class WorkOrdersControllerTests(WebAppFactory webAppFactory)
         var request = new RelocateWorkOrderRequest
         {
             NewStartAtUtc = DateTime.UtcNow.AddHours(2),
-            NewSpot = Contracts.Common.Spot.B
+            NewSpot = Contracts.Common.Spot.B,
         };
 
         var response = await _client.PutAsJsonAsync($"/api/v1.0/workorders/{nonExistentId}/relocation", request);
@@ -313,7 +313,7 @@ public class WorkOrdersControllerTests(WebAppFactory webAppFactory)
 
         var request = new AssignLaborRequest
         {
-            LaborId = TestUsers.Labor02.Id
+            LaborId = TestUsers.Labor02.Id,
         };
 
         try
@@ -339,7 +339,7 @@ public class WorkOrdersControllerTests(WebAppFactory webAppFactory)
 
         var request = new AssignLaborRequest
         {
-            LaborId = Guid.Empty
+            LaborId = Guid.Empty,
         };
 
         var response = await _client.PutAsJsonAsync($"/api/v1.0/workorders/{Guid.NewGuid()}/labor", request);
@@ -370,7 +370,7 @@ public class WorkOrdersControllerTests(WebAppFactory webAppFactory)
         {
             var request = new UpdateWorkOrderStateRequest
             {
-                State = Contracts.Common.WorkOrderState.InProgress
+                State = Contracts.Common.WorkOrderState.InProgress,
             };
 
             var response = await _client.PutAsJsonAsync($"/api/v1.0/workorders/{workOrder.Id}/state", request);
@@ -408,7 +408,7 @@ public class WorkOrdersControllerTests(WebAppFactory webAppFactory)
         {
             var request = new UpdateWorkOrderStateRequest
             {
-                State = Contracts.Common.WorkOrderState.InProgress
+                State = Contracts.Common.WorkOrderState.InProgress,
             };
 
             var response = await _client.PutAsJsonAsync($"/api/v1.0/workorders/{workOrder.Id}/state", request);
@@ -445,7 +445,7 @@ public class WorkOrdersControllerTests(WebAppFactory webAppFactory)
         {
             var request = new UpdateWorkOrderStateRequest
             {
-                State = Contracts.Common.WorkOrderState.InProgress
+                State = Contracts.Common.WorkOrderState.InProgress,
             };
 
             var response = await _client.PutAsJsonAsync($"/api/v1.0/workorders/{workOrder.Id}/state", request);
@@ -487,7 +487,7 @@ public class WorkOrdersControllerTests(WebAppFactory webAppFactory)
 
         var request = new ModifyRepairTaskRequest
         {
-            RepairTaskIds = [newRepairTask.Id]
+            RepairTaskIds = [newRepairTask.Id],
         };
 
         try
@@ -515,7 +515,7 @@ public class WorkOrdersControllerTests(WebAppFactory webAppFactory)
 
         var request = new ModifyRepairTaskRequest
         {
-            RepairTaskIds = [Guid.NewGuid()]
+            RepairTaskIds = [Guid.NewGuid()],
         };
 
         var response = await _client.PutAsJsonAsync($"/api/v1.0/workorders/{workOrderId}/repair-task", request);
@@ -685,7 +685,7 @@ public class WorkOrdersControllerTests(WebAppFactory webAppFactory)
 
         var request = new UpdateWorkOrderStateRequest
         {
-            State = Contracts.Common.WorkOrderState.InProgress
+            State = Contracts.Common.WorkOrderState.InProgress,
         };
 
         var response = await _client.PutAsJsonAsync($"/api/v1.0/workorders/{Guid.NewGuid()}/state", request);
@@ -698,7 +698,7 @@ public class WorkOrdersControllerTests(WebAppFactory webAppFactory)
     {
         var request = new UpdateWorkOrderStateRequest
         {
-            State = Contracts.Common.WorkOrderState.InProgress
+            State = Contracts.Common.WorkOrderState.InProgress,
         };
 
         var response = await _client.PutAsJsonAsync($"/api/v1.0/workorders/{Guid.NewGuid()}/state", request);
@@ -714,7 +714,7 @@ public class WorkOrdersControllerTests(WebAppFactory webAppFactory)
 
         var request = new ModifyRepairTaskRequest
         {
-            RepairTaskIds = [Guid.NewGuid()]
+            RepairTaskIds = [Guid.NewGuid()],
         };
 
         var response = await _client.PutAsJsonAsync($"/api/v1.0/workorders/{Guid.NewGuid()}/repair-task", request);
@@ -727,7 +727,7 @@ public class WorkOrdersControllerTests(WebAppFactory webAppFactory)
     {
         var request = new ModifyRepairTaskRequest
         {
-            RepairTaskIds = [Guid.NewGuid()]
+            RepairTaskIds = [Guid.NewGuid()],
         };
 
         var response = await _client.PutAsJsonAsync($"/api/v1.0/workorders/{Guid.NewGuid()}/repair-task", request);

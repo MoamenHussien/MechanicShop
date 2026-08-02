@@ -1,6 +1,4 @@
-﻿
-
-namespace MechanicShop.Tests.Common.WorkOrders;
+﻿namespace MechanicShop.Tests.Common.WorkOrders;
 
 public static class WorkOrderCommandFactory
 {
@@ -16,7 +14,6 @@ public static class WorkOrderCommandFactory
              vehicleId ?? Guid.NewGuid(),
              spot ?? Spot.A,
              startAt ?? DateTimeOffset.UtcNow.AddDays(1).Date.AddHours(9),
-             repairTaskIds ?? [Guid.NewGuid()]
-           );
+             repairTaskIds ?? [Guid.NewGuid()]);
     }
 }

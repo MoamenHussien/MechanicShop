@@ -6,5 +6,4 @@ public sealed record EmployeeDetailDto(
     string LastName,
     string Email,
     List<string> Roles,
-    bool IsActive
-);
+    bool IsActive);

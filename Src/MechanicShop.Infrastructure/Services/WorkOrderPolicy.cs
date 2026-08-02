@@ -5,7 +5,8 @@ public class WorkOrderPolicy(AppDbContext context, IOptions<AppSettings> options
 {
     public async Task<Result<Success>> CheckSpotAvailabilityAsync(DateTimeOffset startAt, DateTimeOffset endAt, Spot spot, Guid? excludeWorkOrderId, CancellationToken ct)
     {
-        var isOccupied = await context.WorkOrders.AnyAsync(n =>
+        var isOccupied = await context.WorkOrders.AnyAsync(
+            n =>
                         n.Spot == spot &&
                         n.StartAtUtc < endAt &&
                         n.EndAtUtc > startAt &&
@@ -25,10 +26,10 @@ public class WorkOrderPolicy(AppDbContext context, IOptions<AppSettings> options
 
     public bool IsOutsideOperatingHours(DateTimeOffset startAt, TimeSpan duration)
     {
-        //Duration =2 hours                   // start at    9AM
+        // Duration =2 hours                   // start at    9AM
         var opening = startAt.Date.Add(options.Value.OpeningTime.ToTimeSpan());  //    8AM
         var closing = startAt.Date.Add(options.Value.ClosingTime.ToTimeSpan()); //    12AM
-        var endAt = startAt + duration;                               // 9 + 2         11Am     
+        var endAt = startAt + duration;                               // 9 + 2         11Am
         return startAt < opening || endAt > closing;
     }
 
@@ -45,7 +46,7 @@ public class WorkOrderPolicy(AppDbContext context, IOptions<AppSettings> options
     public Result<Success> ValidateMinimumRequirement(DateTimeOffset startAt, DateTimeOffset endAt)
     {
         var result = endAt - startAt;
-        if ((result) < TimeSpan.FromMinutes(options.Value.MinimumAppointmentDurationInMinutes))
+        if (result < TimeSpan.FromMinutes(options.Value.MinimumAppointmentDurationInMinutes))
         {
             return Error.Conflict(
                 "WorkOrder_TooShort",

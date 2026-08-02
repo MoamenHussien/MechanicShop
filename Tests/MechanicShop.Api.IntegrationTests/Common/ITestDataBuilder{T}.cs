@@ -1,4 +1,3 @@
-
 using System.Reflection;
 using MechanicShop.Tests.Common.Security;
 

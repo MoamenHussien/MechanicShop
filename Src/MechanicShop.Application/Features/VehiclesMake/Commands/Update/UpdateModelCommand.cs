@@ -12,4 +12,3 @@ public class UpdateModelCommandValidator : AbstractValidator<UpdateModelCommand>
         .WithMessage("You Must Enter Vehicle Model Name");
     }
 }
-

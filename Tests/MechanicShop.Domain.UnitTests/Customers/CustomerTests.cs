@@ -39,7 +39,6 @@ public class CustomerTests
     {
         // Act
         // var result = CustomerFactory.CreateCustomer(id: Guid.Empty);
-
         var result = Customer.Create(
             id: Guid.Empty,
             name: "Customer #1",
@@ -228,10 +227,12 @@ public class CustomerTests
         Assert.Equal(Result.Updated, result.Value);
         Assert.Equal(2, customer.vehicles.Count);
 
-        Assert.Contains(customer.vehicles,
+        Assert.Contains(
+            customer.vehicles,
             n => n.Id == updatedVehicle.Id && n.Year == 2025);
 
-        Assert.Contains(customer.vehicles,
+        Assert.Contains(
+            customer.vehicles,
             n => n.Id == newVehicle.Id);
     }
 

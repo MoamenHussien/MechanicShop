@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.VisualBasic;
+
 public class ApplicationDbContextInitializer(UserManager<AppUser> user, RoleManager<IdentityRole<Guid>> roleManager,
                                             AppDbContext context, ILogger<ApplicationDbContextInitializer> logger)
 {
@@ -13,7 +14,6 @@ public class ApplicationDbContextInitializer(UserManager<AppUser> user, RoleMana
         {
             // await context.Database.EnsureCreatedAsync();
             await context.Database.MigrateAsync();
-
         }
         catch (Exception ex)
         {
@@ -37,67 +37,66 @@ public class ApplicationDbContextInitializer(UserManager<AppUser> user, RoleMana
 
     private async Task TrySeedDataAsync()
     {
-        var ManagerRole = new IdentityRole<Guid>(Role.Manager.ToString());
-        if (!await roleManager.Roles.AnyAsync(n => n.Name == ManagerRole.Name))
+        var managerRole = new IdentityRole<Guid>(Role.Manager.ToString());
+        if (!await roleManager.Roles.AnyAsync(n => n.Name == managerRole.Name))
         {
-            await roleManager.CreateAsync(ManagerRole);
+            await roleManager.CreateAsync(managerRole);
         }
 
-        var LaborRole = new IdentityRole<Guid>(Role.Labor.ToString());
-        if (!await roleManager.Roles.AnyAsync(n => n.Name == LaborRole.Name))
+        var laborRole = new IdentityRole<Guid>(Role.Labor.ToString());
+        if (!await roleManager.Roles.AnyAsync(n => n.Name == laborRole.Name))
         {
-            await roleManager.CreateAsync(LaborRole);
+            await roleManager.CreateAsync(laborRole);
         }
 
-        var SystemManager = new AppUser
+        var systemManager = new AppUser
         {
             Id = "19a59129-6c20-417a-834d-11a208d32d96".ToGuid().Value,
             Email = "pm@localhost",
             UserName = "pm@localhost",
-            EmailConfirmed = true
+            EmailConfirmed = true,
         };
 
-        if (!await user.Users.AnyAsync(n => n.Email == SystemManager.Email))
+        if (!await user.Users.AnyAsync(n => n.Email == systemManager.Email))
         {
-            await user.CreateAsync(SystemManager, SystemManager.Email);
-            await user.AddToRolesAsync(SystemManager, [ManagerRole.Name!]);
+            await user.CreateAsync(systemManager, systemManager.Email);
+            await user.AddToRolesAsync(systemManager, [managerRole.Name!]);
         }
 
-        var Labor1 = new AppUser
+        var labor1 = new AppUser
         {
             Id = "b6327240-0aea-46fc-863a-777fc4e42560".ToGuid().Value,
             Email = "john.labor@localhost",
             UserName = "john.labor@localhost",
-            EmailConfirmed = true
+            EmailConfirmed = true,
         };
 
-        if (!await user.Users.AnyAsync(n => n.Email == Labor1.Email))
+        if (!await user.Users.AnyAsync(n => n.Email == labor1.Email))
         {
-            await user.CreateAsync(Labor1, Labor1.Email);
-            await user.AddToRolesAsync(Labor1, [LaborRole.Name!]);
+            await user.CreateAsync(labor1, labor1.Email);
+            await user.AddToRolesAsync(labor1, [laborRole.Name!]);
         }
 
-        var Labor2 = new AppUser
+        var labor2 = new AppUser
         {
             Id = "8104AB20-26C2-4651-B1DE-C0BAF04DBBD9".ToGuid().Value,
             Email = "peter.labor@localhost",
             UserName = "peter.labor@localhost",
-            EmailConfirmed = true
+            EmailConfirmed = true,
         };
 
-        if (!await user.Users.AnyAsync(n => n.Email == Labor2.Email))
+        if (!await user.Users.AnyAsync(n => n.Email == labor2.Email))
         {
-            await user.CreateAsync(Labor2, Labor2.Email);
-            await user.AddToRolesAsync(Labor2, [LaborRole.Name!]);
+            await user.CreateAsync(labor2, labor2.Email);
+            await user.AddToRolesAsync(labor2, [laborRole.Name!]);
         }
-
 
         if (!await context.Employees.AnyAsync())
         {
             await context.Employees.AddRangeAsync([
-                Employee.Create(SystemManager.Id, "Admin", "Manager").Value,
-                Employee.Create(Labor1.Id, "john", "M.").Value,
-                Employee.Create(Labor2.Id, "Peter", "R.").Value
+                Employee.Create(systemManager.Id, "Admin", "Manager").Value,
+                Employee.Create(labor1.Id, "john", "M.").Value,
+                Employee.Create(labor2.Id, "Peter", "R.").Value
             ]);
         }
 
@@ -140,12 +139,12 @@ public class ApplicationDbContextInitializer(UserManager<AppUser> user, RoleMana
         if (!context.Customers.Any())
         {
             List<Vehicle> vehiclesCustomer1 = [
-                        Vehicle.Create(id: Guid.Parse("61401e63-007b-4b1c-8914-9eb6e9bd95c5"), VehicleModelId:Guid.Parse("33333333-3333-3333-3333-444444444444") , Year: 2020, LicensePlate: "ABC123").Value,
-                        Vehicle.Create(id: Guid.Parse("13c80914-41ad-4d46-b7bb-60f6c89ad01e"), VehicleModelId:Guid.Parse("33333333-3333-3333-3333-444444444441") , Year: 2020, LicensePlate: "ABC321").Value,
+                        Vehicle.Create(id: Guid.Parse("61401e63-007b-4b1c-8914-9eb6e9bd95c5"), VehicleModelId: Guid.Parse("33333333-3333-3333-3333-444444444444"), Year: 2020, LicensePlate: "ABC123").Value,
+                        Vehicle.Create(id: Guid.Parse("13c80914-41ad-4d46-b7bb-60f6c89ad01e"), VehicleModelId: Guid.Parse("33333333-3333-3333-3333-444444444441"), Year: 2020, LicensePlate: "ABC321").Value,
                     ];
             List<Vehicle> vehiclesCustomer2 = [
-                        Vehicle.Create(id: Guid.Parse("a04f329d-0f5a-46a0-beae-699c034ae401"), VehicleModelId:Guid.Parse("11111111-1111-1111-1111-222222222221") , Year: 2021, LicensePlate: "DEF789").Value,
-                        Vehicle.Create(id: Guid.Parse("cf60e95b-5752-4c26-aa07-31a34164606c"), VehicleModelId:Guid.Parse("eeeeeeee-eeee-eeee-eeee-fffffffffff1") , Year: 2019, LicensePlate: "GHI012").Value,
+                        Vehicle.Create(id: Guid.Parse("a04f329d-0f5a-46a0-beae-699c034ae401"), VehicleModelId: Guid.Parse("11111111-1111-1111-1111-222222222221"), Year: 2021, LicensePlate: "DEF789").Value,
+                        Vehicle.Create(id: Guid.Parse("cf60e95b-5752-4c26-aa07-31a34164606c"), VehicleModelId: Guid.Parse("eeeeeeee-eeee-eeee-eeee-fffffffffff1"), Year: 2019, LicensePlate: "GHI012").Value,
                     ];
 
             context.Customers.AddRange(
@@ -154,7 +153,6 @@ public class ApplicationDbContextInitializer(UserManager<AppUser> user, RoleMana
                 Customer.Create(id: Guid.Parse("73a04dd3-c81a-4a54-9882-ef1017eb192d"), name: "Sarah Peter", phone: "987654321", email: "sarah.peter@localhost", vehicles: vehiclesCustomer2).Value,
             ]);
         }
-
 
         await context.SaveChangesAsync();
     }
@@ -172,4 +170,3 @@ public static class InitialiserExtensions
         }
     }
 }
-

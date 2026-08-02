@@ -1,8 +1,7 @@
-using MediatR;
-using MechanicShop.Application.Features.Labors.DTOs;
-using Microsoft.Extensions.Logging;
-
 using MechanicShop.Application.Common.Constants;
+using MechanicShop.Application.Features.Labors.DTOs;
+using MediatR;
+using Microsoft.Extensions.Logging;
 
 namespace MechanicShop.Application.Features.Labors.Queries;
 

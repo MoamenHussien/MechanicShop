@@ -10,7 +10,7 @@ public static class InvoiceMapper
             Description = item.Description,
             Quantity = item.Quantity,
             UnitPrice = item.UnitPrice,
-            LineTotal = item.LineTotal
+            LineTotal = item.LineTotal,
         };
 
     public static readonly Expression<Func<Invoice, InvoiceDto>> InvoiceProjection =
@@ -33,7 +33,7 @@ public static class InvoiceMapper
                 Name = invoice.WorkOrder.Vehicle.Customer.Name,
                 Email = invoice.WorkOrder.Vehicle.Customer.Email,
                 PhoneNumber = invoice.WorkOrder.Vehicle.Customer.PhoneNumber,
-                Vehicles = new List<VehicleDto>()
+                Vehicles = new List<VehicleDto>(),
             },
 
             DiscountAmount = invoice.DiscountAmount,
@@ -52,7 +52,7 @@ public static class InvoiceMapper
                     UnitPrice = item.UnitPrice,
                     LineTotal = item.LineTotal
                 })
-                .ToList()
+                .ToList(),
         };
 
     public static InvoiceLineItemDto ToDto(this InvoiceLineItem invoiceLine)
@@ -66,7 +66,7 @@ public static class InvoiceMapper
             Description = invoiceLine.Description,
             Quantity = invoiceLine.Quantity,
             UnitPrice = invoiceLine.UnitPrice,
-            LineTotal = invoiceLine.LineTotal
+            LineTotal = invoiceLine.LineTotal,
         };
     }
 
@@ -91,7 +91,7 @@ public static class InvoiceMapper
             TaxAmount = invoice.TaxAmount,
             Total = invoice.Total,
             PaymentStatus = invoice.Status.ToString(),
-            Items = invoice.InvoiceLineItems.ToDto()
+            Items = invoice.InvoiceLineItems.ToDto(),
         };
     }
 

@@ -1,5 +1,3 @@
-
-
 using MechanicShop.Application.SubcutaneousTests.Common;
 using MechanicShop.Tests.Common.Customers;
 using MechanicShop.Tests.Common.Employees;
@@ -121,8 +119,6 @@ public class CreateWorkOrderCommandHandlerTests(WebAppFactory factory)
         Assert.Equal(ApplicationErrors.NotFoundAnyRepairTasks.Code, result.TopError.Code);
     }
 
-
-
     [Fact]
     public async Task CreateWorkOrderHandler_WithOutsideOperatingHours_ShouldFail()
     {
@@ -140,7 +136,6 @@ public class CreateWorkOrderCommandHandlerTests(WebAppFactory factory)
             ]).Value;
 
         var vehicle = customer.vehicles.First();
-
 
         var employee = EmployeeFactory.CreateEmployee().Value;
 
@@ -167,9 +162,6 @@ public class CreateWorkOrderCommandHandlerTests(WebAppFactory factory)
         Assert.True(result.IsError);
     }
 
-
-
-
     [Fact]
     public async Task CreateWorkOrderHandler_WithShortDuration_ShouldFail()
     {
@@ -180,7 +172,6 @@ public class CreateWorkOrderCommandHandlerTests(WebAppFactory factory)
         await _context.VehicleMakes.AddAsync(vehicleMake);
         await _context.RepairTasks.AddAsync(repairTask);
 
-
         var customer = CustomerFactory.CreateCustomer(
             vehicles:
             [
@@ -188,8 +179,6 @@ public class CreateWorkOrderCommandHandlerTests(WebAppFactory factory)
             ]).Value;
 
         var vehicle = customer.vehicles.First();
-
-
 
         var employee = EmployeeFactory.CreateEmployee().Value;
 
@@ -216,10 +205,6 @@ public class CreateWorkOrderCommandHandlerTests(WebAppFactory factory)
         Assert.True(result.IsError);
         Assert.Contains(result.Errors, e => e.Code == "WorkOrder_TooShort");
     }
-
-
-
-
 
     [Fact]
     public async Task CreateWorkOrderHandler_WithMissingVehicle_ShouldFail()
@@ -248,8 +233,6 @@ public class CreateWorkOrderCommandHandlerTests(WebAppFactory factory)
         // Assert
         Assert.True(result.IsError);
     }
-
-
 
     [Fact]
     public async Task CreateWorkOrderHandler_WithMissingLabor_ShouldFail()
@@ -286,8 +269,6 @@ public class CreateWorkOrderCommandHandlerTests(WebAppFactory factory)
         // Assert
         Assert.True(result.IsError);
     }
-
-
 
     [Fact]
     public async Task CreateWorkOrderHandler_WithVehicleConflict_ShouldFail()
@@ -339,7 +320,6 @@ public class CreateWorkOrderCommandHandlerTests(WebAppFactory factory)
         Assert.True(result.IsError);
         Assert.Equal(ApplicationErrors.VehicleSchedulingConflict.Code, result.TopError.Code);
     }
-
 
     [Fact]
     public async Task CreateWorkOrderHandler_WithLaborConflict_ShouldFail()
@@ -397,8 +377,6 @@ public class CreateWorkOrderCommandHandlerTests(WebAppFactory factory)
         Assert.True(result.IsError);
         Assert.Equal(ApplicationErrors.ThisLaborHasAnotherWorkOrderAtThisRangeTime.Code, result.TopError.Code);
     }
-
-
 
     [Fact]
     public async Task CreateWorkOrderHandler_WithUnavailableSpot_ShouldFail()
@@ -466,4 +444,3 @@ public class CreateWorkOrderCommandHandlerTests(WebAppFactory factory)
             result.TopError.Code);
     }
 }
-

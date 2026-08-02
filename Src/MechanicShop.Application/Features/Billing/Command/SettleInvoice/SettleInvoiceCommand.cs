@@ -1,9 +1,9 @@
 using FluentValidation;
+using MechanicShop.Application.Common.Constants;
+using MechanicShop.Application.Common.Interfaces;
 using MediatR;
 using Microsoft.Extensions.Caching.Hybrid;
 using Microsoft.Extensions.Logging;
-using MechanicShop.Application.Common.Constants;
-using MechanicShop.Application.Common.Interfaces;
 
 public sealed record SettleInvoiceCommand(Guid InvoiceId) : IRequest<Result<Success>>;
 
@@ -14,8 +14,6 @@ public class SettleInvoiceCommandValidator : AbstractValidator<SettleInvoiceComm
         RuleFor(n => n.InvoiceId).IdRequired("Invoice");
     }
 }
-
-
 
 public class SettleInvoiceCommandHandler(ILogger<SettleInvoiceCommandHandler> logger, TimeProvider time, IAppDbContext context, ICacheInvalidator cacheInvalidator)
 : IRequestHandler<SettleInvoiceCommand, Result<Success>>

@@ -4,9 +4,13 @@ using System.Net.Http.Headers;
 public sealed class VehicleModel : Entity
 {
     public string Model { get; private set; }
+
     public VehicleMake VehicleMake { get; init; } = null!;
+
     public Guid VehicleMakeId { get; init; }
+
     private readonly List<Vehicle> _vehicles = [];
+
     public IReadOnlyList<Vehicle> Vehicles => _vehicles;
 
 #pragma warning disable CS8618
@@ -16,7 +20,8 @@ public sealed class VehicleModel : Entity
 
 #pragma warning restore CS8618
 
-    private VehicleModel(Guid id, string Model) : base(id)
+    private VehicleModel(Guid id, string Model)
+        : base(id)
     {
         this.Model = Model;
     }
@@ -42,6 +47,7 @@ public sealed class VehicleModel : Entity
         {
             return vehicleModelsErrors.ModelRequired;
         }
+
         this.Model = model.CapitalizeFirstLetter();
 
         return Result.Updated;
@@ -52,9 +58,4 @@ public sealed class VehicleModel : Entity
         Model = model;
         VehicleMake.Load(make);
     }
-
 }
-
-
-
-

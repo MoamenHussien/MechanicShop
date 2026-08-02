@@ -6,6 +6,7 @@ namespace MechanicShop.Contracts.Requests.Labors;
 public class UpdateLaborPermissionsRequest
 {
     public List<string> Roles { get; set; } = null!;
+
     public List<Claim>? Claims { get; set; }
 }
 

@@ -14,7 +14,7 @@ public static class UIHelper
             WorkOrderState.InProgress => (MarkupString)"<span class='badge mx-1 text-secondary'><i class='bi bi-tools'></i> InProgress</span>",
             WorkOrderState.Completed => (MarkupString)"<span class='badge mx-1 text-success'><i class='bi bi-check-all'></i> Completed</span>",
             WorkOrderState.Cancelled => (MarkupString)"<span class='badge mx-1 text-danger'><i class='bi bi-x-circle'></i> Cancelled</span>",
-            _ => (MarkupString)"<span class='badge mx-1 bg-secondary'><i class='bi bi-question-circle'></i> Unknown</span>"
+            _ => (MarkupString)"<span class='badge mx-1 bg-secondary'><i class='bi bi-question-circle'></i> Unknown</span>",
         };
     }
 
@@ -32,7 +32,7 @@ public static class UIHelper
             "Engine Diagnostic" => (MarkupString)"<span class='badge mx-1 text-bg-info'><i class='bi bi-cpu'></i> Engine Diagnostic</span>",
             "Timing Belt Replacement" => (MarkupString)"<span class='badge mx-1 text-bg-primary'><i class='bi bi-gear'></i> Timing Belt Replacement</span>",
             "Transmission Fluid Change" => (MarkupString)"<span class='badge mx-1 text-bg-danger'><i class='bi bi-droplet-half'></i> Transmission Fluid Change</span>",
-            _ => (MarkupString)"<span class='badge mx-1 text-bg-secondary'><i class='bi bi-question-circle'></i> Other Service</span>"
+            _ => (MarkupString)"<span class='badge mx-1 text-bg-secondary'><i class='bi bi-question-circle'></i> Other Service</span>",
         };
     }
 

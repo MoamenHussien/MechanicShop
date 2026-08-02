@@ -3,10 +3,15 @@ namespace MechanicShop.Client.Services
     public class ApiResult<T>
     {
         public bool IsSuccess { get; set; }
+
         public T? Data { get; set; }
+
         public string? ErrorMessage { get; set; }
+
         public string? ErrorDetail { get; set; }
+
         public int StatusCode { get; set; }
+
         public Dictionary<string, string[]>? ValidationErrors { get; set; }
 
         public string? FirstErrorMessage =>
@@ -17,7 +22,7 @@ namespace MechanicShop.Client.Services
             return new ApiResult<T>
             {
                 IsSuccess = true,
-                Data = data
+                Data = data,
             };
         }
 
@@ -29,7 +34,7 @@ namespace MechanicShop.Client.Services
                 ErrorMessage = message,
                 ErrorDetail = detail,
                 StatusCode = statusCode,
-                ValidationErrors = validationErrors
+                ValidationErrors = validationErrors,
             };
         }
     }
@@ -40,7 +45,7 @@ namespace MechanicShop.Client.Services
         {
             return new ApiResult
             {
-                IsSuccess = true
+                IsSuccess = true,
             };
         }
 
@@ -52,7 +57,7 @@ namespace MechanicShop.Client.Services
                 ErrorMessage = message,
                 ErrorDetail = detail,
                 StatusCode = statusCode,
-                ValidationErrors = validationErrors
+                ValidationErrors = validationErrors,
             };
         }
     }

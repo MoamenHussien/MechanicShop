@@ -1,9 +1,7 @@
-using MediatR;
 using FluentValidation;
-
+using MediatR;
 
 public sealed record CreateVehicleModelCommand(string model) : IRequest<Result<VehicleModelDto>>;
-
 
 public class CreateVehicleModelCommandValidator : AbstractValidator<CreateVehicleModelCommand>
 {

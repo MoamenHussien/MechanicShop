@@ -652,7 +652,7 @@ public class ServiceApi(IHttpClientFactory httpClientFactory, TimeZoneService ti
       {
           HttpRequestException => ApiResult<T>.Failure($"Network error occurred. {message}"),
           TaskCanceledException => ApiResult<T>.Failure($"Request timed out. {message}"),
-          _ => ApiResult<T>.Failure($"An unexpected error occurred. {message}")
+          _ => ApiResult<T>.Failure($"An unexpected error occurred. {message}"),
       });
 
     private static Task<ApiResult> HandleExceptionAsync(Exception ex, string message) =>
@@ -677,7 +677,7 @@ public class ServiceApi(IHttpClientFactory httpClientFactory, TimeZoneService ti
             HttpStatusCode.BadGateway => "Service temporarily unavailable. Please try again later.",
             HttpStatusCode.ServiceUnavailable => "Service temporarily unavailable. Please try again later.",
             HttpStatusCode.GatewayTimeout => "The request timed out. Please try again.",
-            _ => "An error occurred while processing your request."
+            _ => "An error occurred while processing your request.",
         };
     }
 
@@ -686,7 +686,7 @@ public class ServiceApi(IHttpClientFactory httpClientFactory, TimeZoneService ti
         var queryParams = new List<string>
         {
             $"page={pageRequest.Page}",
-            $"pageSize={pageRequest.PageSize}"
+            $"pageSize={pageRequest.PageSize}",
         };
 
         if (!string.IsNullOrWhiteSpace(filterRequest.SearchTerm))
@@ -760,7 +760,7 @@ public class ServiceApi(IHttpClientFactory httpClientFactory, TimeZoneService ti
                 var models = dtos?.Select(dto => new VehicleMakeModel
                 {
                     MakeId = dto.MakeId,
-                    VehicleMake = dto.VehicleMake
+                    VehicleMake = dto.VehicleMake,
                 }).ToList() ?? [];
 
                 return ApiResult<List<VehicleMakeModel>>.Success(models);
@@ -786,7 +786,7 @@ public class ServiceApi(IHttpClientFactory httpClientFactory, TimeZoneService ti
                 var models = dtos?.Select(dto => new VehicleModelItemModel
                 {
                     ModelId = dto.Id,
-                    Model = dto.Model
+                    Model = dto.Model,
                 }).ToList() ?? [];
 
                 return ApiResult<List<VehicleModelItemModel>>.Success(models);
@@ -800,8 +800,9 @@ public class ServiceApi(IHttpClientFactory httpClientFactory, TimeZoneService ti
         }
     }
 
-    private record VehicleMakeResponseDto(Guid MakeId, string VehicleMake);
-    private record VehicleModelResponseDto(Guid Id, string Model);
+    private sealed record VehicleMakeResponseDto(Guid MakeId, string VehicleMake);
+
+    private sealed record VehicleModelResponseDto(Guid Id, string Model);
 
     public async Task<ApiResult<Guid>> CreateVehicleMakeAsync(string make, List<string> models)
     {
@@ -810,7 +811,7 @@ public class ServiceApi(IHttpClientFactory httpClientFactory, TimeZoneService ti
             var request = new CreateMakeRequest
             {
                 Make = make,
-                Models = models.Select(m => new CreateModelRequest { Model = m }).ToList()
+                Models = models.Select(m => new CreateModelRequest { Model = m }).ToList(),
             };
 
             var response = await _httpClient.PostAsJsonAsync("api/v1/makes", request);
@@ -836,7 +837,7 @@ public class ServiceApi(IHttpClientFactory httpClientFactory, TimeZoneService ti
             var request = new UpdateMakeRequest
             {
                 Make = make,
-                Models = models.Select(m => new UpdateModelRequest { ModelId = m.ModelId, Model = m.Model }).ToList()
+                Models = models.Select(m => new UpdateModelRequest { ModelId = m.ModelId, Model = m.Model }).ToList(),
             };
 
             var response = await _httpClient.PutAsJsonAsync($"api/v1/makes/{makeId}", request);
@@ -986,7 +987,7 @@ public class ServiceApi(IHttpClientFactory httpClientFactory, TimeZoneService ti
                     LastName = dto.LastName,
                     Email = dto.Email,
                     Roles = dto.Roles ?? [],
-                    IsActive = dto.IsActive
+                    IsActive = dto.IsActive,
                 }).ToList() ?? [];
 
                 return ApiResult<List<EmployeeModel>>.Success(models);

@@ -19,8 +19,7 @@ public class CreateRepairTaskPartCommandValidatorTests
         return new CreateRepairTaskPartCommand(
             name ?? "Valid Part Name",
             cost ?? 100m,
-            quantity ?? 1
-        );
+            quantity ?? 1);
     }
 
     [Fact]

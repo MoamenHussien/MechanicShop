@@ -23,8 +23,7 @@ public class UpdateCustomerCommandValidatorTests
             name ?? "Valid Name",
             email ?? "valid@example.com",
             phoneNumber ?? "+201012345678",
-            vehicles ?? [new UpdateVehicleCommand(Guid.NewGuid(), 2020, "ABC-123", Guid.NewGuid())]
-        );
+            vehicles ?? [new UpdateVehicleCommand(Guid.NewGuid(), 2020, "ABC-123", Guid.NewGuid())]);
     }
 
     [Fact]

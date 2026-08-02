@@ -8,20 +8,20 @@ public class VehicleMakeTests
     public void CreateVehicleMake_ShouldSucceed_WithValidData()
     {
         // Arrange
-        Guid Id = Guid.NewGuid();
+        Guid id = Guid.NewGuid();
         string make = "Make-#1";
-        List<VehicleModel> VehicleModels = [VehicleModelFactory.CreateVehiclModel().Value];
+        List<VehicleModel> vehicleModels = [VehicleModelFactory.CreateVehiclModel().Value];
 
         // Act
-        var result = VehicleMakeFactory.CreateVehicleMake(Id, make, VehicleModels);
+        var result = VehicleMakeFactory.CreateVehicleMake(id, make, vehicleModels);
 
         // Assert
         Assert.True(result.IsSuccess);
         var vehicleMake = result.Value;
-        Assert.Equal(Id, vehicleMake.Id);
+        Assert.Equal(id, vehicleMake.Id);
         Assert.Equal(make, vehicleMake.Make);
         Assert.Single(vehicleMake.VehicleModels);
-        Assert.Equal(VehicleModels[0].Id, vehicleMake.VehicleModels[0].Id);
+        Assert.Equal(vehicleModels[0].Id, vehicleMake.VehicleModels[0].Id);
     }
 
     [Fact]
@@ -30,13 +30,10 @@ public class VehicleMakeTests
         // Act
         var result = VehicleMake.Create(Guid.Empty, $"Make-{Guid.NewGuid().ToString().Substring(0, 8)}", [VehicleModelFactory.CreateVehiclModel().Value]);
 
-
         // Assert
         Assert.True(result.IsSuccess);
         Assert.NotEqual(Guid.Empty, result.Value.Id);
     }
-
-
 
     [Theory]
     [InlineData("")]
@@ -60,7 +57,6 @@ public class VehicleMakeTests
         // Act
         var result = VehicleMake.Create(Guid.NewGuid(), $"Make-{Guid.NewGuid().ToString().Substring(0, 8)}", models!);
 
-
         // Assert
         Assert.True(result.IsError);
         Assert.Equal(VehicleMakeErrors.ModelRequired.Code, result.TopError.Code);
@@ -71,14 +67,12 @@ public class VehicleMakeTests
     {
         // Act
         var result = VehicleMakeFactory.CreateVehicleMake(
-            _vehicleModels: []
-        );
+            _vehicleModels: []);
 
         // Assert
         Assert.True(result.IsError);
         Assert.Equal(VehicleMakeErrors.ModelRequired.Code, result.TopError.Code);
     }
-
 
     [Fact]
     public void UpdateVehicleMake_ShouldUpdateMake_WhenInputIsValid()
@@ -115,21 +109,20 @@ public class VehicleMakeTests
     {
         // Arrange
         var olderModel = VehicleModelFactory.CreateVehiclModel(model: "M3").Value;
-        var Make = VehicleMakeFactory.CreateVehicleMake(Make: "BMW", _vehicleModels: [olderModel]).Value;
+        var make = VehicleMakeFactory.CreateVehicleMake(Make: "BMW", _vehicleModels: [olderModel]).Value;
 
-        var UpdatedOlderModel = VehicleModelFactory.CreateVehiclModel(olderModel.Id, "M4").Value;
-        var NewModel = VehicleModelFactory.CreateVehiclModel(model: "M5").Value;
+        var updatedOlderModel = VehicleModelFactory.CreateVehiclModel(olderModel.Id, "M4").Value;
+        var newModel = VehicleModelFactory.CreateVehiclModel(model: "M5").Value;
 
         // Act
-
-        var resultofupdated = Make.UpSertModels([UpdatedOlderModel, NewModel]);
+        var resultofupdated = make.UpSertModels([updatedOlderModel, newModel]);
 
         // Assert
         Assert.True(resultofupdated.IsSuccess);
-        Assert.Equal(2, Make.VehicleModels.Count);
+        Assert.Equal(2, make.VehicleModels.Count);
         Assert.Equal(Result.Updated, resultofupdated.Value);
-        Assert.Contains(Make.VehicleModels, n => n.Id == UpdatedOlderModel.Id && n.Model == "M4");
-        Assert.Contains(Make.VehicleModels, n => n.Id == NewModel.Id && n.Model == "M5");
+        Assert.Contains(make.VehicleModels, n => n.Id == updatedOlderModel.Id && n.Model == "M4");
+        Assert.Contains(make.VehicleModels, n => n.Id == newModel.Id && n.Model == "M5");
     }
 
     [Fact]
@@ -144,5 +137,4 @@ public class VehicleMakeTests
         Assert.True(result.IsError);
         Assert.Equal(VehicleMakeErrors.ModelRequired.Code, result.TopError.Code);
     }
-
 }

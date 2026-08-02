@@ -12,7 +12,10 @@ public sealed class CacheInvalidator(
 {
     public async Task EvictByTagAsync(string tag, CancellationToken cancellationToken = default)
     {
-        if (string.IsNullOrWhiteSpace(tag)) return;
+        if (string.IsNullOrWhiteSpace(tag))
+        {
+            return;
+        }
 
         logger.LogInformation("🗑️  HybridCache & OutputCache EVICT - Cache tag '{Tag}' evicted successfully.", tag);
 
@@ -27,7 +30,10 @@ public sealed class CacheInvalidator(
 
     public async Task EvictByTagsAsync(CancellationToken cancellationToken, params string[] tags)
     {
-        if (tags is null || tags.Length == 0) return;
+        if (tags is null || tags.Length == 0)
+        {
+            return;
+        }
 
         foreach (var tag in tags)
         {

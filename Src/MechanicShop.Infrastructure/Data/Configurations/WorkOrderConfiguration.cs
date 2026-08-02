@@ -24,6 +24,5 @@ public class WorkOrderConfiguration : IEntityTypeConfiguration<WorkOrder>
         builder.Ignore(w => w.TotalPartsCost);
         builder.Ignore(n => n.IsDeletable);
         builder.Ignore(n => n.IsEditable);
-
     }
 }

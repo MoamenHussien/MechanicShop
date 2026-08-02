@@ -1,7 +1,6 @@
-using MechanicShop.Client;
 using MechanicShop.Api.Components;
+using MechanicShop.Client;
 using Scalar.AspNetCore;
-
 using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -15,10 +14,7 @@ builder.Services
     .AddApplication()
     .AddInfrastructure(builder.Configuration);
 
-
 builder.Host.AddSerilogLogging();
-
-
 
 var app = builder.Build();
 

@@ -48,7 +48,7 @@ public class TokenProvider(IOptions<JwtSettings> JwtConfigSettings, IAppDbContex
                 ValidateAudience = true,
                 ValidAudience = JwtConfigSettings.Value.Audience,
                 ValidateLifetime = false,
-                ClockSkew = TimeSpan.Zero
+                ClockSkew = TimeSpan.Zero,
             };
 
             var tokenHandler = new JwtSecurityTokenHandler();
@@ -89,8 +89,8 @@ public class TokenProvider(IOptions<JwtSettings> JwtConfigSettings, IAppDbContex
         var claims = new List<Claim>
         {
             new(ClaimTypes.NameIdentifier, user.UserId.ToString()),
-            new (JwtRegisteredClaimNames.Sub, user.UserId.ToString()),
-            new (JwtRegisteredClaimNames.Email, user.Email!),
+            new(JwtRegisteredClaimNames.Sub, user.UserId.ToString()),
+            new(JwtRegisteredClaimNames.Email, user.Email!),
         };
 
         foreach (var role in user.Roles)
@@ -144,7 +144,7 @@ public class TokenProvider(IOptions<JwtSettings> JwtConfigSettings, IAppDbContex
                 HttpOnly = true,
                 Secure = true,
                 SameSite = SameSiteMode.Strict,
-                Expires = DateTimeOffset.UtcNow.AddDays(7)
+                Expires = DateTimeOffset.UtcNow.AddDays(7),
             };
 
             httpContext.Response.Cookies.Append("RefreshToken", refreshToken.Token, cookieOptions);
@@ -154,7 +154,7 @@ public class TokenProvider(IOptions<JwtSettings> JwtConfigSettings, IAppDbContex
         {
             AccessToken = tokenHandler.WriteToken(securityToken),
             RefreshToken = null,
-            ExpiresOnUtc = expires
+            ExpiresOnUtc = expires,
         };
     }
 

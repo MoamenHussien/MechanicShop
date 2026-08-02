@@ -21,8 +21,7 @@ public class RegisterLaborCommandHandlerTests(WebAppFactory factory)
             FirstName: "John",
             LastName: "Doe",
             Roles: ["Labor"],
-            Claims: []
-        );
+            Claims: []);
 
         // Act
         var result = await _mediator.Send(command);

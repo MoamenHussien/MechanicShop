@@ -37,12 +37,14 @@ public class AuditableEntityInterceptor(IUser user, TimeProvider time) : SaveCha
                     entry.Entity.CreatedBy = userId;
                     entry.Entity.CreatedAtUtc = now;
                 }
+
                 entry.Entity.LastModifiedBy = userId;
                 entry.Entity.LastModifiedUtc = now;
             }
         }
     }
 }
+
 public static class Extensions
 {
     public static bool HasChangedOwnedEntities(this EntityEntry entry) =>

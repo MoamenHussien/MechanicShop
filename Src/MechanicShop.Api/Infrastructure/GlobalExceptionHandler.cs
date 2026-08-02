@@ -1,7 +1,6 @@
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 
-
 public class GlobalExceptionHandler(IProblemDetailsService problemDetailsService) : IExceptionHandler
 {
     public async ValueTask<bool> TryHandleAsync(
@@ -20,7 +19,7 @@ public class GlobalExceptionHandler(IProblemDetailsService problemDetailsService
                 Type = exception.GetType().Name,
                 Title = "Application error",
                 Detail = exception.Message,
-            }
+            },
         });
     }
 }

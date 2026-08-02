@@ -39,8 +39,7 @@ public class GetDailyScheduleQueryHandlerTests(WebAppFactory factory)
             startAt: DateTimeOffset.UtcNow.AddDays(1),
             endAt: DateTimeOffset.UtcNow.AddDays(1).AddHours(1),
             spot: Spot.A,
-            repairTasks: [repairTask]
-        ).Value;
+            repairTasks: [repairTask]).Value;
 
         await _context.WorkOrders.AddAsync(workOrder);
         await _context.SaveChangesAsync(default);

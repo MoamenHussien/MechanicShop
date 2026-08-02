@@ -3,6 +3,7 @@ using FluentValidation;
 public class CreateMakeRequest
 {
     public string Make { get; set; } = string.Empty;
+
     public List<CreateModelRequest> Models { get; set; } = [];
 }
 

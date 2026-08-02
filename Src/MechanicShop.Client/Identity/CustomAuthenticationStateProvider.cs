@@ -19,7 +19,7 @@ public class CustomAuthenticationStateProvider(
 
     private readonly IHttpClientFactory _httpClientFactory = httpClientFactory;
 
-    private bool authenticated = false;
+    private bool authenticated;
 
     public async Task<FormResult> LoginAsync(string email, string password)
     {
@@ -30,7 +30,7 @@ public class CustomAuthenticationStateProvider(
                 "identity/token/generate", new
                 {
                     email,
-                    password
+                    password,
                 });
 
             if (result.IsSuccessStatusCode)
@@ -51,7 +51,7 @@ public class CustomAuthenticationStateProvider(
         return new FormResult
         {
             Succeeded = false,
-            ErrorList = ["Invalid email and/or password."]
+            ErrorList = ["Invalid email and/or password."],
         };
     }
 
@@ -88,9 +88,9 @@ public class CustomAuthenticationStateProvider(
                 // in this example app, name and email are the same
                 List<Claim> claims =
                 [
-                    new (ClaimTypes.Name, userInfo.Email),
-                    new (ClaimTypes.NameIdentifier, userInfo.UserId),
-                    new (ClaimTypes.Email, userInfo.Email),
+                    new(ClaimTypes.Name, userInfo.Email),
+                    new(ClaimTypes.NameIdentifier, userInfo.UserId),
+                    new(ClaimTypes.Email, userInfo.Email),
                 ];
 
                 foreach (var role in userInfo.Roles)
@@ -152,7 +152,7 @@ public class CustomAuthenticationStateProvider(
         var httpClient = _httpClientFactory.CreateClient("MechanicShopClient");
         var refreshResponse = await httpClient.PostAsJsonAsync("identity/token/refresh-token", new
         {
-            ExpiredAccessToken = authResult.AccessToken
+            ExpiredAccessToken = authResult.AccessToken,
         });
 
         if (!refreshResponse.IsSuccessStatusCode)

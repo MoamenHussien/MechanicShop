@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.OpenApi;
 using Microsoft.OpenApi;
+
 public sealed class VersionInfoTransformer : IOpenApiDocumentTransformer
 {
     public Task TransformAsync(OpenApiDocument document, OpenApiDocumentTransformerContext context, CancellationToken cancellationToken)
@@ -12,4 +13,3 @@ public sealed class VersionInfoTransformer : IOpenApiDocumentTransformer
         return Task.CompletedTask;
     }
 }
-

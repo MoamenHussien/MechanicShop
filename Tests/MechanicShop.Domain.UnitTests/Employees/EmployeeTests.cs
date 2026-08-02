@@ -50,7 +50,6 @@ public class EmployeeTests
         // Act
         var result = Employee.Create(id: Guid.Empty, FirstName: value!, LastName: "Doe");
 
-
         // Assert
         Assert.True(result.IsError);
         Assert.Equal(EmployeeErrors.FirstNameRequired.Code, result.TopError.Code);

@@ -12,7 +12,6 @@ public class OverdueBookingCleanupService
 {
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
-
         using (var timer = new PeriodicTimer(TimeSpan.FromMinutes(settings.Value.OverdueBookingCleanupFrequencyMinutes)))
         {
             while (await timer.WaitForNextTickAsync(stoppingToken))
@@ -26,12 +25,12 @@ public class OverdueBookingCleanupService
 
                         var cutoff = time.GetUtcNow().AddMinutes(-settings.Value.BookingCancellationThresholdMinutes);
 
-                        var WorkOrders = await db.WorkOrders.Where(n => n.State == WorkOrderState.Scheduled && n.StartAtUtc <= cutoff)
+                        var workOrders = await db.WorkOrders.Where(n => n.State == WorkOrderState.Scheduled && n.StartAtUtc <= cutoff)
                                                             .ToListAsync(stoppingToken);
 
-                        if (WorkOrders.Any())
+                        if (workOrders.Any())
                         {
-                            foreach (var order in WorkOrders)
+                            foreach (var order in workOrders)
                             {
                                 var result = order.MarkAsCancelled();
                                 if (result.IsError)
@@ -41,7 +40,7 @@ public class OverdueBookingCleanupService
                             }
 
                             await db.SaveChangesAsync(stoppingToken);
-                            logger.LogInformation("Cancelled {Count} overdue work orders: {@Ids}", WorkOrders.Count, WorkOrders.Select(w => w.Id));
+                            logger.LogInformation("Cancelled {Count} overdue work orders: {@Ids}", workOrders.Count, workOrders.Select(w => w.Id));
                         }
                         else
                         {

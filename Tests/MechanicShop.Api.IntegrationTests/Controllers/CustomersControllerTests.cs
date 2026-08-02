@@ -18,7 +18,6 @@ public class CustomersControllerTests(WebAppFactory webAppFactory)
     // ========================================================================
     // GET /api/v1.0/customers
     // ========================================================================
-
     [Fact]
     public async Task GetCustomers_WithValidRequest_ShouldReturnOk()
     {
@@ -46,7 +45,6 @@ public class CustomersControllerTests(WebAppFactory webAppFactory)
     // ========================================================================
     // GET /api/v1.0/customers/{customerId}
     // ========================================================================
-
     [Fact]
     public async Task GetCustomerById_WithValidId_ShouldReturnOk()
     {
@@ -95,7 +93,6 @@ public class CustomersControllerTests(WebAppFactory webAppFactory)
     // ========================================================================
     // POST /api/v1.0/customers
     // ========================================================================
-
     [Fact]
     public async Task CreateCustomer_WithValidRequest_ShouldReturnCreated()
     {
@@ -118,7 +115,7 @@ public class CustomersControllerTests(WebAppFactory webAppFactory)
                     Year = 2024,
                     LicensePlate = "TST123"
                 }
-            ]
+            ],
         };
 
         CustomerDto? dto = null;
@@ -156,10 +153,10 @@ public class CustomersControllerTests(WebAppFactory webAppFactory)
 
         var request = new CreateCustomerRequest
         {
-            Name = "",
-            Email = "",
-            PhoneNumber = "",
-            Vehicles = []
+            Name = string.Empty,
+            Email = string.Empty,
+            PhoneNumber = string.Empty,
+            Vehicles = [],
         };
 
         var response = await _client.PostAsJsonAsync("/api/v1.0/customers", request);
@@ -187,7 +184,7 @@ public class CustomersControllerTests(WebAppFactory webAppFactory)
                     Year = 2024,
                     LicensePlate = "TST123"
                 }
-            ]
+            ],
         };
 
         var response = await _client.PostAsJsonAsync("/api/v1.0/customers", request);
@@ -215,7 +212,7 @@ public class CustomersControllerTests(WebAppFactory webAppFactory)
                     Year = 2024,
                     LicensePlate = "TST123"
                 }
-            ]
+            ],
         };
 
         var response = await _client.PostAsJsonAsync("/api/v1.0/customers", request);
@@ -235,7 +232,7 @@ public class CustomersControllerTests(WebAppFactory webAppFactory)
             Name = "Test Customer",
             Email = "test@localhost",
             PhoneNumber = "+201012345678",
-            Vehicles = []
+            Vehicles = [],
         };
 
         var response = await _client.PostAsJsonAsync("/api/v1.0/customers", request);
@@ -267,7 +264,7 @@ public class CustomersControllerTests(WebAppFactory webAppFactory)
                     Year = 2024,
                     LicensePlate = "DUP123"
                 }
-            ]
+            ],
         };
 
         var response = await _client.PostAsJsonAsync("/api/v1.0/customers", request);
@@ -295,7 +292,7 @@ public class CustomersControllerTests(WebAppFactory webAppFactory)
                     Year = 2024,
                     LicensePlate = "TST123"
                 }
-            ]
+            ],
         };
 
         var response = await _client.PostAsJsonAsync("/api/v1.0/customers", request);
@@ -323,7 +320,7 @@ public class CustomersControllerTests(WebAppFactory webAppFactory)
                     Year = 2024,
                     LicensePlate = "TST123"
                 }
-            ]
+            ],
         };
 
         var response = await _client.PostAsJsonAsync("/api/v1.0/customers", request);
@@ -347,7 +344,7 @@ public class CustomersControllerTests(WebAppFactory webAppFactory)
                     Year = 2024,
                     LicensePlate = "TST123"
                 }
-            ]
+            ],
         };
 
         var response = await _client.PostAsJsonAsync("/api/v1.0/customers", request);
@@ -358,7 +355,6 @@ public class CustomersControllerTests(WebAppFactory webAppFactory)
     // ========================================================================
     // PUT /api/v1.0/customers/{customerId}
     // ========================================================================
-
     [Fact]
     public async Task UpdateCustomer_WithValidRequest_ShouldReturnNoContent()
     {
@@ -382,7 +378,7 @@ public class CustomersControllerTests(WebAppFactory webAppFactory)
                     Year = 2023,
                     LicensePlate = "UPD123"
                 }
-            ]
+            ],
         };
 
         var createResponse = await _client.PostAsJsonAsync("/api/v1.0/customers", createRequest);
@@ -406,7 +402,7 @@ public class CustomersControllerTests(WebAppFactory webAppFactory)
                         Year = 2025,
                         LicensePlate = "UPD456"
                     }
-                ]
+                ],
             };
 
             var response = await _client.PutAsJsonAsync($"/api/v1.0/customers/{createdCustomer.CustomerId}", updateRequest);
@@ -445,7 +441,7 @@ public class CustomersControllerTests(WebAppFactory webAppFactory)
                     Year = 2024,
                     LicensePlate = "NXS123"
                 }
-            ]
+            ],
         };
 
         var response = await _client.PutAsJsonAsync($"/api/v1.0/customers/{nonExistentId}", request);
@@ -462,10 +458,10 @@ public class CustomersControllerTests(WebAppFactory webAppFactory)
 
         var request = new UpdateCustomerRequest
         {
-            Name = "",
-            Email = "",
-            PhoneNumber = "",
-            Vehicles = []
+            Name = string.Empty,
+            Email = string.Empty,
+            PhoneNumber = string.Empty,
+            Vehicles = [],
         };
 
         var response = await _client.PutAsJsonAsync($"/api/v1.0/customers/{Guid.NewGuid()}", request);
@@ -491,7 +487,7 @@ public class CustomersControllerTests(WebAppFactory webAppFactory)
             Name = "Customer One",
             Email = email1,
             PhoneNumber = "+201011111111",
-            Vehicles = [new CreateVehicleRequest { ModelId = vehicleModel.Id, Year = 2024, LicensePlate = "DU1123" }]
+            Vehicles = [new CreateVehicleRequest { ModelId = vehicleModel.Id, Year = 2024, LicensePlate = "DU1123" }],
         };
 
         var createRequest2 = new CreateCustomerRequest
@@ -499,7 +495,7 @@ public class CustomersControllerTests(WebAppFactory webAppFactory)
             Name = "Customer Two",
             Email = email2,
             PhoneNumber = "+201022222222",
-            Vehicles = [new CreateVehicleRequest { ModelId = vehicleModel.Id, Year = 2024, LicensePlate = "DU2123" }]
+            Vehicles = [new CreateVehicleRequest { ModelId = vehicleModel.Id, Year = 2024, LicensePlate = "DU2123" }],
         };
 
         var response1 = await _client.PostAsJsonAsync("/api/v1.0/customers", createRequest1);
@@ -525,7 +521,8 @@ public class CustomersControllerTests(WebAppFactory webAppFactory)
                     ModelId = vehicleModel.Id,
                     Year = 2024,
                     LicensePlate = "DU2123"
-                }]
+                }
+                ],
             };
 
             var response = await _client.PutAsJsonAsync($"/api/v1.0/customers/{customer2.CustomerId}", updateRequest);
@@ -560,7 +557,7 @@ public class CustomersControllerTests(WebAppFactory webAppFactory)
                     Year = 2024,
                     LicensePlate = "TST123"
                 }
-            ]
+            ],
         };
 
         var response = await _client.PutAsJsonAsync($"/api/v1.0/customers/{Guid.NewGuid()}", request);
@@ -584,7 +581,7 @@ public class CustomersControllerTests(WebAppFactory webAppFactory)
                     Year = 2024,
                     LicensePlate = "TST123"
                 }
-            ]
+            ],
         };
 
         var response = await _client.PutAsJsonAsync($"/api/v1.0/customers/{Guid.NewGuid()}", request);
@@ -595,7 +592,6 @@ public class CustomersControllerTests(WebAppFactory webAppFactory)
     // ========================================================================
     // DELETE /api/v1.0/customers/{customerId}
     // ========================================================================
-
     [Fact]
     public async Task DeleteCustomer_WithValidId_ShouldReturnNoContent()
     {
@@ -619,7 +615,7 @@ public class CustomersControllerTests(WebAppFactory webAppFactory)
                     Year = 2024,
                     LicensePlate = "DEL123"
                 }
-            ]
+            ],
         };
 
         var createResponse = await _client.PostAsJsonAsync("/api/v1.0/customers", createRequest);
@@ -674,7 +670,7 @@ public class CustomersControllerTests(WebAppFactory webAppFactory)
                     Year = 2024,
                     LicensePlate = "CNF123"
                 }
-            ]
+            ],
         };
 
         var createResponse = await _client.PostAsJsonAsync("/api/v1.0/customers", createRequest);

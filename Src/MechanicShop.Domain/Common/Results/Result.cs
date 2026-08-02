@@ -6,15 +6,21 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.VisualBasic;
 
 public readonly record struct Success;
+
 public readonly record struct Created;
+
 public readonly record struct Deleted;
+
 public readonly record struct Updated;
 
 public static class Result
 {
     public static Success Success => default;
+
     public static Created Created => default;
+
     public static Deleted Deleted => default;
+
     public static Updated Updated => default;
 }
 
@@ -24,12 +30,14 @@ public sealed class Result<Tvalue> : IResult<Tvalue>
     private readonly List<Error> _Errors = [];
 
     public bool IsSuccess { get; }
+
     public bool IsError => !IsSuccess;
+
     public Tvalue Value => IsSuccess ? _Value : default!;
+
     public List<Error> Errors => IsError ? _Errors : [];
 
     public Error TopError => _Errors.Count() > 0 ? _Errors[0] : default;
-
 
     [JsonConstructor]
     [EditorBrowsable(EditorBrowsableState.Never)]
@@ -54,15 +62,18 @@ public sealed class Result<Tvalue> : IResult<Tvalue>
             IsSuccess = false;
         }
     }
+
     public Result(Tvalue value)
     {
         if (value is null)
         {
             throw new ArgumentNullException(nameof(value));
         }
+
         IsSuccess = true;
         _Value = value;
     }
+
     public Result(Error error)
     {
         _Errors.Add(error);
@@ -85,11 +96,11 @@ public sealed class Result<Tvalue> : IResult<Tvalue>
         return IsSuccess ? OnSuccess(_Value) : OnFailure(_Errors);
     }
 
-
     public static implicit operator Result<Tvalue>(Tvalue value)
     {
         return new Result<Tvalue>(value);
     }
+
     public static implicit operator Result<Tvalue>(Error error)
     {
         return new Result<Tvalue>(error);
@@ -99,8 +110,4 @@ public sealed class Result<Tvalue> : IResult<Tvalue>
     {
         return new Result<Tvalue>(errors);
     }
-
-
-
-
 }

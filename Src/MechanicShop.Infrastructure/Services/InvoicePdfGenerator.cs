@@ -1,4 +1,3 @@
-
 using QuestPDF.Fluent;
 using QuestPDF.Helpers;
 using QuestPDF.Infrastructure;
@@ -268,7 +267,7 @@ public sealed class InvoicePdfGenerator : IInvoicePdfGenerator
             "Scheduled" => Colors.Orange.Medium,
             "overdue" => Colors.Red.Medium,
             "cancelled" => Colors.Grey.Medium,
-            _ => Colors.Grey.Medium
+            _ => Colors.Grey.Medium,
         };
     }
 }

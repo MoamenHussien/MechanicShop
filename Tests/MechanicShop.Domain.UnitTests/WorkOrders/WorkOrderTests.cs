@@ -52,7 +52,6 @@ public class WorkOrderTests
         Assert.Equal(200m, workOrder.TotalPartsCost);
     }
 
-
     [Fact]
     public void TotalLaborCost_ShouldReturnCorrectValue()
     {
@@ -738,10 +737,12 @@ public class WorkOrderTests
         Assert.Equal(Result.Updated, result.Value);
         Assert.Equal(2, workOrder.RepairTasks.Count);
 
-        Assert.Contains(workOrder.RepairTasks,
+        Assert.Contains(
+            workOrder.RepairTasks,
             n => n.Id == oldTask.Id);
 
-        Assert.Contains(workOrder.RepairTasks,
+        Assert.Contains(
+            workOrder.RepairTasks,
             n => n.Id == newTask.Id);
     }
 

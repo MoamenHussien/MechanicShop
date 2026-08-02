@@ -10,7 +10,6 @@ indent_size = 4
 tab_width = 4
 end_of_line = crlf
 
-#### Modern C# conventions ####
 csharp_style_namespace_declarations = file_scoped:warning
 dotnet_diagnostic.IDE0130.severity = warning
 dotnet_style_readonly_field = true:warning
@@ -30,7 +29,7 @@ dotnet_naming_symbols.interface_symbols.applicable_kinds = interface
 dotnet_naming_style.i_pascalcase_style.capitalization = pascal_case
 dotnet_naming_style.i_pascalcase_style.required_prefix = I
 
-#### GROUP A — Documentation & header rules: never enforced (separate initiative, not a formatting task) ####
+# GROUP A — Documentation/header: off
 dotnet_diagnostic.SA0001.severity = none
 dotnet_diagnostic.SA1600.severity = none
 dotnet_diagnostic.SA1601.severity = none
@@ -38,36 +37,30 @@ dotnet_diagnostic.SA1602.severity = none
 dotnet_diagnostic.SA1615.severity = none
 dotnet_diagnostic.SA1633.severity = none
 
-#### GROUP B — Organizational / opinionated rules: silenced, team preference already decided elsewhere ####
-dotnet_diagnostic.SA1101.severity = none  # this. prefix — team doesn't mandate it
-dotnet_diagnostic.SA1200.severity = none  # using placement inside/outside namespace
-dotnet_diagnostic.SA1201.severity = none  # member ordering — reordering risks field-initializer execution order, never auto-applied anyway
-dotnet_diagnostic.SA1202.severity = none  # ordering by access modifier — same reason
-dotnet_diagnostic.SA1204.severity = none  # static-before-instance ordering — same reason
-dotnet_diagnostic.SA1208.severity = none  # System-usings-first ordering (cosmetic only)
-dotnet_diagnostic.SA1210.severity = none  # Using directives ordering
-dotnet_diagnostic.SA1309.severity = none  # "no underscore prefix" — contradicts the _camelCase convention chosen above
-dotnet_diagnostic.SA1312.severity = none  # Local variable naming
-dotnet_diagnostic.SA1402.severity = none  # one type per file — many valid patterns (CQRS command+validator+handler) intentionally group types
-dotnet_diagnostic.SA1649.severity = none  # filename must match type name — same reason as SA1402
+# GROUP B — Organizational/opinionated: off
+dotnet_diagnostic.SA1101.severity = none
+dotnet_diagnostic.SA1200.severity = none
+dotnet_diagnostic.SA1201.severity = none
+dotnet_diagnostic.SA1202.severity = none
+dotnet_diagnostic.SA1204.severity = none
+dotnet_diagnostic.SA1208.severity = none
+dotnet_diagnostic.SA1309.severity = none
+dotnet_diagnostic.SA1312.severity = none
+dotnet_diagnostic.SA1402.severity = none
+dotnet_diagnostic.SA1649.severity = none
 
-#### GROUP C — Rules fundamentally incompatible with positional records: silenced project-wide ####
-# A positional record's constructor parameter name becomes its public property name
-# (public record Foo(string Bar) generates `public string Bar { get; }`).
-# StyleCop's naming analyzers predate records and cannot distinguish "record property"
-# from "plain method parameter" or "private field," so they produce warnings that are
-# either wrong (per Microsoft's own naming convention for records) or would require
-# renaming a public property to "fix." This is an open, unresolved upstream limitation
-# — see DotNetAnalyzers/StyleCopAnalyzers issues #3181, #3304, #3384, #3576.
-dotnet_diagnostic.SA1300.severity = none  # element should begin with uppercase
-dotnet_diagnostic.SA1306.severity = none  # field should begin with lowercase
-dotnet_diagnostic.SA1307.severity = none  # field should begin with uppercase
-dotnet_diagnostic.SA1311.severity = none  # static readonly field should begin with uppercase
-dotnet_diagnostic.SA1313.severity = none  # parameter should begin with lowercase
-dotnet_diagnostic.SA1314.severity = none  # type parameter should begin with T
+# GROUP C — Incompatible with positional records: off
+# public record Foo(string Bar) → Bar becomes a public property name.
+# Ref: DotNetAnalyzers/StyleCopAnalyzers #3181, #3304, #3384, #3576 (open, unresolved).
+dotnet_diagnostic.SA1300.severity = none
+dotnet_diagnostic.SA1306.severity = none
+dotnet_diagnostic.SA1307.severity = none
+dotnet_diagnostic.SA1311.severity = none
+dotnet_diagnostic.SA1313.severity = none
+dotnet_diagnostic.SA1314.severity = none
 
-#### GROUP D — Formatting, spacing & layout opinion rules without automated Roslyn code fixers: silenced ####
-dotnet_diagnostic.SA1000.severity = none  # Spacing
+# GROUP D — Pure formatting & layout opinion rules without automated Roslyn code fixers: off
+dotnet_diagnostic.SA1000.severity = none
 dotnet_diagnostic.SA1001.severity = none
 dotnet_diagnostic.SA1002.severity = none
 dotnet_diagnostic.SA1003.severity = none
@@ -84,7 +77,7 @@ dotnet_diagnostic.SA1024.severity = none
 dotnet_diagnostic.SA1025.severity = none
 dotnet_diagnostic.SA1028.severity = none
 
-dotnet_diagnostic.SA1106.severity = none  # Layout & Parameters
+dotnet_diagnostic.SA1106.severity = none
 dotnet_diagnostic.SA1110.severity = none
 dotnet_diagnostic.SA1111.severity = none
 dotnet_diagnostic.SA1114.severity = none
@@ -99,8 +92,8 @@ dotnet_diagnostic.SA1127.severity = none
 dotnet_diagnostic.SA1128.severity = none
 dotnet_diagnostic.SA1137.severity = none
 
-dotnet_diagnostic.SA1413.severity = none  # Trailing commas
-dotnet_diagnostic.SA1500.severity = none  # Blank lines & braces
+dotnet_diagnostic.SA1413.severity = none
+dotnet_diagnostic.SA1500.severity = none
 dotnet_diagnostic.SA1502.severity = none
 dotnet_diagnostic.SA1503.severity = none
 dotnet_diagnostic.SA1505.severity = none
@@ -113,3 +106,30 @@ dotnet_diagnostic.SA1515.severity = none
 dotnet_diagnostic.SA1516.severity = none
 dotnet_diagnostic.SA1517.severity = none
 dotnet_diagnostic.SA1518.severity = none
+
+# CA Diagnostics — Specific opinionated rules suppressed by team decision
+dotnet_diagnostic.CA1000.severity = none
+dotnet_diagnostic.CA1050.severity = none
+dotnet_diagnostic.CA1304.severity = none
+dotnet_diagnostic.CA1305.severity = none
+dotnet_diagnostic.CA1309.severity = none
+dotnet_diagnostic.CA1311.severity = none
+dotnet_diagnostic.CA1707.severity = none
+dotnet_diagnostic.CA1711.severity = none
+dotnet_diagnostic.CA1715.severity = none
+dotnet_diagnostic.CA1716.severity = none
+dotnet_diagnostic.CA1725.severity = none
+dotnet_diagnostic.CA1727.severity = none
+dotnet_diagnostic.CA1805.severity = none
+dotnet_diagnostic.CA1822.severity = none
+dotnet_diagnostic.CA1826.severity = none
+dotnet_diagnostic.CA1829.severity = none
+dotnet_diagnostic.CA1848.severity = none
+dotnet_diagnostic.CA1852.severity = none
+dotnet_diagnostic.CA1860.severity = none
+dotnet_diagnostic.CA1861.severity = none
+dotnet_diagnostic.CA1862.severity = none
+dotnet_diagnostic.CA1873.severity = none
+dotnet_diagnostic.CA2012.severity = none
+dotnet_diagnostic.CA2016.severity = none
+dotnet_diagnostic.CA2263.severity = none

@@ -1,5 +1,4 @@
-﻿
-namespace MechanicShop.Tests.Common.Employees;
+﻿namespace MechanicShop.Tests.Common.Employees;
 
 public static class EmployeeFactory
 {
@@ -8,7 +7,6 @@ public static class EmployeeFactory
         return Employee.Create(
             id ?? Guid.NewGuid(),
             firstName ?? "John",
-            lastName ?? "Doe"
-            );
+            lastName ?? "Doe");
     }
 }
