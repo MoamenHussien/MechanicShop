@@ -21,8 +21,7 @@ public class CreateRepairTaskCommandValidatorTests
             name ?? "Valid Repair Task",
             laborCost ?? 150m,
             duration ?? RepairDurationInMinutes.Min60,
-            parts ?? [new CreateRepairTaskPartCommand("Part 1", 50m, 2)]
-        );
+            parts ?? [new CreateRepairTaskPartCommand("Part 1", 50m, 2)]);
     }
 
     [Fact]

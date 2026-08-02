@@ -16,7 +16,7 @@ public static class CustomerMapper
                     vehicle.VehicleModel.Model,
                     vehicle.Year,
                     vehicle.LicensePlate))
-                .ToList()
+                .ToList(),
         };
 
     public static readonly Expression<Func<Vehicle, VehicleDto>> VehicleProjection =
@@ -37,7 +37,7 @@ public static class CustomerMapper
             Name = customer.Name,
             Email = customer.Email,
             PhoneNumber = customer.PhoneNumber,
-            Vehicles = customer.vehicles.ToDto()
+            Vehicles = customer.vehicles.ToDto(),
         };
     }
 

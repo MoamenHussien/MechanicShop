@@ -26,7 +26,6 @@ public class LaborsControllerTests
     // ========================================================================
     // GET /api/v{version}/labors
     // ========================================================================
-
     [Fact]
     public async Task GetLabors_WithValidToken_ShouldReturnOk()
     {
@@ -49,7 +48,6 @@ public class LaborsControllerTests
     // ========================================================================
     // POST /api/v{version}/labors
     // ========================================================================
-
     [Fact]
     public async Task CreateLabor_WithValidRequest_ShouldReturnCreated()
     {
@@ -62,7 +60,7 @@ public class LaborsControllerTests
             Password = "Password123!",
             FirstName = "New",
             LastName = "Labor",
-            Roles = ["Labor"]
+            Roles = ["Labor"],
         };
 
         var response = await _client.PostAsJsonAsync("/api/v1.0/labors", request);
@@ -82,7 +80,7 @@ public class LaborsControllerTests
             Password = "Password123!",
             FirstName = "Dup",
             LastName = "Labor",
-            Roles = ["Labor"]
+            Roles = ["Labor"],
         };
 
         var firstResponse = await _client.PostAsJsonAsync("/api/v1.0/labors", request);
@@ -105,7 +103,7 @@ public class LaborsControllerTests
             Password = "Password123!",
             FirstName = "Forbidden",
             LastName = "Labor",
-            Roles = ["Labor"]
+            Roles = ["Labor"],
         };
 
         var response = await _client.PostAsJsonAsync("/api/v1.0/labors", request);
@@ -116,7 +114,6 @@ public class LaborsControllerTests
     // ========================================================================
     // PUT /api/v{version}/labors/{laborid}/info
     // ========================================================================
-
     [Fact]
     public async Task UpdateLaborInfo_WithValidRequest_ShouldReturnNoContent()
     {
@@ -130,7 +127,7 @@ public class LaborsControllerTests
         {
             FirstName = "Updated",
             LastName = "LaborInfo",
-            IsActive = true
+            IsActive = true,
         };
 
         var response = await _client.PutAsJsonAsync($"/api/v1.0/labors/{labor!.Id}/info", request);
@@ -171,7 +168,6 @@ public class LaborsControllerTests
     // ========================================================================
     // PUT /api/v{version}/labors/{laborid}/permissions
     // ========================================================================
-
     [Fact]
     public async Task UpdateLaborPermissions_WithValidRequest_ShouldReturnNoContent()
     {
@@ -184,7 +180,7 @@ public class LaborsControllerTests
         var request = new UpdateLaborPermissionsRequest
         {
             Roles = ["Labor"],
-            Claims = []
+            Claims = [],
         };
 
         var response = await _client.PutAsJsonAsync($"/api/v1.0/labors/{labor!.Id}/permissions", request);
@@ -225,7 +221,6 @@ public class LaborsControllerTests
     // ========================================================================
     // GET /api/v{version}/labors/details
     // ========================================================================
-
     [Fact]
     public async Task GetEmployeeDetails_WithManagerRole_ShouldReturnOk()
     {
@@ -256,7 +251,6 @@ public class LaborsControllerTests
     // ========================================================================
     // PUT /api/v{version}/labors/{laborid}/reset-password
     // ========================================================================
-
     [Fact]
     public async Task ResetLaborPassword_WithManagerRole_ShouldReturnNoContent()
     {
@@ -288,7 +282,6 @@ public class LaborsControllerTests
     // ========================================================================
     // PUT /api/v{version}/labors/update-password
     // ========================================================================
-
     [Fact]
     public async Task UpdateUserPassword_WithValidCredentials_ShouldReturnNoContent()
     {

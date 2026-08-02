@@ -17,8 +17,7 @@ public class GenerateTokenQueryValidatorsTests
     {
         return new GenerateTokenCommand(
             email ?? "test@example.com",
-            password ?? "Password123!"
-        );
+            password ?? "Password123!");
     }
 
     [Fact]

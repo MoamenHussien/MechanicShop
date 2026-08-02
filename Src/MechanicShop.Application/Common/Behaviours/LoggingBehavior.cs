@@ -8,14 +8,13 @@ where TRequest : notnull
 {
     public async Task Process(TRequest request, CancellationToken cancellationToken)
     {
-        var UserName = string.Empty;
+        var userName = string.Empty;
 
         if (User.Id.HasValue && User.Id != Guid.Empty)
         {
-            UserName = await identity.GetUserNameAsync(User.Id.Value);
+            userName = await identity.GetUserNameAsync(User.Id.Value);
         }
 
-        logger.LogInformation("Request : Name : {RequestName} Values : {@RequestValues} User Id : {Userid} User Name : {UserName}", typeof(TRequest).Name, request, User.Id, UserName);
-
+        logger.LogInformation("Request : Name : {RequestName} Values : {@RequestValues} User Id : {Userid} User Name : {UserName}", typeof(TRequest).Name, request, User.Id, userName);
     }
 }

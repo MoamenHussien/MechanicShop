@@ -1,9 +1,8 @@
+using MechanicShop.Application.Common.Constants;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Internal;
 using Microsoft.Extensions.Logging;
-
-using MechanicShop.Application.Common.Constants;
 
 public sealed record GetVehiclesMakesQuery : ICachedQuery<Result<List<VehicleMakeResponse>>>
 {
@@ -13,7 +12,6 @@ public sealed record GetVehiclesMakesQuery : ICachedQuery<Result<List<VehicleMak
 
     public TimeSpan Expiration => TimeSpan.FromHours(24);
 }
-
 
 public class GetVehiclesMakesQueriesHandler(IAppDbContext context, ILogger<GetVehiclesMakesQueriesHandler> logger)
  : IRequestHandler<GetVehiclesMakesQuery, Result<List<VehicleMakeResponse>>>

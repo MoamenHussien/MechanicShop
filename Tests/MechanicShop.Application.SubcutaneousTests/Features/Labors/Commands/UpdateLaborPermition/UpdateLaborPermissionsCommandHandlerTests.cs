@@ -20,8 +20,7 @@ public class UpdateLaborPermissionsCommandHandlerTests(WebAppFactory factory)
             FirstName: "John",
             LastName: "Doe",
             Roles: ["Labor"],
-            Claims: []
-        );
+            Claims: []);
 
         var registerResult = await _mediator.Send(registerCommand);
         Assert.True(registerResult.IsSuccess);
@@ -29,8 +28,7 @@ public class UpdateLaborPermissionsCommandHandlerTests(WebAppFactory factory)
         var command = new UpdateLaborPermissionsCommand(
             LaborId: registerResult.Value,
             Roles: ["Manager"],
-            Claims: []
-        );
+            Claims: []);
 
         // Act
         var result = await _mediator.Send(command);
@@ -46,8 +44,7 @@ public class UpdateLaborPermissionsCommandHandlerTests(WebAppFactory factory)
         var command = new UpdateLaborPermissionsCommand(
             LaborId: Guid.NewGuid(),
             Roles: ["Manager"],
-            Claims: []
-        );
+            Claims: []);
 
         // Act
         var result = await _mediator.Send(command);

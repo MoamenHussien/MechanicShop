@@ -1,8 +1,8 @@
 using FluentValidation;
-using MediatR;
-using Microsoft.EntityFrameworkCore;
 using MechanicShop.Application.Common.Constants;
 using MechanicShop.Application.Common.Interfaces;
+using MediatR;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
 public sealed record CreateCustomerCommand(
@@ -110,7 +110,6 @@ public class CreateCustomerCommandHandler(
             "Successfully created customer with Id {CustomerId}. Removed Customers cache tag.",
             customer.Value.Id);
 
-
         var vehicleIds = customer.Value.vehicles
             .Select(v => v.Id)
             .ToList();
@@ -122,6 +121,5 @@ public class CreateCustomerCommandHandler(
             .LoadAsync(cancellationToken);
 
         return customer.Value.ToDto();
-
     }
 }

@@ -14,7 +14,6 @@ public class SettingsControllerTests(WebAppFactory webAppFactory)
     // ========================================================================
     // GET /api/settings/operating-hours
     // ========================================================================
-
     [Fact]
     public async Task GetOperatingHours_ShouldReturnOkWithConfiguredHours()
     {

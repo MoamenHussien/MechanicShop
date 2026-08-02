@@ -1,15 +1,14 @@
-namespace MechanicShop.Client.Identity
+namespace MechanicShop.Client.Identity;
+
+public interface IAccountManagement
 {
-    public interface IAccountManagement
-    {
-        public Task<FormResult> LoginAsync(string email, string password);
+    public Task<FormResult> LoginAsync(string email, string password);
 
-        public Task<TokenResponse?> RefreshTokenAsync();
+    public Task<TokenResponse?> RefreshTokenAsync();
 
-        public Task LogoutAsync();
+    public Task LogoutAsync();
 
-        public Task<bool> CheckAuthenticatedAsync();
+    public Task<bool> CheckAuthenticatedAsync();
 
-        public Task<TokenResponse?> LoadAccessTokenFromStorage();
-    }
+    public Task<TokenResponse?> LoadAccessTokenFromStorage();
 }

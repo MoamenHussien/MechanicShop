@@ -33,7 +33,7 @@ public class RefreshTokenQueryHandlerTests(WebAppFactory factory)
             Id = Guid.NewGuid(),
             Email = "refreshuser@localhost.com",
             UserName = "refreshuser@localhost.com",
-            EmailConfirmed = true
+            EmailConfirmed = true,
         };
         var password = "ValidPassword123!";
 
@@ -47,7 +47,7 @@ public class RefreshTokenQueryHandlerTests(WebAppFactory factory)
 
         var expiredAccessToken = generateResult.Value.AccessToken;
 
-        // Move the RefreshToken cookie from the DB into the Request Headers 
+        // Move the RefreshToken cookie from the DB into the Request Headers
         // to simulate the browser sending the cookie back
         var dbRefreshToken = await _context.RefreshTokens.FirstAsync(r => r.UserId == appUser.Id);
         httpContext.Request.Headers.Append("Cookie", $"RefreshToken={dbRefreshToken.Token}");
@@ -77,7 +77,7 @@ public class RefreshTokenQueryHandlerTests(WebAppFactory factory)
             Id = Guid.NewGuid(),
             Email = "missingcookieuser@localhost.com",
             UserName = "missingcookieuser@localhost.com",
-            EmailConfirmed = true
+            EmailConfirmed = true,
         };
         var password = "ValidPassword123!";
 

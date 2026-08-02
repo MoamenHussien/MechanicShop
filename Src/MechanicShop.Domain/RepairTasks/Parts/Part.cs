@@ -1,9 +1,13 @@
 public sealed class Part : AuditableEntity
 {
     public decimal Costs { get; private set; }
+
     public string Name { get; private set; }
+
     public int Quantity { get; private set; }
+
     public RepairTask RepairTask { get; init; } = null!;
+
     public Guid RepairTaskId { get; init; }
 
     public decimal PartFinalCosts => Costs * Quantity;
@@ -11,11 +15,11 @@ public sealed class Part : AuditableEntity
 #pragma warning disable CS8618
     private Part()
     {
-
     }
 #pragma warning restore CS8618
 
-    private Part(Guid id, decimal Costs, string Name, int Quantity) : base(id)
+    private Part(Guid id, decimal Costs, string Name, int Quantity)
+        : base(id)
     {
         this.Costs = Costs;
         this.Name = Name;
@@ -70,5 +74,4 @@ public sealed class Part : AuditableEntity
 
         return Result.Updated;
     }
-
 }

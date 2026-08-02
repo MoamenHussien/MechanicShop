@@ -1,10 +1,10 @@
 using FluentValidation;
+using MechanicShop.Application.Common.Constants;
+using MechanicShop.Application.Common.Interfaces;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Hybrid;
 using Microsoft.Extensions.Logging;
-using MechanicShop.Application.Common.Constants;
-using MechanicShop.Application.Common.Interfaces;
 
 public sealed record DeleteCustomerCommand(Guid CustomerId) : IRequest<Result<Deleted>>;
 
@@ -16,16 +16,14 @@ public class DeleteCustomerCommandValidator : AbstractValidator<DeleteCustomerCo
     }
 }
 
-
-
 public class DeleteCustomerCommandHandler(ILogger<DeleteCustomerCommandHandler> logger, ICacheInvalidator cacheInvalidator, IAppDbContext context, IWorkOrderPolicy policy)
 : IRequestHandler<DeleteCustomerCommand, Result<Deleted>>
 {
     public async Task<Result<Deleted>> Handle(DeleteCustomerCommand request, CancellationToken cancellationToken)
     {
-        var Customer = await context.Customers.FindAsync(request.CustomerId, cancellationToken);
+        var customer = await context.Customers.FindAsync(request.CustomerId, cancellationToken);
 
-        if (Customer is null)
+        if (customer is null)
         {
             logger.LogWarning("The Customer Is Not Found With Id : {id}", request.CustomerId);
             return ApplicationErrors.TheCustomerNotFound;
@@ -36,7 +34,8 @@ public class DeleteCustomerCommandHandler(ILogger<DeleteCustomerCommandHandler> 
             logger.LogWarning("This Customer With Id : {id} Has Record At Work Order Table", request.CustomerId);
             return ApplicationErrors.TheCustomerHasRecordForWorkOrderBefore;
         }
-        context.Customers.Remove(Customer);
+
+        context.Customers.Remove(customer);
         await context.SaveChangesAsync(cancellationToken);
 
         await cacheInvalidator.EvictByTagAsync(CacheTags.Customers, cancellationToken);

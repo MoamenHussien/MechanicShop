@@ -27,8 +27,7 @@ public class UpdateCustomerCommandHandlerTests(WebAppFactory factory)
             "Updated Name",
             "updated@localhost.com",
             "+201012345678",
-            [new UpdateVehicleCommand(Guid.NewGuid(), 2022, "XYZ-789", make.VehicleModels.First().Id)]
-        );
+            [new UpdateVehicleCommand(Guid.NewGuid(), 2022, "XYZ-789", make.VehicleModels.First().Id)]);
 
         // Act
         var result = await _mediator.Send(command);
@@ -56,8 +55,7 @@ public class UpdateCustomerCommandHandlerTests(WebAppFactory factory)
             "Updated Name",
             "updated@localhost.com",
             "+201012345678",
-            [new UpdateVehicleCommand(Guid.NewGuid(), 2022, "XYZ-789", Guid.NewGuid())]
-        );
+            [new UpdateVehicleCommand(Guid.NewGuid(), 2022, "XYZ-789", Guid.NewGuid())]);
 
         // Act
         var result = await _mediator.Send(command);
@@ -81,8 +79,7 @@ public class UpdateCustomerCommandHandlerTests(WebAppFactory factory)
             "Updated Name",
             "existing@localhost.com", // Duplicate email from customer1
             "+201012345678",
-            [new UpdateVehicleCommand(Guid.NewGuid(), 2022, "XYZ-789", Guid.NewGuid())]
-        );
+            [new UpdateVehicleCommand(Guid.NewGuid(), 2022, "XYZ-789", Guid.NewGuid())]);
 
         // Act
         var result = await _mediator.Send(command);

@@ -1,5 +1,5 @@
-using MediatR;
 using MechanicShop.Application.Common.Constants;
+using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Microsoft.VisualBasic;
@@ -17,8 +17,7 @@ public sealed record GetAllWorkOrderQuery(
     DateTime? StartDateTo = null,
     DateTime? EndDateFrom = null,
     DateTime? EndDateTo = null,
-    Spot? Spot = null
-)
+    Spot? Spot = null)
 : ICachedQuery<Result<PaginatedList<WorkOrderListItemDto>>>
 {
     public string CacheKey =>
@@ -33,6 +32,7 @@ public sealed record GetAllWorkOrderQuery(
                              $":EndAtFrom={EndDateFrom?.ToString("yyyyMMdd") ?? "-"}" +
                              $":EndAtTo={EndDateTo?.ToString("yyyyMMdd") ?? "-"}" +
                              $":spot={Spot?.ToString() ?? "-"}";
+
     public string[] Tags => [CacheTags.WorkOrders];
 
     public TimeSpan Expiration => TimeSpan.FromMinutes(10);
@@ -41,8 +41,8 @@ public sealed record GetAllWorkOrderQuery(
 public class GetAllWorkOrderQueryHandler(IAppDbContext context)
 : IRequestHandler<GetAllWorkOrderQuery, Result<PaginatedList<WorkOrderListItemDto>>>
 {
-    public async Task<Result<PaginatedList<WorkOrderListItemDto>>> Handle
-    (GetAllWorkOrderQuery query, CancellationToken cancellationToken)
+    public async Task<Result<PaginatedList<WorkOrderListItemDto>>> Handle(
+    GetAllWorkOrderQuery query, CancellationToken cancellationToken)
     {
         var workOrdersQuery = context.WorkOrders.AsNoTracking()
                                      .Include(n => n.Vehicle).ThenInclude(n => n.VehicleModel).ThenInclude(n => n.VehicleMake).Include(n => n.Vehicle.Customer)
@@ -81,7 +81,7 @@ public class GetAllWorkOrderQueryHandler(IAppDbContext context)
                     ? wo.Labor.FirstName + " " + wo.Labor.LastName
                     : null,
                   State = wo.State,
-                  RepairTasks = wo.RepairTasks.Select(rt => rt.Name).ToList()
+                  RepairTasks = wo.RepairTasks.Select(rt => rt.Name).ToList(),
               })
             .ToListAsync(cancellationToken);
 
@@ -143,7 +143,7 @@ public class GetAllWorkOrderQueryHandler(IAppDbContext context)
     // {
     //     var normalized = searchTerm.Trim().ToLower();
 
-    //     return query.Where(wo =>
+    // return query.Where(wo =>
     //         (wo.Vehicle != null && (
     //             wo.Vehicle.VehicleModel.VehicleMake.Make.ToLower().Contains(normalized) ||
     //             wo.Vehicle.VehicleModel.Model.ToLower().Contains(normalized) ||
@@ -158,7 +158,6 @@ public class GetAllWorkOrderQueryHandler(IAppDbContext context)
     //             rt.Name.ToLower().Contains(normalized)) ||
     //         wo.Id.ToString().ToLower().Contains(normalized));
     // }
-
     private static IQueryable<WorkOrder> ApplySearchTerm(IQueryable<WorkOrder> query, string searchTerm)
     {
         var term = searchTerm.Trim();
@@ -168,13 +167,11 @@ public class GetAllWorkOrderQueryHandler(IAppDbContext context)
             (wo.Vehicle != null && (
                 EF.Functions.Like(wo.Vehicle.VehicleModel.VehicleMake.Make, $"%{term}%") ||
                 EF.Functions.Like(wo.Vehicle.VehicleModel.Model, $"%{term}%") ||
-                EF.Functions.Like(wo.Vehicle.LicensePlate, $"%{term}%")
-            )) ||
+                EF.Functions.Like(wo.Vehicle.LicensePlate, $"%{term}%"))) ||
             (wo.Labor != null && (
                 EF.Functions.Like(wo.Labor.FirstName, $"%{term}%") ||
                 EF.Functions.Like(wo.Labor.LastName, $"%{term}%") ||
-                EF.Functions.Like(wo.Labor.FirstName + " " + wo.Labor.LastName, $"%{term}%")
-            )) ||
+                EF.Functions.Like(wo.Labor.FirstName + " " + wo.Labor.LastName, $"%{term}%"))) ||
             wo.RepairTasks.Any(rt =>
                 EF.Functions.Like(rt.Name, $"%{term}%")) ||
             EF.Functions.Like(wo.Id.ToString(), $"%{term}%"));
@@ -195,10 +192,7 @@ public class GetAllWorkOrderQueryHandler(IAppDbContext context)
             "total" => isDescending ? query.OrderByDescending(wo => wo.Total) : query.OrderBy(wo => wo.Total),
             "vehicleid" => isDescending ? query.OrderByDescending(wo => wo.VehicleId) : query.OrderBy(wo => wo.VehicleId),
             "laborid" => isDescending ? query.OrderByDescending(wo => wo.LaborId) : query.OrderBy(wo => wo.LaborId),
-            _ => query.OrderByDescending(wo => wo.CreatedAtUtc) // Default sorting
+            _ => query.OrderByDescending(wo => wo.CreatedAtUtc), // Default sorting
         };
     }
-
-
 }
-

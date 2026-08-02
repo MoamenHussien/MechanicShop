@@ -1,9 +1,9 @@
 using System.Security.Claims;
 using FluentValidation;
-using MediatR;
-using Microsoft.Extensions.Logging;
 using MechanicShop.Application.Common.Constants;
 using MechanicShop.Application.Common.Interfaces;
+using MediatR;
+using Microsoft.Extensions.Logging;
 
 public sealed record RegisterLaborCommand(string email, string password, string FirstName, string LastName, List<string> Roles, List<Claim> Claims) : IRequest<Result<Guid>>;
 
@@ -25,29 +25,29 @@ public class RegisterLaborCommandHandler(ILogger<RegisterLaborCommandHandler> lo
 {
     public async Task<Result<Guid>> Handle(RegisterLaborCommand request, CancellationToken cancellationToken)
     {
-        var UserId = await identity.CreateUserAsync(request.email, request.password, request.Roles, request.Claims ?? [], cancellationToken);
+        var userId = await identity.CreateUserAsync(request.email, request.password, request.Roles, request.Claims ?? [], cancellationToken);
 
-        if (UserId.IsError)
+        if (userId.IsError)
         {
-            logger.LogWarning("Failed to create User for email {Email} , Errors: {@Errors}", request.email, UserId.Errors);
+            logger.LogWarning("Failed to create User for email {Email} , Errors: {@Errors}", request.email, userId.Errors);
 
-            return UserId.Errors;
+            return userId.Errors;
         }
 
-        logger.LogInformation("User created successfully With UserId: {UserId} , Email: {Email}", UserId.Value, request.email);
+        logger.LogInformation("User created successfully With UserId: {UserId} , Email: {Email}", userId.Value, request.email);
 
-        var employee = Employee.Create(UserId.Value, request.FirstName, request.LastName);
+        var employee = Employee.Create(userId.Value, request.FirstName, request.LastName);
 
         if (employee.IsError)
         {
-            logger.LogWarning("Failed to create Employee for UserId {UserId} , Errors: {@Errors}", UserId.Value, employee.Errors);
+            logger.LogWarning("Failed to create Employee for UserId {UserId} , Errors: {@Errors}", userId.Value, employee.Errors);
 
-            var DeleteResult = await identity.DeleteUserAsync(UserId.Value);
+            var deleteResult = await identity.DeleteUserAsync(userId.Value);
 
-            if (DeleteResult.IsError)
+            if (deleteResult.IsError)
             {
-                logger.LogError("Rollback failed : Could not delete User with UserId {UserId} after Employee creation failure. Errors: {@Errors}", UserId.Value, DeleteResult.Errors);
-                return DeleteResult.Errors;
+                logger.LogError("Rollback failed : Could not delete User with UserId {UserId} after Employee creation failure. Errors: {@Errors}", userId.Value, deleteResult.Errors);
+                return deleteResult.Errors;
             }
 
             return employee.Errors;
@@ -58,7 +58,7 @@ public class RegisterLaborCommandHandler(ILogger<RegisterLaborCommandHandler> lo
 
         await cacheInvalidator.EvictByTagAsync(CacheTags.Users, cancellationToken);
 
-        logger.LogInformation("Employee and User created successfully , With Same Id : {UserId}, Email: {Email}", UserId.Value, request.email);
+        logger.LogInformation("Employee and User created successfully , With Same Id : {UserId}, Email: {Email}", userId.Value, request.email);
 
         return employee.Value.Id;
     }

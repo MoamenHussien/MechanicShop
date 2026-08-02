@@ -11,7 +11,7 @@ internal class UserFactory
             Id = "19a59129-6c20-417a-834d-11a208d32d96".ToGuid().Value,
             Email = "user@localhost",
             UserName = "user@localhost",
-            EmailConfirmed = true
+            EmailConfirmed = true,
         };
     }
 }

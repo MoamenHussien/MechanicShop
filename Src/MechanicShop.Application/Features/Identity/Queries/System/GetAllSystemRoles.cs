@@ -1,5 +1,5 @@
-using MediatR;
 using MechanicShop.Application.Common.Constants;
+using MediatR;
 
 public record GetAllSystemRolesQuery() : ICachedQuery<Result<List<string>>>
 {

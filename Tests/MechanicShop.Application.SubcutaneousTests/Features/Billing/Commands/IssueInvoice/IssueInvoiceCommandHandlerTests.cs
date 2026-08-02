@@ -1,7 +1,7 @@
 using MechanicShop.Application.SubcutaneousTests.Common;
+using MechanicShop.Tests.Common.Customers;
 using MechanicShop.Tests.Common.RepaireTasks;
 using MechanicShop.Tests.Common.WorkOrders;
-using MechanicShop.Tests.Common.Customers;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Xunit;
@@ -76,6 +76,7 @@ public class IssueInvoiceCommandHandlerTests(WebAppFactory factory)
         await _context.RepairTasks.AddAsync(repairTask);
 
         var workOrder = WorkOrderFactory.CreateWorkOrder(vehicleId: vehicle.Id, laborId: employee.Id, repairTasks: [repairTask]).Value;
+
         // Keep it as Scheduled or InProgress
         await _context.WorkOrders.AddAsync(workOrder);
         await _context.SaveChangesAsync(default);

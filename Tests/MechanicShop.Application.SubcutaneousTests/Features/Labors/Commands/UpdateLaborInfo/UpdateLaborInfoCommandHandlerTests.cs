@@ -2,8 +2,8 @@ using MechanicShop.Application.SubcutaneousTests.Common;
 using MechanicShop.Tests.Common.Employees;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
-using Xunit;
 using Microsoft.Extensions.DependencyInjection;
+using Xunit;
 
 namespace MechanicShop.Application.SubcutaneousTests.Features.Labors.Commands.UpdateLaborInfo;
 
@@ -25,7 +25,7 @@ public class UpdateLaborInfoCommandHandlerTests(WebAppFactory factory)
             Id = Guid.NewGuid(),
             Email = "labor_info@test.com",
             UserName = "labor_info@test.com",
-            EmailConfirmed = true
+            EmailConfirmed = true,
         };
         await userManager.CreateAsync(appUser, "Password123!");
 
@@ -38,8 +38,7 @@ public class UpdateLaborInfoCommandHandlerTests(WebAppFactory factory)
             id: employee.Id,
             FirstName: "UpdatedFirstName",
             LastName: "UpdatedLastName",
-            IsActive: false
-        );
+            IsActive: false);
 
         // Act
         var result = await _mediator.Send(command);
@@ -64,8 +63,7 @@ public class UpdateLaborInfoCommandHandlerTests(WebAppFactory factory)
             id: Guid.NewGuid(),
             FirstName: "UpdatedFirstName",
             LastName: "UpdatedLastName",
-            IsActive: true
-        );
+            IsActive: true);
 
         // Act
         var result = await _mediator.Send(command);

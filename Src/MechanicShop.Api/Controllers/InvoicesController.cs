@@ -31,8 +31,7 @@ public sealed class InvoicesController(ISender sender) : ApiController
         return result.Match(success => CreatedAtRoute("GetInvoice", new { version = "1.0", invoiceId = success.InvoiceId }, success), Problem);
     }
 
-
-    [HttpGet("{invoiceId:guid}", Name = ("GetInvoice"))]
+    [HttpGet("{invoiceId:guid}", Name = "GetInvoice")]
     [MapToApiVersion("1.0")]
     [EndpointName("GetInvoice")]
     [EndpointSummary("Retrieves an invoice by ID.")]
@@ -78,5 +77,4 @@ public sealed class InvoicesController(ISender sender) : ApiController
 
         return result.Match(success => File(success.Content!, "application/pdf", success.FileName), Problem);
     }
-
 }

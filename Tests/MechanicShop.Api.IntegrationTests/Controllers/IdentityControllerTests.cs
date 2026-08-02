@@ -14,7 +14,6 @@ public class IdentityControllerTests(WebAppFactory webAppFactory)
     // ========================================================================
     // POST /identity/token/generate
     // ========================================================================
-
     [Fact]
     public async Task GenerateToken_WithValidCredentials_ShouldReturnOk()
     {
@@ -73,7 +72,6 @@ public class IdentityControllerTests(WebAppFactory webAppFactory)
     // ========================================================================
     // POST /identity/token/refresh-token
     // ========================================================================
-
     [Fact]
     public async Task RefreshToken_WithEmptyAccessToken_ShouldReturnBadRequest()
     {
@@ -97,7 +95,6 @@ public class IdentityControllerTests(WebAppFactory webAppFactory)
     // ========================================================================
     // GET /identity/current-user/claims
     // ========================================================================
-
     [Fact]
     public async Task GetCurrentUserInfo_WithValidToken_ShouldReturnOk()
     {
@@ -126,7 +123,6 @@ public class IdentityControllerTests(WebAppFactory webAppFactory)
     // ========================================================================
     // GET /identity/assignable-roles
     // ========================================================================
-
     [Fact]
     public async Task GetRoles_WithManagerRole_ShouldReturnOk()
     {
@@ -157,7 +153,6 @@ public class IdentityControllerTests(WebAppFactory webAppFactory)
     // ========================================================================
     // POST /identity/logout
     // ========================================================================
-
     [Fact]
     public async Task Logout_WithValidToken_ShouldReturnNoContent()
     {

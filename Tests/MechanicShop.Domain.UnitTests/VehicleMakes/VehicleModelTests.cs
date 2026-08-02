@@ -2,7 +2,6 @@ using Xunit;
 
 public class VehicleModelTests
 {
-
     [Fact]
     public void CreateVehiclModel_ShouldSucceed_WithValidData()
     {
@@ -11,12 +10,12 @@ public class VehicleModelTests
         string model = "M4";
 
         // Act
-        var Vehiclemodel = VehicleModelFactory.CreateVehiclModel(id, model);
+        var vehiclemodel = VehicleModelFactory.CreateVehiclModel(id, model);
 
         // Assert
-        Assert.True(Vehiclemodel.IsSuccess);
-        Assert.Equal(id, Vehiclemodel.Value.Id);
-        Assert.Equal(model, Vehiclemodel.Value.Model);
+        Assert.True(vehiclemodel.IsSuccess);
+        Assert.Equal(id, vehiclemodel.Value.Id);
+        Assert.Equal(model, vehiclemodel.Value.Model);
     }
 
     [Fact]
@@ -74,7 +73,4 @@ public class VehicleModelTests
         Assert.True(resultofupdated.IsError);
         Assert.Equal(vehicleModelsErrors.ModelRequired.Code, resultofupdated.TopError.Code);
     }
-
-
 }
-

@@ -2,14 +2,13 @@ using System.Text.RegularExpressions;
 using FluentValidation;
 
 // Application/Validators/CommonRules.cs
-
 public static class CommonRules
 {
     // private static readonly Regex EmailRegex = new(
     // @"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)+$",
     // RegexOptions.Compiled);
-
     private static readonly Regex EmailRegex = new(
+
     // تم تغيير الـ + إلى * في نهاية الـ Regex
     @"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$",
     RegexOptions.Compiled);
@@ -46,6 +45,5 @@ public static class CommonRules
     {
         return ruleBuilder
             .NotEmpty().WithErrorCode($"{TypeName}_Id_Is_Required").WithMessage($"{TypeName} Id Is Required");
-
     }
 }

@@ -40,8 +40,7 @@ public class GetWorkOrdersQueryHandlerTests(WebAppFactory factory)
         var repairTask = await _context.RepairTasks.FirstAsync();
 
         var customer = CustomerFactory.CreateCustomer(
-            vehicles: [VehicleFactory.CreateVehicle(vehicleModelId: vehicleModel.Id).Value]
-        ).Value;
+            vehicles: [VehicleFactory.CreateVehicle(vehicleModelId: vehicleModel.Id).Value]).Value;
 
         var employee = EmployeeFactory.CreateEmployee().Value;
 

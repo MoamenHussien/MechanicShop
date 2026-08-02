@@ -1,10 +1,9 @@
 using FluentValidation;
+using MechanicShop.Application.Common.Constants;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.Extensions.Logging;
-
-using MechanicShop.Application.Common.Constants;
 
 public sealed record GetInvoiceByIdQuery(Guid invoiceId) : ICachedQuery<Result<InvoiceDto>>
 {

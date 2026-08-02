@@ -24,7 +24,7 @@ internal sealed class BearerSecuritySchemeTransformer
                 BearerFormat = "JWT",
                 In = ParameterLocation.Header,
                 Name = "Authorization",
-                Description = "Enter JWT Bearer token"
+                Description = "Enter JWT Bearer token",
             };
 
         return Task.CompletedTask;
@@ -55,7 +55,7 @@ internal sealed class BearerSecuritySchemeTransformer
             {
                 [new OpenApiSecuritySchemeReference(
                     JwtBearerDefaults.AuthenticationScheme,
-                    context.Document)] = []
+                    context.Document)] = [],
             });
         }
 

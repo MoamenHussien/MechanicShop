@@ -65,7 +65,6 @@ public class InvoiceTests
         // Act
         var result = Invoice.Create(id: Guid.NewGuid(), time: TimeProvider.System, TaxAmount: 0, DiscountAmount: 0, InvoiceLineItems: [InvoiceLineItem.Create(Guid.NewGuid(), "Oil Change", 1, 50, 2).Value], WorkOrderid: Guid.Empty);
 
-
         // Assert
         Assert.True(result.IsError);
         Assert.Equal(
@@ -78,7 +77,6 @@ public class InvoiceTests
     {
         // Act
         var result = Invoice.Create(id: Guid.NewGuid(), time: TimeProvider.System, TaxAmount: 0, DiscountAmount: 0, InvoiceLineItems: null!, WorkOrderid: Guid.NewGuid());
-
 
         // Assert
         Assert.True(result.IsError);
@@ -186,7 +184,7 @@ public class InvoiceTests
 
         Assert.Equal(Result.Updated, result.Value);
         Assert.Equal(InvoiceStatus.Paid, invoice.Status);
-        Assert.Equal(time.GetUtcNow(), invoice.PaidAt); // to check if the both are the same date 
+        Assert.Equal(time.GetUtcNow(), invoice.PaidAt); // to check if the both are the same date
     }
 
     [Fact]

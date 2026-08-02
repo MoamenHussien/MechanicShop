@@ -5,7 +5,9 @@ public static class Utilities
     public static string CapitalizeFirstLetter(this string input)
     {
         if (string.IsNullOrWhiteSpace(input))
+        {
             return input;
+        }
 
         ReadOnlySpan<char> span = input.Trim();
         var result = new StringBuilder(span.Length);

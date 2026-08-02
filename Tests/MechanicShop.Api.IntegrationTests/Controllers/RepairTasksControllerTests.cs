@@ -26,7 +26,6 @@ public class RepairTasksControllerTests
     // ========================================================================
     // GET /api/v{version}/repair-tasks
     // ========================================================================
-
     [Fact]
     public async Task GetRepairTasks_WithValidToken_ShouldReturnOk()
     {
@@ -49,7 +48,6 @@ public class RepairTasksControllerTests
     // ========================================================================
     // GET /api/v{version}/repair-tasks/{repairTaskId}
     // ========================================================================
-
     [Fact]
     public async Task GetRepairTaskById_WithValidId_ShouldReturnOk()
     {
@@ -80,7 +78,6 @@ public class RepairTasksControllerTests
     // ========================================================================
     // POST /api/v{version}/repair-tasks
     // ========================================================================
-
     [Fact]
     public async Task CreateRepairTask_WithValidRequest_ShouldReturnCreated()
     {
@@ -95,7 +92,7 @@ public class RepairTasksControllerTests
             Parts =
             [
                 new CreateRepairTaskPartRequest { Name = "Part A", Cost = 50.00m, Quantity = 2 }
-            ]
+            ],
         };
 
         try
@@ -125,7 +122,7 @@ public class RepairTasksControllerTests
             Parts =
             [
                 new CreateRepairTaskPartRequest { Name = "Part B", Cost = 10.00m, Quantity = 1 }
-            ]
+            ],
         };
 
         try
@@ -155,7 +152,7 @@ public class RepairTasksControllerTests
             Name = "Forbidden Task",
             LaborCost = 100.00m,
             EstimatedDurationInMins = MechanicShop.Contracts.Common.RepairDurationInMinutes.Min60,
-            Parts = [new() { Name = "Valid Part", Cost = 10m, Quantity = 1 }]
+            Parts = [new() { Name = "Valid Part", Cost = 10m, Quantity = 1 }],
         };
 
         var response = await _client.PostAsJsonAsync("/api/v1.0/repair-tasks", request);
@@ -166,7 +163,6 @@ public class RepairTasksControllerTests
     // ========================================================================
     // PUT /api/v{version}/repair-tasks/{repairTaskId}
     // ========================================================================
-
     [Fact]
     public async Task UpdateRepairTask_WithValidRequest_ShouldReturnNoContent()
     {
@@ -181,7 +177,7 @@ public class RepairTasksControllerTests
             Parts =
             [
                 new CreateRepairTaskPartRequest { Name = "Part C", Cost = 20.00m, Quantity = 1 }
-            ]
+            ],
         };
 
         try
@@ -203,7 +199,7 @@ public class RepairTasksControllerTests
                 Parts =
                 [
                     new UpdateRepairTaskPartRequest { Name = "Updated Part C", Cost = 25.00m, Quantity = 2 }
-                ]
+                ],
             };
 
             var updateResponse = await _client.PutAsJsonAsync($"/api/v1.0/repair-tasks/{taskId}", updateRequest);
@@ -229,7 +225,7 @@ public class RepairTasksControllerTests
             Name = "NonExistent Update",
             LaborCost = 100.00m,
             EstimatedDurationInMins = MechanicShop.Contracts.Common.RepairDurationInMinutes.Min60,
-            Parts = [new() { Name = "Valid Part", Cost = 10m, Quantity = 1 }]
+            Parts = [new() { Name = "Valid Part", Cost = 10m, Quantity = 1 }],
         };
 
         var response = await _client.PutAsJsonAsync($"/api/v1.0/repair-tasks/{nonExistentId}", request);
@@ -251,7 +247,7 @@ public class RepairTasksControllerTests
             Name = "Forbidden Update",
             LaborCost = 100.00m,
             EstimatedDurationInMins = MechanicShop.Contracts.Common.RepairDurationInMinutes.Min60,
-            Parts = [new() { Name = "Valid Part", Cost = 10m, Quantity = 1 }]
+            Parts = [new() { Name = "Valid Part", Cost = 10m, Quantity = 1 }],
         };
 
         var response = await _client.PutAsJsonAsync($"/api/v1.0/repair-tasks/{task!.Id}", request);
@@ -262,7 +258,6 @@ public class RepairTasksControllerTests
     // ========================================================================
     // DELETE /api/v{version}/repair-tasks/{repairTaskId}
     // ========================================================================
-
     [Fact]
     public async Task DeleteRepairTask_WithValidId_ShouldReturnNoContent()
     {
@@ -274,7 +269,7 @@ public class RepairTasksControllerTests
             Name = "Task To Delete",
             LaborCost = 25.00m,
             EstimatedDurationInMins = MechanicShop.Contracts.Common.RepairDurationInMinutes.Min30,
-            Parts = [new() { Name = "Valid Part", Cost = 10m, Quantity = 1 }]
+            Parts = [new() { Name = "Valid Part", Cost = 10m, Quantity = 1 }],
         };
 
         try

@@ -16,4 +16,3 @@ public class CreateVehicleCommandValidator : AbstractValidator<CreateVehicleComm
         RuleFor(n => n.VehicleModelId).NotEmpty().WithMessage("You Must Enter Vehicle Model");
     }
 }
-

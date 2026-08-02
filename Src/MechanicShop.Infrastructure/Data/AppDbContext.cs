@@ -7,15 +7,25 @@ public class AppDbContext(DbContextOptions<AppDbContext> options, IMediator medi
                                             IdentityDbContext<AppUser, IdentityRole<Guid>, Guid>(options), IAppDbContext
 {
     public DbSet<Customer> Customers => Set<Customer>();
+
     public DbSet<Vehicle> Vehicles => Set<Vehicle>();
+
     public DbSet<VehicleModel> VehicleModels => Set<VehicleModel>();
+
     public DbSet<VehicleMake> VehicleMakes => Set<VehicleMake>();
+
     public DbSet<Employee> Employees => Set<Employee>();
+
     public DbSet<WorkOrder> WorkOrders => Set<WorkOrder>();
+
     public DbSet<Invoice> Invoices => Set<Invoice>();
+
     public DbSet<RepairTask> RepairTasks => Set<RepairTask>();
+
     public DbSet<Part> Parts => Set<Part>();
+
     public DbSet<RefreshToken> RefreshTokens => Set<RefreshToken>();
+
     public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
     {
         var result = await base.SaveChangesAsync(cancellationToken);
@@ -34,9 +44,9 @@ public class AppDbContext(DbContextOptions<AppDbContext> options, IMediator medi
         var domainEntities = ChangeTracker.Entries().Where(n => n.Entity is Entity entity && entity.DomainEvents.Count > 0)
                                                     .Select(n => (Entity)n.Entity).ToList();
 
-        var DomainEvents = domainEntities.SelectMany(n => n.DomainEvents).ToList();
+        var domainEvents = domainEntities.SelectMany(n => n.DomainEvents).ToList();
 
-        foreach (var domain in DomainEvents)
+        foreach (var domain in domainEvents)
         {
             await mediator.Publish(domain, cancellationToken);
         }
@@ -45,6 +55,5 @@ public class AppDbContext(DbContextOptions<AppDbContext> options, IMediator medi
         {
             entity.ClearDomainEvent();
         }
-
     }
 }

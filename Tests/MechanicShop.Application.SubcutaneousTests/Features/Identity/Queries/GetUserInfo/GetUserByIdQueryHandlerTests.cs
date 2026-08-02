@@ -24,7 +24,7 @@ public class GetUserByIdQueryHandlerTests(WebAppFactory factory)
             Id = Guid.NewGuid(),
             Email = "getuser@localhost.com",
             UserName = "getuser@localhost.com",
-            EmailConfirmed = true
+            EmailConfirmed = true,
         };
 
         var createResult = await userManager.CreateAsync(appUser, "ValidPassword123!");

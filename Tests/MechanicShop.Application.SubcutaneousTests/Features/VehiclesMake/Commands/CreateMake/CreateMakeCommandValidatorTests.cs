@@ -87,7 +87,7 @@ public class CreateMakeCommandValidatorTests
     public void CreateMakeCommandValidator_ShouldFail_WhenModelIsInvalid()
     {
         // Arrange
-        var command = CreateCommand(models: [new CreateVehicleModelCommand("")]);
+        var command = CreateCommand(models: [new CreateVehicleModelCommand(string.Empty)]);
 
         // Act
         var result = _sut.Validate(command);

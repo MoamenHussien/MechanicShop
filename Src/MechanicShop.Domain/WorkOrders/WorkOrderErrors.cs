@@ -55,29 +55,19 @@ public static class WorkOrderErrors
     public static Error CantMarkAsComplete(WorkOrderState state) =>
         Error.Conflict(
             "Invalid WorkOrder State",
-            $"Cannot mark as Completed from '{state}'."
-        );
+            $"Cannot mark as Completed from '{state}'.");
 
     public static Error CantMarkAsInProgress(WorkOrderState state) =>
         Error.Conflict(
             "Invalid WorkOrder State",
-            $"Cannot mark as InProgress from '{state}'."
-        );
+            $"Cannot mark as InProgress from '{state}'.");
 
     public static Error CantMarkAsCancelled(WorkOrderState state) =>
         Error.Conflict(
             "Invalid WorkOrder State",
-            $"Cannot mark as Cancelled from '{state}'."
-        );
+            $"Cannot mark as Cancelled from '{state}'.");
 
     public static Error CantDeleteWorkOrder(WorkOrderState state) => Error.Conflict($"WorkOrder Status: {state}", $"Cannot delete this work order because its current status is '{state}', which does not allow deletion.");
+
     public static Error CantEditWorkOrder(WorkOrderState state) => Error.Conflict($"WorkOrder Status: {state}", $"Cannot edit this work order because its current status is '{state}', which does not allow editing.");
-
-
-
-
-
-
-
-
 }

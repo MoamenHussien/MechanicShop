@@ -1,11 +1,11 @@
 using MechanicShop.Application.SubcutaneousTests.Common;
 using MechanicShop.Tests.Common.Customers;
 using MechanicShop.Tests.Common.Employees;
+using MechanicShop.Tests.Common.RepaireTasks;
 using MechanicShop.Tests.Common.WorkOrders;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Xunit;
-using MechanicShop.Tests.Common.RepaireTasks;
 
 namespace MechanicShop.Application.SubcutaneousTests.Features.WorkOrders.Commands.UpdateOrderState;
 
@@ -40,8 +40,7 @@ public class UpdateWorkOrderStateCommandHandlerTests(WebAppFactory factory)
         await _context.RepairTasks.AddAsync(repairTask);
 
         var customer = CustomerFactory.CreateCustomer(
-            vehicles: [VehicleFactory.CreateVehicle(vehicleModelId: vehicleModel.Id).Value]
-        ).Value;
+            vehicles: [VehicleFactory.CreateVehicle(vehicleModelId: vehicleModel.Id).Value]).Value;
 
         var employee = EmployeeFactory.CreateEmployee().Value;
 
@@ -69,6 +68,7 @@ public class UpdateWorkOrderStateCommandHandlerTests(WebAppFactory factory)
 
         // Assert
         Assert.True(result.IsSuccess);
+
         // Assert.Equal(ApplicationErrors.NothingIsChanged.Code, result.TopError.Code);
     }
 
@@ -83,8 +83,7 @@ public class UpdateWorkOrderStateCommandHandlerTests(WebAppFactory factory)
         await _context.RepairTasks.AddAsync(repairTask);
 
         var customer = CustomerFactory.CreateCustomer(
-            vehicles: [VehicleFactory.CreateVehicle(vehicleModelId: vehicleModel.Id).Value]
-        ).Value;
+            vehicles: [VehicleFactory.CreateVehicle(vehicleModelId: vehicleModel.Id).Value]).Value;
 
         var employee = EmployeeFactory.CreateEmployee().Value;
 
@@ -124,8 +123,7 @@ public class UpdateWorkOrderStateCommandHandlerTests(WebAppFactory factory)
         await _context.RepairTasks.AddAsync(repairTask);
 
         var customer = CustomerFactory.CreateCustomer(
-            vehicles: [VehicleFactory.CreateVehicle(vehicleModelId: vehicleModel.Id).Value]
-        ).Value;
+            vehicles: [VehicleFactory.CreateVehicle(vehicleModelId: vehicleModel.Id).Value]).Value;
 
         var employee = EmployeeFactory.CreateEmployee().Value;
 
@@ -150,7 +148,7 @@ public class UpdateWorkOrderStateCommandHandlerTests(WebAppFactory factory)
         var result = await _mediator.Send(command);
 
         // Assert
-        Assert.True(result.IsSuccess, result.IsError ? result.TopError.Description : "");
+        Assert.True(result.IsSuccess, result.IsError ? result.TopError.Description : string.Empty);
 
         ((DbContext)_context).ChangeTracker.Clear();
 
@@ -169,8 +167,7 @@ public class UpdateWorkOrderStateCommandHandlerTests(WebAppFactory factory)
         await _context.RepairTasks.AddAsync(repairTask);
 
         var customer = CustomerFactory.CreateCustomer(
-            vehicles: [VehicleFactory.CreateVehicle(vehicleModelId: vehicleModel.Id).Value]
-        ).Value;
+            vehicles: [VehicleFactory.CreateVehicle(vehicleModelId: vehicleModel.Id).Value]).Value;
 
         var employee = EmployeeFactory.CreateEmployee().Value;
 

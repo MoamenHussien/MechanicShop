@@ -3,24 +3,29 @@ using System.Dynamic;
 public sealed class RepairTask : AuditableEntity
 {
     public string Name { get; private set; }
+
     public decimal LaborCost { get; private set; }
+
     public RepairDurationInMinutes EstimatedDuration { get; private set; }
 
     private readonly List<Part> _Parts = [];
+
     public IReadOnlyList<Part> Parts => _Parts;
+
     public decimal TotalPartsCost => _Parts.Sum(n => n.PartFinalCosts);
+
     public decimal TotalCost => TotalPartsCost + LaborCost;
 
 #pragma warning disable CS8618
 
     private RepairTask()
     {
-
     }
 
 #pragma warning restore CS8618
 
-    private RepairTask(Guid id, string name, decimal LaborCost, RepairDurationInMinutes repairDuration, List<Part> parts) : base(id)
+    private RepairTask(Guid id, string name, decimal LaborCost, RepairDurationInMinutes repairDuration, List<Part> parts)
+        : base(id)
     {
         this.Name = name;
         this.LaborCost = LaborCost;
@@ -93,17 +98,17 @@ public sealed class RepairTask : AuditableEntity
 
         _Parts.RemoveAll(n => !ids.Contains(n.Id));
 
-        var Dic = _Parts.ToDictionary(n => n.Id);
+        var dic = _Parts.ToDictionary(n => n.Id);
 
         foreach (var part in parts)
         {
-            if (Dic.TryGetValue(part.Id, out Part? TempPart))
+            if (dic.TryGetValue(part.Id, out Part? tempPart))
             {
-                var UpdatePartStatus = TempPart.Update(part.Costs, part.Name, part.Quantity);
+                var updatePartStatus = tempPart.Update(part.Costs, part.Name, part.Quantity);
 
-                if (UpdatePartStatus.IsError)
+                if (updatePartStatus.IsError)
                 {
-                    return UpdatePartStatus.Errors;
+                    return updatePartStatus.Errors;
                 }
             }
             else
@@ -114,7 +119,4 @@ public sealed class RepairTask : AuditableEntity
 
         return Result.Updated;
     }
-
-
-
 }

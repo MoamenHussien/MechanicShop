@@ -1,5 +1,5 @@
 public enum Policies
 {
     SharedAuthCache,
-    PerUserAuthCache
+    PerUserAuthCache,
 }

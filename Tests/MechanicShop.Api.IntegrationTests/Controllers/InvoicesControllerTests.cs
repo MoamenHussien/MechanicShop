@@ -21,11 +21,9 @@ public class InvoicesControllerTests
         _context = webAppFactory.CreateAppDbContext();
     }
 
-
     // ========================================================================
     // POST /api/v{version}/invoices/workorders/{workOrderId} (IssueInvoice)
     // ========================================================================
-
     [Fact]
     public async Task IssueInvoice_WithValidCompletedWorkOrder_ShouldReturnCreated()
     {
@@ -150,7 +148,6 @@ public class InvoicesControllerTests
     // ========================================================================
     // GET /api/v{version}/invoices/{invoiceId} (GetInvoice)
     // ========================================================================
-
     [Fact]
     public async Task GetInvoice_WithValidId_ShouldReturnOk()
     {
@@ -213,7 +210,6 @@ public class InvoicesControllerTests
     // ========================================================================
     // PUT /api/v{version}/invoices/{invoiceId}/payments (SettleInvoice)
     // ========================================================================
-
     [Fact]
     public async Task SettleInvoice_WithValidId_ShouldReturnNoContent()
     {
@@ -297,7 +293,6 @@ public class InvoicesControllerTests
     // ========================================================================
     // GET /api/v{version}/invoices/{invoiceId}/pdf (GetInvoicePdf)
     // ========================================================================
-
     [Fact]
     public async Task GetInvoicePdf_WithValidId_ShouldReturnFile()
     {

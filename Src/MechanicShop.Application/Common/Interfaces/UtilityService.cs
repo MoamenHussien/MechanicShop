@@ -26,7 +26,7 @@ public static class UtilityService
     //         return Error.Failure("Invalid_Guid","Guid value is null or empty");
     //     }
 
-    //     if (Guid.TryParse(stringGuidId, out Guid guidId))
+    // if (Guid.TryParse(stringGuidId, out Guid guidId))
     //     {
     //         return guidId;
     //     }
@@ -50,7 +50,6 @@ public static class UtilityService
         return Error.Failure("Invalid_Guid", $"'{stringGuidId}' is not a valid Guid");
     }
 
-
     public static DateTime ToUtc(this DateTime date, TimeZoneInfo zone)
     {
         return TimeZoneInfo.ConvertTimeToUtc(date, zone);
@@ -70,7 +69,4 @@ public static class UtilityService
     {
         return TimeZoneInfo.ConvertTime(date, zone);
     }
-
-
-
 }

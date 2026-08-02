@@ -1,10 +1,9 @@
 using FluentValidation;
+using MechanicShop.Application.Common.Constants;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using Microsoft.Extensions.Logging;
-
-using MechanicShop.Application.Common.Constants;
 
 public sealed record GetVehiclesModelsByMakeIdQuery(Guid MakeId) : ICachedQuery<Result<List<VehicleModelDto>>>
 {
@@ -39,6 +38,5 @@ public class GetVehiclesModelsByMakeIdQueryHandler(IAppDbContext context, ILogge
         logger.LogInformation("Returning And Caching Vehicles Models To This Make Id : {id}", request.MakeId);
 
         return models;
-
     }
 }

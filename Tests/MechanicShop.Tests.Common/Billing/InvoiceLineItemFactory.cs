@@ -1,5 +1,4 @@
-﻿
-namespace MechanicShop.Tests.Common.Billing;
+﻿namespace MechanicShop.Tests.Common.Billing;
 
 public static class InvoiceLineItemFactory
 {
@@ -15,6 +14,6 @@ public static class InvoiceLineItemFactory
             description ?? "some invoice line",
             lineNumber ?? 1,
             unitPrice ?? 100m,
-             quantity ?? 1);
+            quantity ?? 1);
     }
 }

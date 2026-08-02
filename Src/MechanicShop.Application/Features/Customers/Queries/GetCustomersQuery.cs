@@ -1,10 +1,9 @@
 using System.Runtime.InteropServices;
+using MechanicShop.Application.Common.Constants;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Hybrid;
 using Microsoft.Extensions.Logging;
-
-using MechanicShop.Application.Common.Constants;
 
 public sealed record GetCustomersQuery() : ICachedQuery<Result<List<CustomerDto>>>
 {

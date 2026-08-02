@@ -1,9 +1,8 @@
 using System.Linq.Expressions;
+using MechanicShop.Application.Common.Constants;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-
-using MechanicShop.Application.Common.Constants;
 
 public sealed record GetLaborsQuery() : ICachedQuery<Result<List<LaborDto>>>
 {

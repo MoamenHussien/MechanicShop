@@ -15,5 +15,4 @@ public class TestCurrentUser : IUser
     _currentUser!.Id == Guid.Empty
         ? UserFactory.CreateUser().Id
         : _currentUser.Id;
-
 }

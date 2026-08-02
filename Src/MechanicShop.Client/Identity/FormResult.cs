@@ -1,9 +1,8 @@
-namespace MechanicShop.Client.Identity
-{
-    public class FormResult
-    {
-        public bool Succeeded { get; set; }
+namespace MechanicShop.Client.Identity;
 
-        public string[] ErrorList { get; set; } = [];
-    }
+public class FormResult
+{
+    public bool Succeeded { get; set; }
+
+    public string[] ErrorList { get; set; } = [];
 }

@@ -1,6 +1,4 @@
-﻿
-
-namespace MechanicShop.Tests.Common.Customers;
+﻿namespace MechanicShop.Tests.Common.Customers;
 
 public static class CustomerFactory
 {

@@ -13,5 +13,3 @@ public class CreatePartCommandValidator : AbstractValidator<CreateRepairTaskPart
         RuleFor(n => n.Quantity).NotEmpty().WithMessage("Part Quantity Is Required").GreaterThan(0).WithMessage("The Part Quantity Must Be Greater Than 0)");
     }
 }
-
-

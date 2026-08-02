@@ -36,7 +36,6 @@ public class IdentityController(ISender sender) : ApiController
         return result.Match(response => Ok(response), Problem);
     }
 
-
     [HttpGet("current-user/claims")]
     [Authorize]
     [EndpointName("GetCurrentUserClaims")]
@@ -44,7 +43,7 @@ public class IdentityController(ISender sender) : ApiController
     [EndpointDescription("Returns user information for the currently authenticated user based on the access token.")]
     [ProducesResponseType(typeof(AppUserDto), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status401Unauthorized)]
-    [OutputCache(PolicyName = (nameof(Policies.PerUserAuthCache)), Duration = 120)]
+    [OutputCache(PolicyName = nameof(Policies.PerUserAuthCache), Duration = 120)]
     public async Task<IActionResult> GetCurrentUserInfo(CancellationToken ct)
     {
         var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
@@ -87,11 +86,4 @@ public class IdentityController(ISender sender) : ApiController
 
         return result.Match(success => Ok(success), Problem);
     }
-
-
-
-
-
-
-
 }

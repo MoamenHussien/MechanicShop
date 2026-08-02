@@ -1,8 +1,8 @@
 using FluentValidation;
-using MediatR;
-using Microsoft.EntityFrameworkCore;
 using MechanicShop.Application.Common.Constants;
 using MechanicShop.Application.Common.Interfaces;
+using MediatR;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Microsoft.VisualBasic;
 
@@ -28,16 +28,16 @@ public class UpdateWorkOrderRepairTasksCommandHandler(ILogger<UpdateWorkOrderRep
             return ApplicationErrors.NotAllowed;
         }
 
-        var WorkOrder = await context.WorkOrders.Include(n => n.RepairTasks).FirstOrDefaultAsync(n => n.Id == request.WorkOrderid, cancellationToken);
+        var workOrder = await context.WorkOrders.Include(n => n.RepairTasks).FirstOrDefaultAsync(n => n.Id == request.WorkOrderid, cancellationToken);
 
-        if (WorkOrder is null)
+        if (workOrder is null)
         {
             logger.LogWarning("WorkOrder '{WorkOrderId}' not found for updating repair tasks", request.WorkOrderid);
 
             return ApplicationErrors.NotFoundTheWorkOrder;
         }
 
-        var currentIds = WorkOrder.RepairTasks.Select(n => n.Id).ToHashSet();
+        var currentIds = workOrder.RepairTasks.Select(n => n.Id).ToHashSet();
         var newIds = request.RepairTasksIds.ToHashSet();
 
         if (currentIds.SetEquals(newIds))
@@ -46,61 +46,63 @@ public class UpdateWorkOrderRepairTasksCommandHandler(ILogger<UpdateWorkOrderRep
             return Result.Updated;
         }
 
-        var RepairTasks = await context.RepairTasks.Where(n => newIds.Contains(n.Id)).ToListAsync(cancellationToken);
+        var repairTasks = await context.RepairTasks.Where(n => newIds.Contains(n.Id)).ToListAsync(cancellationToken);
 
-        if (!RepairTasks.Any())
+        if (!repairTasks.Any())
         {
             logger.LogError("Not Found Any Repair Tasks For These Ids : {ids}", string.Join(" , ", request.RepairTasksIds));
             return ApplicationErrors.NotFoundAnyRepairTasks;
         }
 
-        if (RepairTasks.Count != request.RepairTasksIds.Length)
+        if (repairTasks.Count != request.RepairTasksIds.Length)
         {
-            var notfound = request.RepairTasksIds.Except(RepairTasks.Select(n => n.Id));
+            var notfound = request.RepairTasksIds.Except(repairTasks.Select(n => n.Id));
             logger.LogError("Cant Find Some Selected Repair Tasks , The Ids For Repair Tasks Not Found : {ids}", string.Join(" , ", notfound));
             return ApplicationErrors.SomeRepairTaskIdsNotfound;
         }
 
-        var TotalDurations = TimeSpan.FromMinutes(RepairTasks.Sum(n => (int)n.EstimatedDuration));
+        var totalDurations = TimeSpan.FromMinutes(repairTasks.Sum(n => (int)n.EstimatedDuration));
 
-        var NewEndAt = WorkOrder.StartAtUtc + TotalDurations;
+        var newEndAt = workOrder.StartAtUtc + totalDurations;
 
-        if (policy.IsOutsideOperatingHours(WorkOrder.StartAtUtc, TotalDurations))
+        if (policy.IsOutsideOperatingHours(workOrder.StartAtUtc, totalDurations))
         {
-            logger.LogWarning("Updated repair tasks duration ({StartAt} ? {EndAt}) exceeds operating hours for WorkOrder '{WorkOrderId}'",
-                WorkOrder.StartAtUtc, NewEndAt, WorkOrder.Id);
-            return ApplicationErrors.WorkOrderOutsideOperatingHour(WorkOrder.StartAtUtc, NewEndAt);
+            logger.LogWarning(
+                "Updated repair tasks duration ({StartAt} ? {EndAt}) exceeds operating hours for WorkOrder '{WorkOrderId}'",
+                workOrder.StartAtUtc, newEndAt, workOrder.Id);
+            return ApplicationErrors.WorkOrderOutsideOperatingHour(workOrder.StartAtUtc, newEndAt);
         }
 
-        var MinimumRequirementResult = policy.ValidateMinimumRequirement(WorkOrder.StartAtUtc, NewEndAt);
-        if (MinimumRequirementResult.IsError)
+        var minimumRequirementResult = policy.ValidateMinimumRequirement(workOrder.StartAtUtc, newEndAt);
+        if (minimumRequirementResult.IsError)
         {
-            logger.LogWarning("Updated repair tasks fail minimum requirement check for WorkOrder '{WorkOrderId}': {Error}",
-                WorkOrder.Id, MinimumRequirementResult.TopError.Description);
-            return MinimumRequirementResult.Errors;
+            logger.LogWarning(
+                "Updated repair tasks fail minimum requirement check for WorkOrder '{WorkOrderId}': {Error}",
+                workOrder.Id, minimumRequirementResult.TopError.Description);
+            return minimumRequirementResult.Errors;
         }
 
-        if (await policy.IsLaborOccupiedDuringRange(WorkOrder.StartAtUtc, NewEndAt, WorkOrder.LaborId, WorkOrder.Id, cancellationToken))
+        if (await policy.IsLaborOccupiedDuringRange(workOrder.StartAtUtc, newEndAt, workOrder.LaborId, workOrder.Id, cancellationToken))
         {
-            logger.LogError("Labor with Id '{LaborId}' is occupied during the new calculated duration.", WorkOrder.LaborId);
+            logger.LogError("Labor with Id '{LaborId}' is occupied during the new calculated duration.", workOrder.LaborId);
             return ApplicationErrors.ThisLaborHasAnotherWorkOrderAtThisRangeTime;
         }
 
-        var isAvailable = await policy.CheckSpotAvailabilityAsync(WorkOrder.StartAtUtc, NewEndAt, WorkOrder.Spot, WorkOrder.Id, cancellationToken);
+        var isAvailable = await policy.CheckSpotAvailabilityAsync(workOrder.StartAtUtc, newEndAt, workOrder.Spot, workOrder.Id, cancellationToken);
 
         if (isAvailable.IsError)
         {
-            logger.LogError("Spot '{Spot}' is already occupied during the new calculated duration.", WorkOrder.Spot.ToString());
+            logger.LogError("Spot '{Spot}' is already occupied during the new calculated duration.", workOrder.Spot.ToString());
             return ApplicationErrors.RangeTimeIsAlreadyTakenByAnotherWorkOrderAtThisSpot;
         }
 
-        var RemoveAndInsertedState = WorkOrder.RemoveAndInsertRepairTasks(RepairTasks);
-        if (RemoveAndInsertedState.IsError)
+        var removeAndInsertedState = workOrder.RemoveAndInsertRepairTasks(repairTasks);
+        if (removeAndInsertedState.IsError)
         {
-            return RemoveAndInsertedState.Errors;
+            return removeAndInsertedState.Errors;
         }
 
-        var updateTimeState = WorkOrder.UpdateTiming(WorkOrder.StartAtUtc, NewEndAt);
+        var updateTimeState = workOrder.UpdateTiming(workOrder.StartAtUtc, newEndAt);
         if (updateTimeState.IsError)
         {
             return updateTimeState.Errors;
@@ -109,10 +111,10 @@ public class UpdateWorkOrderRepairTasksCommandHandler(ILogger<UpdateWorkOrderRep
         await context.SaveChangesAsync(cancellationToken);
         await cacheInvalidator.EvictByTagAsync(CacheTags.WorkOrders, cancellationToken);
 
-        logger.LogInformation("Successfully updated Repair Tasks for WorkOrder Id: {WorkOrderId}. New Duration: {Duration} mins, New EndAt: {EndAt} , And Remove Cache Tag 'WorkOrders' ",
-            WorkOrder.Id, TotalDurations, WorkOrder.EndAtUtc);
+        logger.LogInformation(
+            "Successfully updated Repair Tasks for WorkOrder Id: {WorkOrderId}. New Duration: {Duration} mins, New EndAt: {EndAt} , And Remove Cache Tag 'WorkOrders' ",
+            workOrder.Id, totalDurations, workOrder.EndAtUtc);
 
         return Result.Updated;
-
     }
 }

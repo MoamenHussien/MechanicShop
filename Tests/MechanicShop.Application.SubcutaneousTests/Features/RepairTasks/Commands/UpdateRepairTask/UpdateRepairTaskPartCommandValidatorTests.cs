@@ -21,8 +21,7 @@ public class UpdateRepairTaskPartCommandValidatorTests
             id,
             name ?? "Valid Part",
             cost ?? 50m,
-            quantity ?? 2
-        );
+            quantity ?? 2);
     }
 
     [Fact]

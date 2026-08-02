@@ -1,6 +1,4 @@
-﻿
-
-namespace MechanicShop.Tests.Common.Billing;
+﻿namespace MechanicShop.Tests.Common.Billing;
 
 public static class InvoiceFactory
 {

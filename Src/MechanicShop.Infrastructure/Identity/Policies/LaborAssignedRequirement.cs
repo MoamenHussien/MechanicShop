@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 
 public class LaborAssignedRequirement : IAuthorizationRequirement;
+
 public class LaborAssignedRequirementHandler(AppDbContext contextDb, IHttpContextAccessor httpContextAccessor)
                                                 : AuthorizationHandler<LaborAssignedRequirement>
 {
@@ -43,4 +44,3 @@ public class LaborAssignedRequirementHandler(AppDbContext contextDb, IHttpContex
         context.Fail();
     }
 }
-

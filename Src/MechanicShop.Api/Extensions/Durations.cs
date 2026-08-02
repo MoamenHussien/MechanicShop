@@ -16,5 +16,5 @@ public enum DurationInSeconds
 
     TwoHours = 7200,
 
-    OneDay = 86400
+    OneDay = 86400,
 }

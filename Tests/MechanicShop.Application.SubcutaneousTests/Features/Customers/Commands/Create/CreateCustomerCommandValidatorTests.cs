@@ -1,7 +1,7 @@
-﻿using MechanicShop.Tests.Common.Customers;
+using MechanicShop.Tests.Common.Customers;
 using Xunit;
 
-namespace MechanicShop.Application.SubcutaneousTests.Features.Customers.Commands.CreateCustomer;
+namespace MechanicShop.Application.SubcutaneousTests.Features.Customers.Commands.Create;
 
 public class CreateCustomerCommandValidatorTests
 {
@@ -44,7 +44,6 @@ public class CreateCustomerCommandValidatorTests
         Assert.True(result.IsValid);
         Assert.Empty(result.Errors);
     }
-
 
     [Theory]
     [InlineData("")]
@@ -147,7 +146,9 @@ public class CreateCustomerCommandValidatorTests
         System.Console.WriteLine($"COMMAND VEHICLES IS NULL? {command.Vehicles == null}");
         System.Console.WriteLine($"IS VALID? {result.IsValid}");
         foreach (var error in result.Errors)
+        {
             System.Console.WriteLine($"ERROR: {error.PropertyName} - {error.ErrorMessage}");
+        }
 
         // Assert
         Assert.False(result.IsValid);
@@ -181,5 +182,4 @@ public class CreateCustomerCommandValidatorTests
         Assert.False(result.IsValid);
         Assert.Contains(result.Errors, n => n.PropertyName == "Vehicles[0].year");
     }
-
 }

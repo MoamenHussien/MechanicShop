@@ -3,4 +3,3 @@ namespace MechanicShop.Application.SubcutaneousTests.Features.WorkOrders.Queries
 public class GetWorkOrdersQueryValidatorTests
 {
 }
-

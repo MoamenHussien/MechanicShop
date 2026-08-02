@@ -1,10 +1,9 @@
 using System.Data.Common;
 using System.Numerics;
 using FluentValidation;
+using MechanicShop.Application.Common.Constants;
 using MediatR;
 using Microsoft.Extensions.Logging;
-
-using MechanicShop.Application.Common.Constants;
 
 public sealed record GetUserByIdCommand(Guid id) : ICachedQuery<Result<AppUserDto>>
 {
@@ -28,16 +27,16 @@ public sealed class GetUserByIdCommandHandler(ILogger<GetUserByIdCommandHandler>
 {
     public async Task<Result<AppUserDto>> Handle(GetUserByIdCommand request, CancellationToken cancellationToken)
     {
-        var UserInfo = await identity.GetUserByIdAsync(request.id);
+        var userInfo = await identity.GetUserByIdAsync(request.id);
 
-        if (UserInfo.IsError)
+        if (userInfo.IsError)
         {
-            logger.LogWarning("Cannot get User info For This Id : {id} , And This Is Errors: {@Errors}", request.id, UserInfo.Errors);
-            return UserInfo.Errors;
+            logger.LogWarning("Cannot get User info For This Id : {id} , And This Is Errors: {@Errors}", request.id, userInfo.Errors);
+            return userInfo.Errors;
         }
 
         logger.LogInformation("User info retrieved successfully for Id: {UserId}", request.id);
 
-        return UserInfo.Value;
+        return userInfo.Value;
     }
 }

@@ -6,17 +6,19 @@ using Microsoft.VisualBasic;
 public sealed class VehicleMake : Entity
 {
     public string Make { get; private set; }
+
     private readonly List<VehicleModel> _VehicleModels = [];
+
     public IReadOnlyList<VehicleModel> VehicleModels => _VehicleModels;
 
 #pragma warning disable CS8618
     private VehicleMake()
     {
-
     }
 
 #pragma warning restore CS8618
-    private VehicleMake(Guid id, string Make, List<VehicleModel> vehicleModels) : base(id)
+    private VehicleMake(Guid id, string Make, List<VehicleModel> vehicleModels)
+        : base(id)
     {
         this.Make = Make;
         this._VehicleModels = vehicleModels;
@@ -63,18 +65,17 @@ public sealed class VehicleMake : Entity
 
         // var Hash = UpModels.Select(n=>n.Id).ToHashSet();
         // _VehicleModels.RemoveAll(n=> !Hash.Contains(n.Id));
-
-        var Dic = _VehicleModels.ToDictionary(n => n.Id);
+        var dic = _VehicleModels.ToDictionary(n => n.Id);
 
         foreach (var model in UpModels)
         {
-            if (Dic.TryGetValue(model.Id, out var vehicleModel))
+            if (dic.TryGetValue(model.Id, out var vehicleModel))
             {
-                var UpdateModelState = vehicleModel.Update(model.Model);
+                var updateModelState = vehicleModel.Update(model.Model);
 
-                if (UpdateModelState.IsError)
+                if (updateModelState.IsError)
                 {
-                    return UpdateModelState.Errors;
+                    return updateModelState.Errors;
                 }
             }
             else
@@ -82,6 +83,7 @@ public sealed class VehicleMake : Entity
                 _VehicleModels.Add(model);
             }
         }
+
         return Result.Updated;
     }
 
@@ -89,20 +91,4 @@ public sealed class VehicleMake : Entity
     {
         Make = make;
     }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 }

@@ -17,7 +17,6 @@ public class DashboardControllerTests(WebAppFactory webAppFactory)
     // ========================================================================
     // GET /api/v1.0/dashboard/stats
     // ========================================================================
-
     [Fact]
     public async Task GetTodayStats_WithDefaultDate_ShouldReturnOk()
     {

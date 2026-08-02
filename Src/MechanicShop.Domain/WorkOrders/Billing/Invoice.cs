@@ -4,17 +4,22 @@ using System.Runtime.CompilerServices;
 
 public sealed class Invoice : AuditableEntity
 {
-
     public DateTimeOffset IssuedAtUtc { get; init; }
+
     public InvoiceStatus Status { get; private set; }
 
     public decimal TaxAmount { get; private set; }
+
     public decimal DiscountAmount { get; private set; }
+
     public DateTimeOffset? PaidAt { get; private set; }
+
     private readonly List<InvoiceLineItem> _InvoiceLineItems = [];
+
     public IEnumerable<InvoiceLineItem> InvoiceLineItems => _InvoiceLineItems.AsReadOnly();
 
     public WorkOrder WorkOrder { get; init; } = null!;
+
     public Guid WorkOrderId { get; init; }
 
     public decimal Subtotal => _InvoiceLineItems.Sum(n => n.LineTotal);
@@ -24,13 +29,13 @@ public sealed class Invoice : AuditableEntity
 #pragma warning disable CS8618
     private Invoice()
     {
-
     }
 #pragma warning restore CS8618
 
     private Invoice(Guid id, DateTimeOffset IssuedAtUtc,
                    decimal TaxAmount, decimal DiscountAmount,
-                   List<InvoiceLineItem> InvoiceLineItems, Guid workOrderid) : base(id)
+                   List<InvoiceLineItem> InvoiceLineItems, Guid workOrderid)
+        : base(id)
     {
         this.IssuedAtUtc = IssuedAtUtc;
         this.Status = InvoiceStatus.Unpaid;
@@ -64,7 +69,7 @@ public sealed class Invoice : AuditableEntity
 
     public Result<Updated> ApplyDiscount(decimal DiscountAmount)
     {
-        if (this.Status is not (InvoiceStatus.Unpaid))
+        if (this.Status is not InvoiceStatus.Unpaid)
         {
             return InvoiceErrors.InvoiceLocked;
         }
@@ -86,7 +91,7 @@ public sealed class Invoice : AuditableEntity
 
     public Result<Updated> MarkAsPaid(TimeProvider timeProvider)
     {
-        if (this.Status is not (InvoiceStatus.Unpaid))
+        if (this.Status is not InvoiceStatus.Unpaid)
         {
             return InvoiceErrors.InvoiceLocked;
         }
@@ -96,6 +101,4 @@ public sealed class Invoice : AuditableEntity
 
         return Result.Updated;
     }
-
-
 }

@@ -103,7 +103,7 @@ public class UpdateMakeCommandValidatorTests
     public void UpdateMakeCommandValidator_ShouldFail_WhenModelIsInvalid()
     {
         // Arrange
-        var command = CreateCommand(models: [new UpdateModelCommand(null, "")]);
+        var command = CreateCommand(models: [new UpdateModelCommand(null, string.Empty)]);
 
         // Act
         var result = _sut.Validate(command);

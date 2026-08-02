@@ -25,7 +25,7 @@ public class GenerateTokensQueryHandlerTests(WebAppFactory factory)
             Id = Guid.NewGuid(),
             Email = "testuser@localhost.com",
             UserName = "testuser@localhost.com",
-            EmailConfirmed = true
+            EmailConfirmed = true,
         };
         var password = "ValidPassword123!";
 
@@ -56,7 +56,7 @@ public class GenerateTokensQueryHandlerTests(WebAppFactory factory)
             Id = Guid.NewGuid(),
             Email = "anotheruser@localhost.com",
             UserName = "anotheruser@localhost.com",
-            EmailConfirmed = true
+            EmailConfirmed = true,
         };
 
         var password = "ValidPassword123!";
@@ -100,7 +100,7 @@ public class GenerateTokensQueryHandlerTests(WebAppFactory factory)
             Id = Guid.NewGuid(),
             Email = "lockeduser@localhost.com",
             UserName = "lockeduser@localhost.com",
-            EmailConfirmed = true
+            EmailConfirmed = true,
         };
 
         var password = "ValidPassword123!";
@@ -133,7 +133,7 @@ public class GenerateTokensQueryHandlerTests(WebAppFactory factory)
             Id = Guid.NewGuid(),
             Email = "unconfirmeduser@localhost.com",
             UserName = "unconfirmeduser@localhost.com",
-            EmailConfirmed = false // Crucial missing confirmation
+            EmailConfirmed = false, // Crucial missing confirmation
         };
 
         var password = "ValidPassword123!";

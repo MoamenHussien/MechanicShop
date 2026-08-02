@@ -1,11 +1,11 @@
 using MechanicShop.Application.SubcutaneousTests.Common;
 using MechanicShop.Tests.Common.Customers;
 using MechanicShop.Tests.Common.Employees;
+using MechanicShop.Tests.Common.RepaireTasks;
 using MechanicShop.Tests.Common.WorkOrders;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Xunit;
-using MechanicShop.Tests.Common.RepaireTasks;
 
 namespace MechanicShop.Application.SubcutaneousTests.Features.WorkOrders.Commands.DeleteWorkOrder;
 
@@ -67,7 +67,7 @@ public class DeleteWorkOrderCommandHandlerTests(WebAppFactory factory)
         var result = await _mediator.Send(command);
 
         // Assert
-        Assert.True(result.IsSuccess, result.IsError ? result.TopError.Description : "");
+        Assert.True(result.IsSuccess, result.IsError ? result.TopError.Description : string.Empty);
 
         ((DbContext)_context).ChangeTracker.Clear();
 

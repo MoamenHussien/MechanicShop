@@ -9,7 +9,7 @@ public static class TestUsers
         Id = "19a59129-6c20-417a-834d-11a208d32d96".ToGuid().Value,
         Email = "pm@localhost",
         UserName = "pm@localhost",
-        EmailConfirmed = true
+        EmailConfirmed = true,
     };
 
     public static AppUser Labor01 => new()
@@ -17,7 +17,7 @@ public static class TestUsers
         Id = "b6327240-0aea-46fc-863a-777fc4e42560".ToGuid().Value,
         Email = "john.labor@localhost",
         UserName = "john.labor@localhost",
-        EmailConfirmed = true
+        EmailConfirmed = true,
     };
 
     public static AppUser Labor02 => new()
@@ -25,7 +25,7 @@ public static class TestUsers
         Id = "8104AB20-26C2-4651-B1DE-C0BAF04DBBD9".ToGuid().Value,
         Email = "peter.labor@localhost",
         UserName = "peter.labor@localhost",
-        EmailConfirmed = true
+        EmailConfirmed = true,
     };
 
     // public static AppUser Labor03 => new()

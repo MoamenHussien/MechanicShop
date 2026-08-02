@@ -1,6 +1,6 @@
 using Xunit;
 
-namespace MechanicShop.Application.SubcutaneousTests.Features.Customers.Commands.UpdateCustomer;
+namespace MechanicShop.Application.SubcutaneousTests.Features.Customers.Commands.Update;
 
 public class UpdateVehicleCommandValidatorTests
 {

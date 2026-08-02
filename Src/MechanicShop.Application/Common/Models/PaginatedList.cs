@@ -4,7 +4,9 @@ public sealed class PaginatedList<T>
         = Array.Empty<T>();
 
     public int TotalCount { get; init; }
+
     public int PageIndex { get; init; }
+
     public int PageSize { get; init; }
 
     public int TotalPages => PageSize > 0
@@ -12,6 +14,7 @@ public sealed class PaginatedList<T>
         : 0;
 
     public bool HasPreviousPage => PageIndex > 1;
+
     public bool HasNextPage => PageIndex < TotalPages;
 
     public static PaginatedList<T> Create(
@@ -31,7 +34,7 @@ public sealed class PaginatedList<T>
                          ?? (IReadOnlyCollection<T>)Array.Empty<T>(),
             TotalCount = totalCount,
             PageIndex = pageIndex,
-            PageSize = pageSize
+            PageSize = pageSize,
         };
     }
 }

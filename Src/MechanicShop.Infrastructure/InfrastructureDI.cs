@@ -1,20 +1,20 @@
 using System.Text;
+using MechanicShop.Application.Common.Interfaces;
+using MechanicShop.Infrastructure.Caching;
+using MechanicShop.Infrastructure.HealthChecks;
 using MechanicShop.Infrastructure.Identity;
 using MechanicShop.Infrastructure.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
+using Microsoft.Extensions.Caching.Hybrid;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Caching.Hybrid;
-using Microsoft.Extensions.Diagnostics.HealthChecks;
-using MechanicShop.Application.Common.Interfaces;
-using MechanicShop.Infrastructure.Caching;
-using MechanicShop.Infrastructure.HealthChecks;
 
 public static class InfrastructureDI
 {
@@ -26,8 +26,10 @@ public static class InfrastructureDI
         services.AddOptions<JwtSettings>().BindConfiguration(JwtSettings.Name).ValidateOnStart();
         services.AddOptions<MailSettings>().BindConfiguration(MailSettings.Name).ValidateOnStart();
         services.AddOptions<HealthCheckSettings>().BindConfiguration(HealthCheckSettings.Name).ValidateOnStart();
+
         // BackGround Services
         services.AddHostedService<OverdueBookingCleanupService>();
+
         // Application Services
         services.AddScoped<IWorkOrderNotifier, SignalRWorkOrderNotifier>();
         services.AddScoped<INotificationService, NotificationService>();
@@ -46,7 +48,8 @@ public static class InfrastructureDI
         services.AddDbContext<AppDbContext>((sp, options) =>
         {
             options.AddInterceptors(sp.GetServices<ISaveChangesInterceptor>());
-            options.UseSqlServer(connectionString,
+            options.UseSqlServer(
+                connectionString,
                 sqlOptions =>
                 {
                     sqlOptions.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery);
@@ -54,13 +57,14 @@ public static class InfrastructureDI
         });
 
         // Health Checks
-
         services.AddHealthChecks()
+
              // Database
              .AddDbContextCheck<AppDbContext>(
                  name: "SQL Server",
                  failureStatus: HealthStatus.Unhealthy,
                  tags: ["db", "ready"])
+
              // Redis
              .AddRedis(
                  redisConnectionString: config.GetConnectionString("Redis")!,
@@ -68,17 +72,20 @@ public static class InfrastructureDI
                  failureStatus: HealthStatus.Unhealthy,
                  tags: ["cache", "ready"],
                  timeout: TimeSpan.FromSeconds(2))
+
              // Mail
              .AddCheck<MailHealthCheck>(
                  name: "SMTP",
                  failureStatus: HealthStatus.Unhealthy,
                  tags: ["external", "ready"],
                  timeout: TimeSpan.FromSeconds(5))
+
              // Memory
              .AddCheck<MemoryHealthCheck>(
                  name: "Memory",
                  failureStatus: HealthStatus.Degraded,
                  tags: ["system", "diagnostics"])
+
              // Disk
              .AddCheck<DiskHealthCheck>(
                  name: "Disk",
@@ -86,7 +93,6 @@ public static class InfrastructureDI
                  tags: ["system", "diagnostics"]);
 
         // Security & Identity
-
         var jwtSettings = config.GetSection("JwtSettings");
 
         services.AddScoped<IAuthorizationHandler, LaborAssignedRequirementHandler>();
@@ -99,7 +105,6 @@ public static class InfrastructureDI
         {
             options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
             options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-
         }).AddJwtBearer(options =>
         {
             options.TokenValidationParameters = new TokenValidationParameters
@@ -126,11 +131,9 @@ public static class InfrastructureDI
             options.Password.RequiredUniqueChars = 1;
             options.SignIn.RequireConfirmedAccount = false;
             options.User.RequireUniqueEmail = true;
-
         }).AddRoles<IdentityRole<Guid>>().AddEntityFrameworkStores<AppDbContext>().AddDefaultTokenProviders();
 
-        //Caching & Rides
-
+        // Caching & Rides
         services.AddStackExchangeRedisCache(options =>
         {
             options.Configuration = config.GetConnectionString("Redis");

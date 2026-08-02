@@ -18,23 +18,23 @@ public class GenerateTokenCommandHandler(ILogger<GenerateTokenCommandHandler> lo
 {
     public async Task<Result<TokenResponse>> Handle(GenerateTokenCommand request, CancellationToken cancellationToken)
     {
-        var UserDto = await identity.AuthenticateAsync(request.email, request.password, cancellationToken);
+        var userDto = await identity.AuthenticateAsync(request.email, request.password, cancellationToken);
 
-        if (UserDto.IsError)
+        if (userDto.IsError)
         {
-            logger.LogWarning("Login failed for email: {Email} - {@ErrorDescription}", request.email, UserDto.Errors);
-            return UserDto.Errors;
+            logger.LogWarning("Login failed for email: {Email} - {@ErrorDescription}", request.email, userDto.Errors);
+            return userDto.Errors;
         }
 
-        var TokenResponse = await token.GenerateJwtTokenAsync(UserDto.Value);
+        var tokenResponse = await token.GenerateJwtTokenAsync(userDto.Value);
 
-        if (TokenResponse.IsError)
+        if (tokenResponse.IsError)
         {
-            logger.LogError("Token generation failed for user: {UserId} - {ErrorDescription}", UserDto.Value.UserId, TokenResponse.Errors);
-            return TokenResponse.Errors;
+            logger.LogError("Token generation failed for user: {UserId} - {ErrorDescription}", userDto.Value.UserId, tokenResponse.Errors);
+            return tokenResponse.Errors;
         }
 
-        logger.LogInformation("The Authentication And Generate Jwt Token To This User Id : {id} Is Successfully", UserDto.Value.UserId);
-        return TokenResponse.Value;
+        logger.LogInformation("The Authentication And Generate Jwt Token To This User Id : {id} Is Successfully", userDto.Value.UserId);
+        return tokenResponse.Value;
     }
 }

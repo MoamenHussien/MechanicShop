@@ -65,7 +65,6 @@ public class PartTests
         // Act
         var result = Part.Create(id: Guid.Empty, Costs: 100, Name: value!, Quantity: 2);
 
-
         // Assert
         Assert.True(result.IsError);
         Assert.Equal(PartsErrors.ValidPartName.Code, result.TopError.Code);

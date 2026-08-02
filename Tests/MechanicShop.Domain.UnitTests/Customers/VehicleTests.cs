@@ -38,8 +38,7 @@ public class VehicleTests
             id: Guid.Empty,
             Year: 2024,
             LicensePlate: "ABC 123",
-            VehicleModelId: "11111111-1111-1111-1111-222222222221".ToGuid().Value
-            );
+            VehicleModelId: "11111111-1111-1111-1111-222222222221".ToGuid().Value);
 
         // Assert
         Assert.True(result.IsSuccess);
@@ -73,8 +72,7 @@ public class VehicleTests
             id: Guid.Empty,
             Year: 2024,
             LicensePlate: value!,
-            VehicleModelId: "11111111-1111-1111-1111-222222222221".ToGuid().Value
-            );
+            VehicleModelId: "11111111-1111-1111-1111-222222222221".ToGuid().Value);
 
         // Assert
         Assert.True(result.IsError);
@@ -91,8 +89,7 @@ public class VehicleTests
             id: Guid.Empty,
             Year: 2024,
             LicensePlate: "ABC 123",
-            VehicleModelId: Guid.Empty
-            );
+            VehicleModelId: Guid.Empty);
 
         // Assert
         Assert.True(result.IsError);

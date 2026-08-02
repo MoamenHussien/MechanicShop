@@ -22,11 +22,11 @@ public class CachingBehavior<TRequest, TResponse>
         var data = await cache.GetOrCreateAsync<TResponse>(
                                                            cachedQuery.CacheKey,
                                                            _ => new ValueTask<TResponse>((TResponse)(object)null!),
-                                                            new HybridCacheEntryOptions
-                                                            {
-                                                                Flags = HybridCacheEntryFlags.DisableUnderlyingData
-                                                            },
-                                                            cancellationToken: cancellationToken);
+                                                           new HybridCacheEntryOptions
+                                                           {
+                                                               Flags = HybridCacheEntryFlags.DisableUnderlyingData,
+                                                           },
+                                                           cancellationToken: cancellationToken);
         if (data is not null)
         {
             logger.LogInformation(
@@ -51,7 +51,7 @@ public class CachingBehavior<TRequest, TResponse>
                 data,
                 new HybridCacheEntryOptions
                 {
-                    Expiration = cachedQuery.Expiration
+                    Expiration = cachedQuery.Expiration,
                 },
                 cachedQuery.Tags,
                 cancellationToken);

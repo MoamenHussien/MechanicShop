@@ -7,7 +7,7 @@ public static class VehiclesMakeMapper
         {
             Id = make.Id,
             Make = make.Make,
-            VehiclesModels = make.VehicleModels.ToModelsDto()
+            VehiclesModels = make.VehicleModels.ToModelsDto(),
         };
     }
 

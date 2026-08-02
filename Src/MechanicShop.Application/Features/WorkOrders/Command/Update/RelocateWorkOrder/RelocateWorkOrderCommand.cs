@@ -1,9 +1,9 @@
 using System.Security.AccessControl;
 using FluentValidation;
-using MediatR;
-using Microsoft.EntityFrameworkCore;
 using MechanicShop.Application.Common.Constants;
 using MechanicShop.Application.Common.Interfaces;
+using MediatR;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
 public sealed record RelocateWorkOrderCommand(Guid WorkOrderId, DateTimeOffset NewStartDateTimeUtc, Spot NewSpot) : IRequest<Result<Updated>>;
@@ -29,53 +29,53 @@ public class RelocateWorkOrderCommandHandler(ILogger<RelocateWorkOrderCommandHan
             return ApplicationErrors.NotAllowed;
         }
 
-        var WorkOrder = await context.WorkOrders.FirstOrDefaultAsync(n => n.Id == request.WorkOrderId, cancellationToken);
+        var workOrder = await context.WorkOrders.FirstOrDefaultAsync(n => n.Id == request.WorkOrderId, cancellationToken);
 
-        if (WorkOrder is null)
+        if (workOrder is null)
         {
             logger.LogWarning("Relocate Work Order Failed: WorkOrder with Id '{WorkOrderId}' not found.", request.WorkOrderId);
             return ApplicationErrors.NotFoundTheWorkOrder;
         }
 
-        var TotalDurations = WorkOrder.EndAtUtc.Subtract(WorkOrder.StartAtUtc);
+        var totalDurations = workOrder.EndAtUtc.Subtract(workOrder.StartAtUtc);
 
-        var newEndAt = request.NewStartDateTimeUtc.Add(TotalDurations);
+        var newEndAt = request.NewStartDateTimeUtc.Add(totalDurations);
 
-        if (WorkOrder.StartAtUtc == request.NewStartDateTimeUtc && WorkOrder.EndAtUtc == newEndAt)
+        if (workOrder.StartAtUtc == request.NewStartDateTimeUtc && workOrder.EndAtUtc == newEndAt)
         {
             return ApplicationErrors.NothingIsChanged;
         }
 
-        if (policy.IsOutsideOperatingHours(request.NewStartDateTimeUtc, TotalDurations))
+        if (policy.IsOutsideOperatingHours(request.NewStartDateTimeUtc, totalDurations))
         {
             logger.LogWarning("Relocate Work Order Failed: The requested time ({StartAt} - {EndAt}) is outside store operating hours.", request.NewStartDateTimeUtc, newEndAt);
             return ApplicationErrors.WorkOrderOutsideOperatingHour(request.NewStartDateTimeUtc, newEndAt);
         }
 
-        if (await policy.IsVehicleAlreadyScheduled(WorkOrder.VehicleId, request.NewStartDateTimeUtc, newEndAt, WorkOrder.Id, cancellationToken))
+        if (await policy.IsVehicleAlreadyScheduled(workOrder.VehicleId, request.NewStartDateTimeUtc, newEndAt, workOrder.Id, cancellationToken))
         {
-            logger.LogWarning("Vehicle with Id '{VehicleId}' already has an overlapping WorkOrder.", WorkOrder.VehicleId);
+            logger.LogWarning("Vehicle with Id '{VehicleId}' already has an overlapping WorkOrder.", workOrder.VehicleId);
             return ApplicationErrors.VehicleSchedulingConflict;
         }
 
-        var IsSpotAvailable = await policy.CheckSpotAvailabilityAsync(request.NewStartDateTimeUtc, newEndAt, request.NewSpot, request.WorkOrderId, cancellationToken);
-        if (IsSpotAvailable.IsError)
+        var isSpotAvailable = await policy.CheckSpotAvailabilityAsync(request.NewStartDateTimeUtc, newEndAt, request.NewSpot, request.WorkOrderId, cancellationToken);
+        if (isSpotAvailable.IsError)
         {
             logger.LogWarning("Relocate Work Order Failed: Spot '{Spot}' is already occupied during this time range.", request.NewSpot.ToString());
             return ApplicationErrors.RangeTimeIsAlreadyTakenByAnotherWorkOrderAtThisSpot;
         }
 
-        if (await policy.IsLaborOccupiedDuringRange(request.NewStartDateTimeUtc, newEndAt, WorkOrder.LaborId, WorkOrder.Id))
+        if (await policy.IsLaborOccupiedDuringRange(request.NewStartDateTimeUtc, newEndAt, workOrder.LaborId, workOrder.Id))
         {
-            logger.LogWarning("Relocate Work Order Failed: Labor with Id '{LaborId}' is already occupied or unavailable during this time range.", WorkOrder.LaborId);
+            logger.LogWarning("Relocate Work Order Failed: Labor with Id '{LaborId}' is already occupied or unavailable during this time range.", workOrder.LaborId);
             return ApplicationErrors.ThisLaborHasAnotherWorkOrderAtThisRangeTime;
         }
 
-        var UpdateStartTimeState = WorkOrder.ReLocateWorkOrder(request.NewSpot, request.NewStartDateTimeUtc, newEndAt);
-        if (UpdateStartTimeState.IsError)
+        var updateStartTimeState = workOrder.ReLocateWorkOrder(request.NewSpot, request.NewStartDateTimeUtc, newEndAt);
+        if (updateStartTimeState.IsError)
         {
-            logger.LogWarning("Relocate Work Order Failed: Domain validation failed. Error: {Error}", UpdateStartTimeState.TopError.Description);
-            return UpdateStartTimeState.Errors;
+            logger.LogWarning("Relocate Work Order Failed: Domain validation failed. Error: {Error}", updateStartTimeState.TopError.Description);
+            return updateStartTimeState.Errors;
         }
 
         await context.SaveChangesAsync(cancellationToken);

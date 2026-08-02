@@ -1,9 +1,8 @@
 using FluentValidation;
+using MechanicShop.Application.Common.Constants;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-
-using MechanicShop.Application.Common.Constants;
 
 public sealed record GetRepairTaskByIdQuery(Guid id) : ICachedQuery<Result<RepairTaskDto>>
 {
@@ -41,7 +40,7 @@ public class GetRepairTaskByIdQueryHandler(ILogger<GetRepairTaskByIdQueryHandler
                                                                             p.Name,
                                                                             p.Costs,
                                                                             p.Quantity))
-                                                                        .ToList()
+                                                                        .ToList(),
                                                                 })
                                                                 .FirstOrDefaultAsync(cancellationToken);
 
@@ -50,9 +49,9 @@ public class GetRepairTaskByIdQueryHandler(ILogger<GetRepairTaskByIdQueryHandler
             logger.LogWarning("The Repair Task Is Not Found , For This Id : {id}", request.id);
             return ApplicationErrors.NotFoundThisRepairTaskId;
         }
+
         logger.LogInformation("Returning Repair Task Successfully To This Id : {id}", request.id);
 
         return repairTask;
     }
 }
-

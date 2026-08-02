@@ -238,11 +238,13 @@ public class RepairTaskTests
         Assert.Equal(Result.Updated, result.Value);
         Assert.Equal(2, repairTask.Parts.Count);
 
-        Assert.Contains(repairTask.Parts,
+        Assert.Contains(
+            repairTask.Parts,
             n => n.Id == updatedPart.Id &&
                  n.Name == "Oil Filter");
 
-        Assert.Contains(repairTask.Parts,
+        Assert.Contains(
+            repairTask.Parts,
             n => n.Id == newPart.Id);
     }
 
