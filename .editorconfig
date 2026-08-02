@@ -11,7 +11,6 @@ tab_width = 4
 end_of_line = crlf
 
 csharp_style_namespace_declarations = file_scoped:warning
-dotnet_diagnostic.IDE0130.severity = warning
 dotnet_style_readonly_field = true:warning
 
 dotnet_naming_rule.private_fields_should_be__camelcase.severity = warning
@@ -28,6 +27,11 @@ dotnet_naming_rule.interfaces_should_start_with_i.style = i_pascalcase_style
 dotnet_naming_symbols.interface_symbols.applicable_kinds = interface
 dotnet_naming_style.i_pascalcase_style.capitalization = pascal_case
 dotnet_naming_style.i_pascalcase_style.required_prefix = I
+
+# IDE Rule Exclusions for EF Core Backing Fields, Extension Namespaces & Migration Snapshots
+dotnet_diagnostic.IDE0130.severity = none
+dotnet_diagnostic.IDE0161.severity = none
+dotnet_diagnostic.IDE1006.severity = none
 
 # GROUP A — Documentation/header: off
 dotnet_diagnostic.SA0001.severity = none
@@ -59,7 +63,7 @@ dotnet_diagnostic.SA1311.severity = none
 dotnet_diagnostic.SA1313.severity = none
 dotnet_diagnostic.SA1314.severity = none
 
-# GROUP D — Pure formatting & layout opinion rules without automated Roslyn code fixers: off
+# GROUP D — Formatting & layout opinion rules without automated Roslyn code fixers: off
 dotnet_diagnostic.SA1000.severity = none
 dotnet_diagnostic.SA1001.severity = none
 dotnet_diagnostic.SA1002.severity = none
@@ -107,7 +111,7 @@ dotnet_diagnostic.SA1516.severity = none
 dotnet_diagnostic.SA1517.severity = none
 dotnet_diagnostic.SA1518.severity = none
 
-# CA Diagnostics — Specific opinionated rules suppressed by team decision
+# CA Diagnostics — Specific opinionated rules configured by team decision
 dotnet_diagnostic.CA1000.severity = none
 dotnet_diagnostic.CA1050.severity = none
 dotnet_diagnostic.CA1304.severity = none

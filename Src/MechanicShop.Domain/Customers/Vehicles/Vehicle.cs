@@ -17,7 +17,7 @@ public sealed class Vehicle : AuditableEntity
 
     public string VehicleInfo => LicensePlate + " " + Year;
 
-    private List<WorkOrder> _workOrders = [];
+    private readonly List<WorkOrder> _workOrders = [];
 
     public IReadOnlyList<WorkOrder> WorkOrders => _workOrders;
 

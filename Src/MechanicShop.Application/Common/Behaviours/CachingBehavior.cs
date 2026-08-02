@@ -23,9 +23,9 @@ public class CachingBehavior<TRequest, TResponse>
                                                            cachedQuery.CacheKey,
                                                            _ => new ValueTask<TResponse>((TResponse)(object)null!),
                                                            new HybridCacheEntryOptions
-                                                            {
-                                                                Flags = HybridCacheEntryFlags.DisableUnderlyingData,
-                                                            },
+                                                           {
+                                                               Flags = HybridCacheEntryFlags.DisableUnderlyingData,
+                                                           },
                                                            cancellationToken: cancellationToken);
         if (data is not null)
         {

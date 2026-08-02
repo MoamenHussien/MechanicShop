@@ -1,10 +1,10 @@
-﻿using MechanicShop.Application.SubcutaneousTests.Common;
+using MechanicShop.Application.SubcutaneousTests.Common;
 using MechanicShop.Tests.Common.Customers;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Xunit;
 
-namespace MechanicShop.Application.SubcutaneousTests.Features.Customers.Commands.CreateCustomer;
+namespace MechanicShop.Application.SubcutaneousTests.Features.Customers.Commands.Create;
 
 [Collection(WebAppFactoryCollection.CollectionName)]
 public class CreateCustomerCommandHandlerTests(WebAppFactory factory)

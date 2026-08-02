@@ -45,15 +45,15 @@ public class RefreshTokenCommandHandler(ILogger<RefreshTokenCommandHandler> logg
 
         Guid userId = userIdResult.Value;
 
-        var RefreshToken = identity.GetRefreshTokenFromCookies();
+        var refreshToken1 = identity.GetRefreshTokenFromCookies();
 
-        if (RefreshToken.IsError)
+        if (refreshToken1.IsError)
         {
-            logger.LogWarning("Failed to get refresh token from cookies. Error: {ErrorCode}", RefreshToken.TopError);
-            return RefreshToken.Errors;
+            logger.LogWarning("Failed to get refresh token from cookies. Error: {ErrorCode}", refreshToken1.TopError);
+            return refreshToken1.Errors;
         }
 
-        var refreshToken = await context.RefreshTokens.FirstOrDefaultAsync(n => n.UserId == userId && n.Token == RefreshToken.Value);
+        var refreshToken = await context.RefreshTokens.FirstOrDefaultAsync(n => n.UserId == userId && n.Token == refreshToken1.Value);
 
         if (refreshToken is null || refreshToken.IsExpired())
         {

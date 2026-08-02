@@ -46,21 +46,21 @@ public class CreateMakeCommandHandler(IAppDbContext context, ICacheInvalidator c
             listOfVehicleModel.Add(createdModel.Value);
         }
 
-        var Make = VehicleMake.Create(Guid.NewGuid(), request.Make, listOfVehicleModel);
-        if (Make.IsError)
+        var make1 = VehicleMake.Create(Guid.NewGuid(), request.Make, listOfVehicleModel);
+        if (make1.IsError)
         {
             logger.LogWarning("The Creation Of New VehicleMake With Name {MakeName} Is Fail", request.Make);
-            return Make.TopError;
+            return make1.TopError;
         }
 
-        await context.VehicleMakes.AddAsync(Make.Value, cancellationToken);
+        await context.VehicleMakes.AddAsync(make1.Value, cancellationToken);
         await context.SaveChangesAsync(cancellationToken);
-        logger.LogInformation("Add New VehicleMake With id {id} And Name {Name}", Make.Value.Id, Make.Value.Make);
+        logger.LogInformation("Add New VehicleMake With id {id} And Name {Name}", make1.Value.Id, make1.Value.Make);
 
         await cacheInvalidator.EvictByTagAsync(CacheTags.VehicleMakes, cancellationToken);
 
         logger.LogInformation("The Hybrid Cache Delete The Tag With Name VMakes");
 
-        return Make.Value.Id;
+        return make1.Value.Id;
     }
 }

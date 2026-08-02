@@ -14,12 +14,12 @@ public class CustomAuthenticationStateProvider(
     ILogger<CustomAuthenticationStateProvider> logger) : AuthenticationStateProvider, IAccountManagement
 {
     private readonly ILocalStorageService _localStorageService = localStorageService;
-    private readonly JsonSerializerOptions jsonSerializerOptions = new() { PropertyNamingPolicy = JsonNamingPolicy.CamelCase };
-    private readonly ClaimsPrincipal unauthenticated = new(new ClaimsIdentity());
+    private readonly JsonSerializerOptions _jsonSerializerOptions = new() { PropertyNamingPolicy = JsonNamingPolicy.CamelCase };
+    private readonly ClaimsPrincipal _unauthenticated = new(new ClaimsIdentity());
 
     private readonly IHttpClientFactory _httpClientFactory = httpClientFactory;
 
-    private bool authenticated;
+    private bool _authenticated;
 
     public async Task<FormResult> LoginAsync(string email, string password)
     {
@@ -57,17 +57,17 @@ public class CustomAuthenticationStateProvider(
 
     public override async Task<AuthenticationState> GetAuthenticationStateAsync()
     {
-        authenticated = false;
+        _authenticated = false;
 
         // default to not authenticated
-        var user = unauthenticated;
+        var user = _unauthenticated;
 
         try
         {
             var authResult = await LoadAccessTokenFromStorage();
             if (authResult?.AccessToken is null)
             {
-                return new AuthenticationState(unauthenticated);
+                return new AuthenticationState(_unauthenticated);
             }
 
             var httpClient = _httpClientFactory.CreateClient("MechanicShopClient");
@@ -81,7 +81,7 @@ public class CustomAuthenticationStateProvider(
             // user is authenticated,so let's build their authenticated identity
             var userJson = await userResponse.Content.ReadAsStringAsync();
 
-            var userInfo = JsonSerializer.Deserialize<UserInfo>(userJson, jsonSerializerOptions);
+            var userInfo = JsonSerializer.Deserialize<UserInfo>(userJson, _jsonSerializerOptions);
 
             if (userInfo != null)
             {
@@ -104,7 +104,7 @@ public class CustomAuthenticationStateProvider(
 
                 user = new ClaimsPrincipal(id);
 
-                authenticated = true;
+                _authenticated = true;
             }
         }
         catch (Exception ex)
@@ -130,14 +130,14 @@ public class CustomAuthenticationStateProvider(
         finally
         {
             await _localStorageService.RemoveItemAsync("authResult");
-            NotifyAuthenticationStateChanged(Task.FromResult(new AuthenticationState(unauthenticated)));
+            NotifyAuthenticationStateChanged(Task.FromResult(new AuthenticationState(_unauthenticated)));
         }
     }
 
     public async Task<bool> CheckAuthenticatedAsync()
     {
         await GetAuthenticationStateAsync();
-        return authenticated;
+        return _authenticated;
     }
 
     public async Task<TokenResponse?> RefreshTokenAsync()

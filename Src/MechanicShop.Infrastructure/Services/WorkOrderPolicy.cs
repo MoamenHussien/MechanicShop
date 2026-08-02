@@ -12,7 +12,7 @@ public class WorkOrderPolicy(AppDbContext context, IOptions<AppSettings> options
                         n.EndAtUtc > startAt &&
                         n.State != WorkOrderState.Cancelled &&
                         (!excludeWorkOrderId.HasValue || n.Id != excludeWorkOrderId.Value),
-                        ct);
+            ct);
 
         return isOccupied
              ? Error.Conflict("MechanicShop_Spot_Full", "The selected time slot is unavailable for the requested services.")

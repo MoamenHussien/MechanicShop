@@ -50,7 +50,7 @@ public static class InvoiceMapper
                     Description = item.Description,
                     Quantity = item.Quantity,
                     UnitPrice = item.UnitPrice,
-                    LineTotal = item.LineTotal
+                    LineTotal = item.LineTotal,
                 })
                 .ToList(),
         };

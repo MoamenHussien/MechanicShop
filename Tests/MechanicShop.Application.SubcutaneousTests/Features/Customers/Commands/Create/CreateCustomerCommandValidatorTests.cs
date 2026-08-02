@@ -1,7 +1,7 @@
-﻿using MechanicShop.Tests.Common.Customers;
+using MechanicShop.Tests.Common.Customers;
 using Xunit;
 
-namespace MechanicShop.Application.SubcutaneousTests.Features.Customers.Commands.CreateCustomer;
+namespace MechanicShop.Application.SubcutaneousTests.Features.Customers.Commands.Create;
 
 public class CreateCustomerCommandValidatorTests
 {

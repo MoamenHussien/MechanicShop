@@ -1,64 +1,63 @@
-namespace MechanicShop.Client.Services
+namespace MechanicShop.Client.Services;
+
+public class ApiResult<T>
 {
-    public class ApiResult<T>
+    public bool IsSuccess { get; set; }
+
+    public T? Data { get; set; }
+
+    public string? ErrorMessage { get; set; }
+
+    public string? ErrorDetail { get; set; }
+
+    public int StatusCode { get; set; }
+
+    public Dictionary<string, string[]>? ValidationErrors { get; set; }
+
+    public string? FirstErrorMessage =>
+        ValidationErrors?.SelectMany(kvp => kvp.Value).FirstOrDefault() ?? ErrorMessage;
+
+    public static ApiResult<T> Success(T data)
     {
-        public bool IsSuccess { get; set; }
-
-        public T? Data { get; set; }
-
-        public string? ErrorMessage { get; set; }
-
-        public string? ErrorDetail { get; set; }
-
-        public int StatusCode { get; set; }
-
-        public Dictionary<string, string[]>? ValidationErrors { get; set; }
-
-        public string? FirstErrorMessage =>
-            ValidationErrors?.SelectMany(kvp => kvp.Value).FirstOrDefault() ?? ErrorMessage;
-
-        public static ApiResult<T> Success(T data)
+        return new ApiResult<T>
         {
-            return new ApiResult<T>
-            {
-                IsSuccess = true,
-                Data = data,
-            };
-        }
-
-        public static ApiResult<T> Failure(string? message, string? detail = null, int statusCode = 0, Dictionary<string, string[]>? validationErrors = null)
-        {
-            return new ApiResult<T>
-            {
-                IsSuccess = false,
-                ErrorMessage = message,
-                ErrorDetail = detail,
-                StatusCode = statusCode,
-                ValidationErrors = validationErrors,
-            };
-        }
+            IsSuccess = true,
+            Data = data,
+        };
     }
 
-    public class ApiResult : ApiResult<object>
+    public static ApiResult<T> Failure(string? message, string? detail = null, int statusCode = 0, Dictionary<string, string[]>? validationErrors = null)
     {
-        public static ApiResult Success()
+        return new ApiResult<T>
         {
-            return new ApiResult
-            {
-                IsSuccess = true,
-            };
-        }
+            IsSuccess = false,
+            ErrorMessage = message,
+            ErrorDetail = detail,
+            StatusCode = statusCode,
+            ValidationErrors = validationErrors,
+        };
+    }
+}
 
-        public static new ApiResult Failure(string? message, string? detail = null, int statusCode = 0, Dictionary<string, string[]>? validationErrors = null)
+public class ApiResult : ApiResult<object>
+{
+    public static ApiResult Success()
+    {
+        return new ApiResult
         {
-            return new ApiResult
-            {
-                IsSuccess = false,
-                ErrorMessage = message,
-                ErrorDetail = detail,
-                StatusCode = statusCode,
-                ValidationErrors = validationErrors,
-            };
-        }
+            IsSuccess = true,
+        };
+    }
+
+    public static new ApiResult Failure(string? message, string? detail = null, int statusCode = 0, Dictionary<string, string[]>? validationErrors = null)
+    {
+        return new ApiResult
+        {
+            IsSuccess = false,
+            ErrorMessage = message,
+            ErrorDetail = detail,
+            StatusCode = statusCode,
+            ValidationErrors = validationErrors,
+        };
     }
 }

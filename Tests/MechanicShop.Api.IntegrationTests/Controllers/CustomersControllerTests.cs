@@ -113,7 +113,7 @@ public class CustomersControllerTests(WebAppFactory webAppFactory)
                 {
                     ModelId = vehicleModel.Id,
                     Year = 2024,
-                    LicensePlate = "TST123"
+                    LicensePlate = "TST123",
                 }
             ],
         };
@@ -182,7 +182,7 @@ public class CustomersControllerTests(WebAppFactory webAppFactory)
                 {
                     ModelId = Guid.NewGuid(),
                     Year = 2024,
-                    LicensePlate = "TST123"
+                    LicensePlate = "TST123",
                 }
             ],
         };
@@ -210,7 +210,7 @@ public class CustomersControllerTests(WebAppFactory webAppFactory)
                 {
                     ModelId = Guid.NewGuid(),
                     Year = 2024,
-                    LicensePlate = "TST123"
+                    LicensePlate = "TST123",
                 }
             ],
         };
@@ -262,7 +262,7 @@ public class CustomersControllerTests(WebAppFactory webAppFactory)
                 {
                     ModelId = vehicleModel.Id,
                     Year = 2024,
-                    LicensePlate = "DUP123"
+                    LicensePlate = "DUP123",
                 }
             ],
         };
@@ -290,7 +290,7 @@ public class CustomersControllerTests(WebAppFactory webAppFactory)
                 {
                     ModelId = Guid.NewGuid(),
                     Year = 2024,
-                    LicensePlate = "TST123"
+                    LicensePlate = "TST123",
                 }
             ],
         };
@@ -318,7 +318,7 @@ public class CustomersControllerTests(WebAppFactory webAppFactory)
                 {
                     ModelId = Guid.NewGuid(),
                     Year = 2024,
-                    LicensePlate = "TST123"
+                    LicensePlate = "TST123",
                 }
             ],
         };
@@ -342,7 +342,7 @@ public class CustomersControllerTests(WebAppFactory webAppFactory)
                 {
                     ModelId = Guid.NewGuid(),
                     Year = 2024,
-                    LicensePlate = "TST123"
+                    LicensePlate = "TST123",
                 }
             ],
         };
@@ -376,7 +376,7 @@ public class CustomersControllerTests(WebAppFactory webAppFactory)
                 {
                     ModelId = vehicleModel.Id,
                     Year = 2023,
-                    LicensePlate = "UPD123"
+                    LicensePlate = "UPD123",
                 }
             ],
         };
@@ -400,7 +400,7 @@ public class CustomersControllerTests(WebAppFactory webAppFactory)
                         VehicleId = createdCustomer!.Vehicles.First().Id,
                         ModelId = vehicleModel.Id,
                         Year = 2025,
-                        LicensePlate = "UPD456"
+                        LicensePlate = "UPD456",
                     }
                 ],
             };
@@ -439,7 +439,7 @@ public class CustomersControllerTests(WebAppFactory webAppFactory)
                 {
                     ModelId = vehicleModel.Id,
                     Year = 2024,
-                    LicensePlate = "NXS123"
+                    LicensePlate = "NXS123",
                 }
             ],
         };
@@ -520,7 +520,7 @@ public class CustomersControllerTests(WebAppFactory webAppFactory)
                     VehicleId = customer2!.Vehicles.First().Id,
                     ModelId = vehicleModel.Id,
                     Year = 2024,
-                    LicensePlate = "DU2123"
+                    LicensePlate = "DU2123",
                 }
                 ],
             };
@@ -555,7 +555,7 @@ public class CustomersControllerTests(WebAppFactory webAppFactory)
                 {
                     ModelId = Guid.NewGuid(),
                     Year = 2024,
-                    LicensePlate = "TST123"
+                    LicensePlate = "TST123",
                 }
             ],
         };
@@ -579,7 +579,7 @@ public class CustomersControllerTests(WebAppFactory webAppFactory)
                 {
                     ModelId = Guid.NewGuid(),
                     Year = 2024,
-                    LicensePlate = "TST123"
+                    LicensePlate = "TST123",
                 }
             ],
         };
@@ -613,7 +613,7 @@ public class CustomersControllerTests(WebAppFactory webAppFactory)
                 {
                     ModelId = vehicleModel.Id,
                     Year = 2024,
-                    LicensePlate = "DEL123"
+                    LicensePlate = "DEL123",
                 }
             ],
         };
@@ -668,7 +668,7 @@ public class CustomersControllerTests(WebAppFactory webAppFactory)
                 {
                     ModelId = vehicleModel.Id,
                     Year = 2024,
-                    LicensePlate = "CNF123"
+                    LicensePlate = "CNF123",
                 }
             ],
         };

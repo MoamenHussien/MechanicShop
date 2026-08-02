@@ -58,7 +58,7 @@ public sealed class IssueInvoiceCommandHandler(ILogger<IssueInvoiceCommand> logg
             var lineNumber = repairTaskIndex;
             if (repairTask.Parts.Any())
             {
-                partDescription = string.Join(Environment.NewLine, repairTask.Parts.Select(n => $"    • {n.Name} | Qty: {n.Quantity} × {n.Costs:C} = { n.Quantity * n.Costs:C}"));
+                partDescription = string.Join(Environment.NewLine, repairTask.Parts.Select(n => $"    • {n.Name} | Qty: {n.Quantity} × {n.Costs:C} = {n.Quantity * n.Costs:C}"));
             }
             else
             {
