@@ -1,3 +1,4 @@
+using System.Globalization;
 using QuestPDF.Fluent;
 using QuestPDF.Helpers;
 using QuestPDF.Infrastructure;
@@ -6,13 +7,18 @@ namespace MechanicShop.Infrastructure.Services;
 
 public sealed class InvoicePdfGenerator : IInvoicePdfGenerator
 {
+    private static readonly CultureInfo UsCulture = new("en-US");
+
     public byte[] Generate(Invoice invoice)
     {
         return Document.Create(container =>
         {
             container.Page(page =>
             {
-                page.Margin(40);
+                page.Size(PageSizes.A4);
+                page.Margin(36);
+                page.DefaultTextStyle(x => x.FontSize(10).FontColor("#0F172A"));
+
                 page.Header().Element(BuildHeader(invoice));
                 page.Content().Element(BuildInvoiceContent(invoice));
                 page.Footer().Element(BuildFooter());
@@ -25,62 +31,88 @@ public sealed class InvoicePdfGenerator : IInvoicePdfGenerator
     {
         header.Column(col =>
         {
-            // Logo and Company Name Row
+            // Top Header Row: Shop Logo & Info (Left) vs Invoice Details (Right)
             col.Item().Row(row =>
             {
-                row.RelativeItem(1).Element(container =>
+                // Left: Company Logo & Brand Name
+                row.RelativeItem(1).Column(companyCol =>
                 {
-                    container.Row(logoRow =>
+                    companyCol.Item().Row(logoRow =>
                     {
-                        // Car repair icon placeholder
-                        logoRow.ConstantItem(50).Height(50)
-                            .Background(Colors.Red.Medium)
+                        // Logo Icon Container
+                        logoRow.ConstantItem(42).Height(42)
+                            .Background("#0F172A")
+                            .CornerRadius(8)
                             .AlignCenter()
                             .AlignMiddle()
                             .Text("🔧")
-                            .FontSize(24)
+                            .FontSize(20)
                             .FontColor(Colors.White);
 
-                        // Company name with colorful letters
-                        logoRow.RelativeItem().PaddingLeft(15).AlignMiddle().Text(text =>
+                        // Company Brand Name & Subtitle
+                        logoRow.RelativeItem().PaddingLeft(12).AlignMiddle().Column(brandCol =>
                         {
-                            text.Span("M").FontColor(Colors.Cyan.Lighten3).FontSize(24).Bold();
-                            text.Span("e").FontColor(Colors.Orange.Medium).FontSize(24).Bold();
-                            text.Span("c").FontColor(Colors.Yellow.Medium).FontSize(24).Bold();
-                            text.Span("h").FontColor(Colors.Green.Medium).FontSize(24).Bold();
-                            text.Span("a").FontColor(Colors.Blue.Lighten2).FontSize(24).Bold();
-                            text.Span("n").FontColor(Colors.Red.Lighten2).FontSize(24).Bold();
-                            text.Span("i").FontColor(Colors.Purple.Medium).FontSize(24).Bold();
-                            text.Span("c").FontColor(Colors.Brown.Medium).FontSize(24).Bold();
-                            text.Span(" ").FontSize(24);
-                            text.Span("S").FontColor(Colors.Red.Darken1).FontSize(24).Bold();
-                            text.Span("h").FontColor(Colors.Red.Medium).FontSize(24).Bold();
-                            text.Span("o").FontColor(Colors.Green.Lighten1).FontSize(24).Bold();
-                            text.Span("P").FontColor(Colors.Pink.Lighten2).FontSize(24).Bold();
+                            brandCol.Item().Text(text =>
+                            {
+                                text.Span("MECHANIC").FontSize(18).Bold().FontColor("#0F172A");
+                                text.Span("SHOP").FontSize(18).Bold().FontColor("#2563EB");
+                            });
+
+                            brandCol.Item().Text("AUTO REPAIR & WORKSHOP MANAGEMENT")
+                                .FontSize(7)
+                                .SemiBold()
+                                .FontColor("#64748B")
+                                .LetterSpacing(0.08f);
                         });
                     });
+
+                    companyCol.Item().PaddingTop(8).Text("100 Auto Care Blvd, Suite 400 • Phone: +1 (555) 019-2831")
+                        .FontSize(8)
+                        .FontColor("#64748B");
+
+                    companyCol.Item().Text("support@mechanicshop.com • www.mechanicshop.com")
+                        .FontSize(8)
+                        .FontColor("#64748B");
                 });
 
-                // Invoice details
+                // Right: Invoice Title, ID, Date & Status
                 row.RelativeItem(1).AlignRight().Column(detailsCol =>
                 {
-                    detailsCol.Item().Text($"INVOICE #{invoice.Id.ToString().Substring(0, 8)}")
-                        .FontSize(28)
+                    detailsCol.Item().Text("INVOICE")
+                        .FontSize(26)
+                        .ExtraBold()
+                        .FontColor("#0F172A");
+
+                    detailsCol.Item().PaddingTop(2).Text($"#INV-{invoice.Id.ToString().Substring(0, 8).ToUpper()}")
+                        .FontSize(11)
                         .Bold()
-                        .FontColor(Colors.Grey.Darken3);
+                        .FontColor("#2563EB");
 
-                    detailsCol.Item().PaddingTop(5).Text($"Date: {invoice.IssuedAtUtc:MMMM dd, yyyy}")
-                        .FontSize(12)
-                        .FontColor(Colors.Grey.Medium);
+                    detailsCol.Item().PaddingTop(4).Text($"Date: {invoice.IssuedAtUtc.ToString("MMMM dd, yyyy", UsCulture)}")
+                        .FontSize(9)
+                        .FontColor("#475569");
 
-                    detailsCol.Item().Text($"Status: {invoice.Status}")
-                        .FontSize(12)
-                        .FontColor(GetStatusColor(invoice.Status.ToString()));
+                    // Status Badge Pill
+                    detailsCol.Item().PaddingTop(6).AlignRight().Element(container =>
+                    {
+                        var status = invoice.Status.ToString().ToUpper();
+                        var (bgColor, textColor) = GetStatusBadgeColors(status);
+
+                        container
+                            .Background(bgColor)
+                            .CornerRadius(4)
+                            .PaddingHorizontal(10)
+                            .PaddingVertical(4)
+                            .Text(status)
+                            .FontSize(9)
+                            .Bold()
+                            .FontColor(textColor);
+                    });
                 });
             });
 
-            // Separator line
-            col.Item().PaddingVertical(20).LineHorizontal(2).LineColor(Colors.Grey.Darken2);
+            // Divider line
+            col.Item().PaddingVertical(16).LineHorizontal(1).LineColor("#E2E8F0");
         });
     };
 
@@ -88,148 +120,147 @@ public sealed class InvoicePdfGenerator : IInvoicePdfGenerator
     {
         content.Column(col =>
         {
-            // Professional table with enhanced styling
+            // Table of Repair Services & Line Items
             col.Item().Table(table =>
             {
                 table.ColumnsDefinition(columns =>
                 {
-                    columns.RelativeColumn(4); // Description
+                    columns.RelativeColumn(5); // Description
                     columns.RelativeColumn(1); // Qty
                     columns.RelativeColumn(2); // Unit Price
                     columns.RelativeColumn(2); // Line Total
                 });
 
-                // Enhanced header
+                // Table Header Row
                 table.Header(header =>
                 {
                     header.Cell()
-                        .Background(Colors.Grey.Darken2)
-                        .Padding(12)
-                        .Text("DESCRIPTION")
+                        .Background("#1E293B")
+                        .Padding(10)
+                        .Text("DESCRIPTION / REPAIR SERVICE")
                         .Bold()
                         .FontColor(Colors.White)
-                        .FontSize(11);
+                        .FontSize(9);
 
                     header.Cell()
-                        .Background(Colors.Grey.Darken2)
-                        .Padding(12)
+                        .Background("#1E293B")
+                        .Padding(10)
                         .AlignCenter()
                         .Text("QTY")
                         .Bold()
                         .FontColor(Colors.White)
-                        .FontSize(11);
+                        .FontSize(9);
 
                     header.Cell()
-                        .Background(Colors.Grey.Darken2)
-                        .Padding(12)
-                        .AlignCenter()
+                        .Background("#1E293B")
+                        .Padding(10)
+                        .AlignRight()
                         .Text("UNIT PRICE")
                         .Bold()
                         .FontColor(Colors.White)
-                        .FontSize(11);
+                        .FontSize(9);
 
                     header.Cell()
-                        .Background(Colors.Grey.Darken2)
-                        .Padding(12)
+                        .Background("#1E293B")
+                        .Padding(10)
                         .AlignRight()
                         .Text("LINE TOTAL")
                         .Bold()
                         .FontColor(Colors.White)
-                        .FontSize(11);
+                        .FontSize(9);
                 });
 
-                // Enhanced rows with alternating colors
+                // Line Items Rows
                 var isEvenRow = false;
                 foreach (var item in invoice.InvoiceLineItems)
                 {
-                    var backgroundColor = isEvenRow ? Colors.Grey.Lighten4 : Colors.White;
+                    var backgroundColor = isEvenRow ? "#F8FAFC" : "#FFFFFF";
 
                     table.Cell()
                         .Background(backgroundColor)
-                        .Padding(12)
+                        .Padding(10)
                         .BorderBottom(1)
-                        .BorderColor(Colors.Grey.Lighten2)
+                        .BorderColor("#E2E8F0")
                         .Text(item.Description)
-                        .FontSize(10)
-                        .FontColor(Colors.Grey.Darken3);
+                        .FontSize(9)
+                        .FontColor("#1E293B");
 
                     table.Cell()
                         .Background(backgroundColor)
-                        .Padding(12)
+                        .Padding(10)
                         .BorderBottom(1)
-                        .BorderColor(Colors.Grey.Lighten2)
+                        .BorderColor("#E2E8F0")
                         .AlignCenter()
-                        .Text(item.Quantity.ToString())
-                        .FontSize(10)
-                        .FontColor(Colors.Grey.Darken3);
+                        .Text(item.Quantity.ToString(UsCulture))
+                        .FontSize(9)
+                        .FontColor("#1E293B");
 
                     table.Cell()
                         .Background(backgroundColor)
-                        .Padding(12)
+                        .Padding(10)
                         .BorderBottom(1)
-                        .BorderColor(Colors.Grey.Lighten2)
-                        .AlignCenter()
-                        .Text($"{item.UnitPrice:C}")
-                        .FontSize(10)
-                        .FontColor(Colors.Grey.Darken3);
-
-                    table.Cell()
-                        .Background(backgroundColor)
-                        .Padding(12)
-                        .BorderBottom(1)
-                        .BorderColor(Colors.Grey.Lighten2)
+                        .BorderColor("#E2E8F0")
                         .AlignRight()
-                        .Text($"{item.LineTotal:C}")
-                        .FontSize(10)
-                        .FontColor(Colors.Grey.Darken3)
+                        .Text(item.UnitPrice.ToString("C", UsCulture))
+                        .FontSize(9)
+                        .FontColor("#1E293B");
+
+                    table.Cell()
+                        .Background(backgroundColor)
+                        .Padding(10)
+                        .BorderBottom(1)
+                        .BorderColor("#E2E8F0")
+                        .AlignRight()
+                        .Text(item.LineTotal.ToString("C", UsCulture))
+                        .FontSize(9)
+                        .FontColor("#0F172A")
                         .Bold();
 
                     isEvenRow = !isEvenRow;
                 }
             });
 
-            // Enhanced totals section
-            col.Item().PaddingTop(30).Row(row =>
+            // Summary & Totals Box
+            col.Item().PaddingTop(20).Row(row =>
             {
-                row.RelativeItem(2); // Empty space
+                row.RelativeItem(2); // Empty left spacing
 
-                row.RelativeItem(1).Column(totalsCol =>
+                row.RelativeItem(1.5f).Column(totalsCol =>
                 {
-                    totalsCol.Item().BorderTop(1).BorderColor(Colors.Grey.Medium).PaddingTop(10);
-
-                    totalsCol.Item().PaddingVertical(5).Row(totalRow =>
+                    totalsCol.Item().PaddingVertical(3).Row(totalRow =>
                     {
-                        totalRow.RelativeItem().Text("Subtotal:").FontSize(11).FontColor(Colors.Grey.Medium);
-                        totalRow.RelativeItem().AlignRight().Text($"{invoice.Subtotal:C}").FontSize(11).FontColor(Colors.Grey.Darken3);
+                        totalRow.RelativeItem().Text("Subtotal:").FontSize(10).FontColor("#64748B");
+                        totalRow.RelativeItem().AlignRight().Text(invoice.Subtotal.ToString("C", UsCulture)).FontSize(10).FontColor("#1E293B").SemiBold();
                     });
 
-                    totalsCol.Item().PaddingVertical(5).Row(totalRow =>
+                    totalsCol.Item().PaddingVertical(3).Row(totalRow =>
                     {
-                        totalRow.RelativeItem().Text("Tax:").FontSize(11).FontColor(Colors.Grey.Medium);
-                        totalRow.RelativeItem().AlignRight().Text($"{invoice.TaxAmount:C}").FontSize(11).FontColor(Colors.Grey.Darken3);
+                        totalRow.RelativeItem().Text("Tax (15%):").FontSize(10).FontColor("#64748B");
+                        totalRow.RelativeItem().AlignRight().Text(invoice.TaxAmount.ToString("C", UsCulture)).FontSize(10).FontColor("#1E293B").SemiBold();
                     });
 
                     if (invoice.DiscountAmount > 0)
                     {
-                        totalsCol.Item().PaddingVertical(5).Row(totalRow =>
+                        totalsCol.Item().PaddingVertical(3).Row(totalRow =>
                         {
-                            totalRow.RelativeItem().Text("Discount:").FontSize(11).FontColor(Colors.Red.Medium);
-                            totalRow.RelativeItem().AlignRight().Text($"-{invoice.DiscountAmount:C}").FontSize(11).FontColor(Colors.Red.Medium);
+                            totalRow.RelativeItem().Text("Discount:").FontSize(10).FontColor("#DC2626");
+                            totalRow.RelativeItem().AlignRight().Text($"-{invoice.DiscountAmount.ToString("C", UsCulture)}").FontSize(10).FontColor("#DC2626").SemiBold();
                         });
                     }
 
-                    totalsCol.Item()
-                        .BorderTop(2)
-                        .BorderColor(Colors.Grey.Darken3)
-                        .PaddingTop(10)
-                        .PaddingVertical(5)
-                        .Background(Colors.Grey.Lighten3)
-                        .Padding(10)
-                        .Row(totalRow =>
-                        {
-                            totalRow.RelativeItem().Text("TOTAL:").FontSize(14).Bold().FontColor(Colors.Grey.Darken3);
-                            totalRow.RelativeItem().AlignRight().Text($"{invoice.Total:C}").FontSize(16).Bold().FontColor(Colors.Green.Medium);
-                        });
+                    // Total Highlight Box
+                    totalsCol.Item().PaddingTop(8).Element(container =>
+                    {
+                        container
+                            .Background("#0F172A")
+                            .CornerRadius(6)
+                            .Padding(10)
+                            .Row(totalRow =>
+                            {
+                                totalRow.RelativeItem().AlignMiddle().Text("TOTAL").FontSize(12).Bold().FontColor(Colors.White);
+                                totalRow.RelativeItem().AlignRight().AlignMiddle().Text(invoice.Total.ToString("C", UsCulture)).FontSize(14).ExtraBold().FontColor("#4ADE80");
+                            });
+                    });
                 });
             });
         });
@@ -237,37 +268,43 @@ public sealed class InvoicePdfGenerator : IInvoicePdfGenerator
 
     private Action<IContainer> BuildFooter() => footer =>
     {
-        footer.Row(row =>
+        footer.Column(col =>
         {
-            row.RelativeItem()
-                .AlignLeft()
-                .Text("Drive safe. See you next time!")
-                .FontSize(10)
-                .FontColor(Colors.Grey.Medium)
-                .Italic();
+            col.Item().PaddingBottom(8).LineHorizontal(1).LineColor("#E2E8F0");
 
-            row.RelativeItem()
-                .AlignRight()
-                .Text(text =>
-                {
-                    text.Span("Generated on ").FontSize(9).FontColor(Colors.Grey.Medium);
-                    text.Span($"{DateTime.UtcNow:MMMM dd, yyyy 'at' HH:mm} UTC")
-                        .FontSize(9)
-                        .FontColor(Colors.Grey.Medium)
-                        .SemiBold();
-                });
+            col.Item().Row(row =>
+            {
+                row.RelativeItem()
+                    .AlignLeft()
+                    .Text("Thank you for choosing MechanicShop! Drive safely and see you next time.")
+                    .FontSize(8)
+                    .FontColor("#64748B")
+                    .Italic();
+
+                row.RelativeItem()
+                    .AlignRight()
+                    .Text(text =>
+                    {
+                        text.Span("Generated on ").FontSize(8).FontColor("#94A3B8");
+                        text.Span($"{DateTime.UtcNow.ToString("MMMM dd, yyyy 'at' HH:mm", UsCulture)} UTC")
+                            .FontSize(8)
+                            .FontColor("#64748B")
+                            .SemiBold();
+                    });
+            });
         });
     };
 
-    private string GetStatusColor(string status)
+    private static (string BgColor, string TextColor) GetStatusBadgeColors(string status)
     {
-        return status.ToLower() switch
+        return status switch
         {
-            "paid" => Colors.Green.Medium,
-            "Scheduled" => Colors.Orange.Medium,
-            "overdue" => Colors.Red.Medium,
-            "cancelled" => Colors.Grey.Medium,
-            _ => Colors.Grey.Medium,
+            "PAID" => ("#DCFCE7", "#166534"),      // Soft Green Bg, Dark Green Text
+            "UNPAID" => ("#FEF3C7", "#92400E"),    // Soft Amber Bg, Dark Amber Text
+            "OVERDUE" => ("#FEE2E2", "#991B1B"),   // Soft Red Bg, Dark Red Text
+            "CANCELLED" => ("#F1F5F9", "#475569"), // Soft Gray Bg, Dark Gray Text
+            _ => ("#F1F5F9", "#475569"),
         };
     }
+
 }
