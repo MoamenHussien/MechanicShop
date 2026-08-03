@@ -7,8 +7,11 @@
 
 MechanicShop is an ASP.NET Core backend for a full auto repair workshop: customer and vehicle management, technician scheduling, work order lifecycles, billing and PDF invoicing, real-time notifications, and observability.
 
-**Live Demo:** Coming soon — deployment link will be added after publishing.
+**🚀 Live Demo :** 
 
+🌐 https://your-app.onrender.com
+
+> ℹ️ Hosted on **Render (Free Plan)**. Initial startup may take up to **60 seconds**.
 ---
 
 ## Why This Project
