@@ -52,22 +52,23 @@ public sealed class IssueInvoiceCommandHandler(ILogger<IssueInvoiceCommand> logg
         var invoiceLineItems = new List<InvoiceLineItem>();
         var invoiceID = Guid.NewGuid();
 
+        var usCulture = new System.Globalization.CultureInfo("en-US");
         foreach (var (repairTask, repairTaskIndex) in workOrder.RepairTasks.Select((R, I) => (R, I + 1)))
         {
             var partDescription = string.Empty;
             var lineNumber = repairTaskIndex;
             if (repairTask.Parts.Any())
             {
-                partDescription = string.Join(Environment.NewLine, repairTask.Parts.Select(n => $"    • {n.Name} | Qty: {n.Quantity} × {n.Costs:C} = {n.Quantity * n.Costs:C}"));
+                partDescription = string.Join(Environment.NewLine, repairTask.Parts.Select(n => $"    • {n.Name} | Qty: {n.Quantity} × {n.Costs.ToString("C", usCulture)} = {(n.Quantity * n.Costs).ToString("C", usCulture)}"));
             }
             else
             {
-                partDescription = "    • No Parts";
+                partDescription = "    • No Parts Required";
             }
 
-            var description = $"{repairTaskIndex} : {repairTask.Name}{Environment.NewLine}" +
-                              $"  Labor = {repairTask.LaborCost:c}{Environment.NewLine}" +
-                              $"  Parts:{Environment.NewLine}" + partDescription;
+            var description = $"{repairTaskIndex}. {repairTask.Name}{Environment.NewLine}" +
+                              $"   Labor: {repairTask.LaborCost.ToString("C", usCulture)}{Environment.NewLine}" +
+                              $"   Parts:{Environment.NewLine}" + partDescription;
             var quantity = 1;
             var unitPrice = repairTask.LaborCost + repairTask.Parts.Sum(n => n.Costs * n.Quantity);
 
