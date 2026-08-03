@@ -134,6 +134,7 @@ public static class InfrastructureDI
         }).AddRoles<IdentityRole<Guid>>().AddEntityFrameworkStores<AppDbContext>().AddDefaultTokenProviders();
 
         // Caching & Rides
+        
         services.AddStackExchangeRedisCache(options =>
         {
             options.Configuration = config.GetConnectionString("Redis");
