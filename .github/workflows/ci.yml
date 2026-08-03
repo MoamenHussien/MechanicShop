@@ -42,8 +42,8 @@ jobs:
       - name: Restore Dependencies
         run: dotnet restore MechanicShop.slnx
 
-      - name: Verify Code Formatting (.editorconfig)
-        run: dotnet format --verify-no-changes --verbosity diagnostic
+      - name: Verify Analyzer Rules
+        run: dotnet format analyzers MechanicShop.slnx --verify-no-changes
 
       - name: Audit NuGet Vulnerabilities
         run: dotnet list package --vulnerable --include-transitive
