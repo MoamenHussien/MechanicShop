@@ -13,12 +13,13 @@ using Microsoft.Extensions.Caching.Hybrid;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 
 public static class InfrastructureDI
 {
-    public static IServiceCollection AddInfrastructure(this IServiceCollection services, IConfiguration config)
+    public static IServiceCollection AddInfrastructure(this IServiceCollection services, IConfiguration config, IHostEnvironment environment)
     {
         // System Core
         services.AddSingleton(TimeProvider.System);
@@ -135,11 +136,14 @@ public static class InfrastructureDI
 
         // Caching & Rides
 
-        services.AddStackExchangeRedisCache(options =>
+        if (environment.IsProduction())
         {
-            options.Configuration = config.GetConnectionString("Redis");
-            options.InstanceName = "MechanicShop:";
-        });
+            services.AddStackExchangeRedisCache(options =>
+            {
+                options.Configuration = config.GetConnectionString("Redis");
+                options.InstanceName = "MechanicShop:";
+            });
+        }
 
         services.AddHybridCache(options => options.DefaultEntryOptions = new HybridCacheEntryOptions
         {

@@ -12,7 +12,7 @@ builder.Services.AddRazorComponents()
 builder.Services
     .AddPresentation(builder.Configuration)
     .AddApplication()
-    .AddInfrastructure(builder.Configuration);
+    .AddInfrastructure(builder.Configuration,builder.Environment);
 
 builder.Host.AddSerilogLogging();
 
