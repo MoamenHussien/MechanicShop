@@ -14,7 +14,7 @@ MechanicShop is an ASP.NET Core backend for a full auto repair workshop: custome
 > ℹ️ Hosted on **Render (Free Plan)**. Initial startup may take up to **60 seconds**.
 ---
 
-## Why This Project
+## Project Overview
 
 I wanted to build something closer to a real backend than a CRUD demo. So MechanicShop handles actual workshop problems — technician scheduling conflicts, work order state transitions, itemized invoicing — and it's backed by the same kind of infrastructure a real service needs: caching, rate limiting, health checks, structured logging, and distributed tracing.
 
@@ -162,14 +162,31 @@ Microsoft OpenAPI, Scalar API Reference UI
 
 ### Seeded Accounts (local development only)
 
-The app applies migrations and seeds these accounts on startup:
+The application applies migrations and seeds these accounts on startup:
 
 | Role | Email | Password | Access |
 |---|---|---|---|
-| Manager | `pm@localhost` | `pm@localhost` | Full administrative control, billing, labor assignment |
+| Manager | `pm@localhost` | `pm@localhost` | Full administrative access, billing, labor assignment |
 | Labor | `john.labor@localhost` | `john.labor@localhost` | Assigned work order updates, personal schedule view |
 
-> These credentials are for local development only and must not be used, or reused, in any deployed environment.
+These credentials are intended for local development and demonstration environments only. They must never be reused in any production environment.
+
+
+---
+
+### Seeded Development Data
+
+For a better out-of-the-box development experience, the application automatically seeds a representative dataset on first startup, including:
+
+- Identity roles (`Manager`, `Labor`)
+- Default development accounts
+- Employee records
+- Vehicle makes and models
+- Repair tasks with labor costs, durations, and required parts
+- Sample customers
+- Sample vehicles
+
+This allows developers and reviewers to explore the application immediately without manually creating reference data.
 
 ---
 
