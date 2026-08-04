@@ -52,6 +52,8 @@ jobs:
         run: dotnet build MechanicShop.slnx --configuration Release --no-restore
 
       - name: Run Unit Tests
+        env:
+          JwtSettings__SecretKey: ${{ secrets.JWT_SECRET_KEY }}
         run: |
           dotnet test MechanicShop.slnx \
             --configuration Release \
