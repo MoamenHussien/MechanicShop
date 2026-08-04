@@ -31,7 +31,7 @@ WORKDIR /app
 LABEL org.opencontainers.image.title="MechanicShop.Api" \
       org.opencontainers.image.description="MechanicShop ASP.NET Core Web API with Blazor WASM" \
       org.opencontainers.image.version="1.0.0" \
-      org.opencontainers.image.source="https://github.com/user/mechanicshop"
+      org.opencontainers.image.source="https://github.com/MoamenHussien/MechanicShop"
 
 # Configure listening port
 EXPOSE 8080
