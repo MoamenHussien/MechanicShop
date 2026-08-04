@@ -68,12 +68,14 @@ services:
       context: .
       dockerfile: Dockerfile
       pull: true
+    pull_policy: build
     container_name: mechanicshop-api
     environment:
       ASPNETCORE_ENVIRONMENT: "Production"
       ASPNETCORE_URLS: "http://0.0.0.0:8080"
       ConnectionStrings__DefaultConnection: "Server=sqlserver,1433;Database=MechanicShop;User Id=sa;Password=${SA_PASSWORD};TrustServerCertificate=True;MultipleActiveResultSets=true;"
       Serilog__WriteTo__1__Args__serverUrl: "http://seq:5341"
+      ConnectionStrings__Redis: "redis:6379"
       JwtSettings__SecretKey: "${JWT_SECRET_KEY}"
       MailSettings__Username: "${MAIL_USERNAME}"
       MailSettings__Password: "${MAIL_PASSWORD}"
@@ -103,6 +105,34 @@ services:
     depends_on:
       sqlserver:
         condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - mechanicshop-network
+
+  redis:
+    image: redis:7.4-alpine
+    pull_policy: if_not_present
+    container_name: mechanicshop-redis
+    ports:
+      - "127.0.0.1:6379:6379"
+    volumes:
+      - redis-data:/data
+    mem_limit: 128m
+    mem_reservation: 64m
+    cpus: 0.25
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+    restart: unless-stopped
+    init: true
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
     networks:
       - mechanicshop-network
 
@@ -112,5 +142,6 @@ networks:
 
 volumes:
   sqlserver-data:
+  redis-data:
   seq-data:
   dataprotection-keys:

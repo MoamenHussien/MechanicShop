@@ -41,6 +41,8 @@ ENV ASPNETCORE_URLS=http://+:8080
 COPY --from=build /app/publish .
 
 # Run as non-root user
+RUN mkdir -p /home/app/.aspnet/DataProtection-Keys \
+    && chown -R app:app /home/app
 USER app
 
 ENTRYPOINT ["dotnet", "MechanicShop.Api.dll"]
