@@ -1,9 +1,9 @@
 # MechanicShop — Auto Repair Workshop Management System
 
-[![.NET 10](https://img.shields.io/badge/.NET-10-512BD4.svg)]()
-[![Build & Test](https://img.shields.io/badge/build-passing-brightgreen.svg)]()
-[![Tests](https://img.shields.io/badge/tests-688%20passed-brightgreen.svg)]()
-[![Warnings](https://img.shields.io/badge/warnings-0-success.svg)]()
+[![.NET 10](https://img.shields.io/badge/.NET-10-512BD4.svg)](https://dotnet.microsoft.com/)
+[![Build & Test](https://img.shields.io/badge/build-passing-brightgreen.svg)](https://github.com/MoamenHussien/MechanicShop/actions/workflows/ci.yml)
+[![Tests](https://img.shields.io/badge/tests-688%20passed-brightgreen.svg)](https://github.com/MoamenHussien/MechanicShop/actions)
+[![Warnings](https://img.shields.io/badge/warnings-0-success.svg)](https://github.com/MoamenHussien/MechanicShop/actions)
 
 MechanicShop is an ASP.NET Core backend for a full auto repair workshop: customer and vehicle management, technician scheduling, work order lifecycles, billing and PDF invoicing, real-time notifications, and observability.
 
@@ -11,7 +11,8 @@ MechanicShop is an ASP.NET Core backend for a full auto repair workshop: custome
 
 🌐 https://your-app.onrender.com
 
-> ℹ️ Hosted on **Render (Free Plan)**. Initial startup may take up to **60 seconds**.
+> ℹ️ Hosted on an Ubuntu VPS using Docker, Docker Compose, and HTTPS.
+
 ---
 
 ## Project Overview
