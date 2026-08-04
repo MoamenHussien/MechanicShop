@@ -26,7 +26,7 @@ public sealed class SendWorkOrderCompletedEmailHandler(INotificationService noti
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Failed to send email in the background");
+                logger.LogError(ex, "Failed to send completion email to customer {CustomerEmail} for WorkOrder {WorkOrderId}",workOrder.Vehicle.Customer.Email,workOrder.Id);
             }
         });
 
@@ -38,7 +38,7 @@ public sealed class SendWorkOrderCompletedEmailHandler(INotificationService noti
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Failed to send SMS in the background");
+                logger.LogError(ex, "Failed to send completion SMS to customer {CustomerEmail} for WorkOrder {WorkOrderId}",workOrder.Vehicle.Customer.Email,workOrder.Id);
             }
         });
     }
