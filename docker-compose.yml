@@ -41,7 +41,7 @@ services:
     environment:
       ACCEPT_EULA: "Y"
     ports:
-       - "127.0.0.1:8081:80"
+       - "8081:80"
     volumes:
       - seq-data:/data
     mem_limit: 200m
