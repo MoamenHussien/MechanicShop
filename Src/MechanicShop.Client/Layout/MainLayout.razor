@@ -1,5 +1,6 @@
 @using Microsoft.AspNetCore.Components.Authorization
 @inherits LayoutComponentBase
+@inject NavigationManager Navigation
 
 <div class="app-wrapper">
     <header class="app-header-outer py-2">
@@ -49,12 +50,12 @@
                 <div class="header-right d-flex align-items-center gap-2 justify-content-end">
                     <AuthorizeView>
                         <Authorized>
-                            <div class="profile-card d-flex align-items-center px-3 py-1.5 me-1">
-                                <div class="avatar-circle d-flex align-items-center justify-content-center me-2">
+                            <div class="profile-card d-flex align-items-center px-2 px-sm-3 py-1.5 me-1">
+                                <div class="avatar-circle d-flex align-items-center justify-content-center me-0 me-sm-2">
                                     <i class="bi bi-person-fill text-white"></i>
                                 </div>
-                                <div class="d-flex flex-column text-start justify-content-center">
-                                    <span class="user-name text-white fw-semibold lh-sm">@context.User.Identity?.Name</span>
+                                <div class="d-none d-sm-flex flex-column text-start justify-content-center">
+                                    <span class="user-name text-white fw-semibold lh-sm text-truncate" style="max-width: 130px;">@context.User.Identity?.Name</span>
                                     <span class="user-role text-secondary extra-small lh-sm mt-0.5">Manager</span>
                                 </div>
                             </div>
@@ -66,10 +67,13 @@
                             </a>
                         </Authorized>
                         <NotAuthorized>
-                            <a href="login" class="btn btn-outline-light btn-sm d-flex align-items-center gap-2">
-                                <i class="bi bi-unlock"></i>
-                                <span>Login</span>
-                            </a>
+                            @if (!Navigation.Uri.Contains("/login", StringComparison.OrdinalIgnoreCase))
+                            {
+                                <a href="login" class="btn btn-outline-light btn-sm d-flex align-items-center gap-2">
+                                    <i class="bi bi-unlock"></i>
+                                    <span>Login</span>
+                                </a>
+                            }
                         </NotAuthorized>
                     </AuthorizeView>
                 </div>

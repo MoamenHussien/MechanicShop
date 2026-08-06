@@ -1,5 +1,29 @@
-﻿.blur-effect {
-    filter: blur(4px); /* Adjust the blur intensity as needed */
-    pointer-events: none; /* Prevent user interaction while loading */
-    opacity: 0.5; /* Optional: lower opacity for a better effect */
+.schedule-scroll-wrapper {
+    width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+}
+
+.schedule-grid {
+    min-width: 720px;
+}
+
+.time-col-header,
+.time-col-body {
+    width: 65px;
+    min-width: 65px;
+    flex: 0 0 65px;
+    text-align: right;
+}
+
+.spot-col-header,
+.spot-col-body {
+    min-width: 150px;
+    flex: 1 1 0%;
+}
+
+.blur-effect {
+    filter: blur(4px);
+    pointer-events: none;
+    opacity: 0.5;
 }

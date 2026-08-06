@@ -78,17 +78,17 @@ public class WorkOrderTestDataBuilder : ITestDataBuilder<WorkOrder>
 
     public WorkOrderTestDataBuilder ForToday(TimeOnly? from = null, TimeOnly? to = null)
     {
+        var today = DateTimeOffset.UtcNow.Date;
         if (from.HasValue && to.HasValue)
         {
-            var today = DateTimeOffset.UtcNow.Date;
             _startAt = today.Add(from.Value.ToTimeSpan());
             _endAt = today.Add(to.Value.ToTimeSpan());
         }
         else
         {
-            // Default to future times (1-3 hours from now) to pass WorkOrder.Create validation
-            _startAt = DateTimeOffset.UtcNow.AddHours(1);
-            _endAt = DateTimeOffset.UtcNow.AddHours(3);
+            // Set fixed times within today's UTC day (10:00 to 12:00 UTC) so test never crosses midnight boundary
+            _startAt = new DateTimeOffset(today.Year, today.Month, today.Day, 10, 0, 0, TimeSpan.Zero);
+            _endAt = new DateTimeOffset(today.Year, today.Month, today.Day, 12, 0, 0, TimeSpan.Zero);
         }
 
         return this;

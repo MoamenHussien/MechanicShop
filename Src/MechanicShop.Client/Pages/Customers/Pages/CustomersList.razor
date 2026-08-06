@@ -4,14 +4,14 @@
 
 <div class="container-fluid py-4">
     <!-- Header Section -->
-    <div class="d-flex justify-content-between align-items-center mb-4">
+    <div class="d-flex flex-column flex-sm-row justify-content-between align-items-sm-center gap-3 mb-4">
         <div>
             <h1 class="h3 mb-1 text-body-emphasis">
-                <i class="bi bi-people me-2"></i>Customers
+                <i class="bi bi-people me-2 brand-red"></i>Customers
             </h1>
             <p class="text-muted mb-0">Manage customers and their vehicles</p>
         </div>
-        <button class="btn btn-primary btn-lg" @onclick="ShowCreateModal">
+        <button class="btn btn-primary btn-md-lg align-self-start align-self-sm-auto" @onclick="ShowCreateModal">
             <i class="bi bi-plus-lg me-1"></i>
             New Customer
         </button>
@@ -21,7 +21,7 @@
     <div class="card border mb-4">
         <div class="card-body">
             <div class="row g-3">
-                <div class="col-md-6">
+                <div class="col-12 col-md-6">
                     <div class="input-group">
                         <span class="input-group-text bg-transparent border-end-0">
                             <i class="bi bi-search text-muted"></i>
@@ -30,7 +30,7 @@
                                @bind="searchTerm" @oninput="OnSearchChanged">
                     </div>
                 </div>
-                <div class="col-md-3">
+                <div class="col-12 col-sm-7 col-md-3">
                     <select class="form-select" @bind="sortBy" @bind:after="ApplyFilters">
                         <option value="name">Sort by Name</option>
                         <option value="email">Sort by Email</option>
@@ -38,7 +38,7 @@
                         <option value="vehicles">Sort by Vehicle Count</option>
                     </select>
                 </div>
-                <div class="col-md-3">
+                <div class="col-12 col-sm-5 col-md-3">
                     <div class="btn-group w-100" role="group">
                         <input type="radio" class="btn-check" id="asc" @onchange="() => SetSortDirection(true)"
                                checked="@sortAscending">
@@ -195,7 +195,7 @@
 
                     @if (newCustomerRequest.Vehicles.Any())
                     {
-                        <div class="row g-3 mb-2">
+                        <div class="row g-3 mb-2 d-none d-md-flex">
                             <div class="col-md-3">
                                 <label class="form-label">Make</label>
                             </div>
@@ -214,8 +214,9 @@
                         @for (int i = 0; i < newCustomerRequest.Vehicles.Count; i++)
                         {
                             var index = i;
-                            <div class="row g-3 mb-2">
-                                <div class="col-md-3">
+                            <div class="row g-2 mb-3 pb-3 border-bottom border-secondary-subtle border-md-0">
+                                <div class="col-12 col-md-3">
+                                    <label class="form-label d-md-none small text-muted">Make</label>
                                     @{
                                         var selectedMakeId = GetMakeId(index, false);
                                     }
@@ -228,7 +229,8 @@
                                         }
                                     </InputSelect>
                                 </div>
-                                <div class="col-md-3">
+                                <div class="col-12 col-md-3">
+                                    <label class="form-label d-md-none small text-muted">Model</label>
                                     <InputSelect class="form-select" @bind-Value="newCustomerRequest.Vehicles[index].ModelId"
                                                  disabled="@(GetMakeId(index, false) == Guid.Empty)">
                                         <option value="@Guid.Empty">-- Select Model --</option>
@@ -240,20 +242,22 @@
                                     <ValidationMessage For="@(() => newCustomerRequest.Vehicles[index].ModelId)"
                                                        class="text-danger small" />
                                 </div>
-                                <div class="col-md-2">
+                                <div class="col-6 col-md-2">
+                                    <label class="form-label d-md-none small text-muted">Year</label>
                                     <InputNumber class="form-control" @bind-Value="newCustomerRequest.Vehicles[index].Year" min="1900"
                                                  max="@DateTime.Now.Year" />
                                     <ValidationMessage For="@(() => newCustomerRequest.Vehicles[index].Year)"
                                                        class="text-danger small" />
                                 </div>
-                                <div class="col-md-3">
+                                <div class="col-6 col-md-3">
+                                    <label class="form-label d-md-none small text-muted">License Plate</label>
                                     <InputText class="form-control" @bind-Value="newCustomerRequest.Vehicles[index].LicensePlate" />
                                     <ValidationMessage For="@(() => newCustomerRequest.Vehicles[index].LicensePlate)"
                                                        class="text-danger small" />
                                 </div>
-                                <div class="col-md-1">
-                                    <button type="button" class="btn btn-link link-danger btn-sm" @onclick="() => RemoveVehicle(index)">
-                                        <i class="bi bi-trash"></i>
+                                <div class="col-12 col-md-1 d-flex justify-content-end align-items-center">
+                                    <button type="button" class="btn btn-outline-danger btn-sm w-100 w-md-auto mt-2 mt-md-0" @onclick="() => RemoveVehicle(index)">
+                                        <i class="bi bi-trash me-1"></i><span class="d-md-none">Remove Vehicle</span>
                                     </button>
                                 </div>
                             </div>
@@ -306,7 +310,7 @@
 
                     @if (updateCustomerRequest.Vehicles.Any())
                     {
-                        <div class="row g-3 mb-2">
+                        <div class="row g-3 mb-2 d-none d-md-flex">
                             <div class="col-md-3">
                                 <label class="form-label">Make</label>
                             </div>
@@ -325,8 +329,9 @@
                         @for (int i = 0; i < updateCustomerRequest.Vehicles.Count; i++)
                         {
                             var index = i;
-                            <div class="row g-3 mb-2">
-                                <div class="col-md-3">
+                            <div class="row g-2 mb-3 pb-3 border-bottom border-secondary-subtle border-md-0">
+                                <div class="col-12 col-md-3">
+                                    <label class="form-label d-md-none small text-muted">Make</label>
                                     @{
                                         var selectedMakeId = GetMakeId(index, true);
                                     }
@@ -339,7 +344,8 @@
                                         }
                                     </InputSelect>
                                 </div>
-                                <div class="col-md-3">
+                                <div class="col-12 col-md-3">
+                                    <label class="form-label d-md-none small text-muted">Model</label>
                                     <InputSelect class="form-select" @bind-Value="updateCustomerRequest.Vehicles[index].ModelId"
                                                  disabled="@(GetMakeId(index, true) == Guid.Empty)">
                                         <option value="@Guid.Empty">-- Select Model --</option>
@@ -351,20 +357,22 @@
                                     <ValidationMessage For="@(() => updateCustomerRequest.Vehicles[index].ModelId)"
                                                        class="text-danger small" />
                                 </div>
-                                <div class="col-md-2">
+                                <div class="col-6 col-md-2">
+                                    <label class="form-label d-md-none small text-muted">Year</label>
                                     <InputNumber class="form-control" @bind-Value="updateCustomerRequest.Vehicles[index].Year"
                                                  min="1900" max="@DateTime.Now.Year" />
                                     <ValidationMessage For="@(() => updateCustomerRequest.Vehicles[index].Year)"
                                                        class="text-danger small" />
                                 </div>
-                                <div class="col-md-3">
+                                <div class="col-6 col-md-3">
+                                    <label class="form-label d-md-none small text-muted">License Plate</label>
                                     <InputText class="form-control" @bind-Value="updateCustomerRequest.Vehicles[index].LicensePlate" />
                                     <ValidationMessage For="@(() => updateCustomerRequest.Vehicles[index].LicensePlate)"
                                                        class="text-danger small" />
                                 </div>
-                                <div class="col-md-1">
-                                    <button type="button" class="btn btn-link link-danger btn-sm" @onclick="() => RemoveVehicle(index)">
-                                        <i class="bi bi-trash"></i>
+                                <div class="col-12 col-md-1 d-flex justify-content-end align-items-center">
+                                    <button type="button" class="btn btn-outline-danger btn-sm w-100 w-md-auto mt-2 mt-md-0" @onclick="() => RemoveVehicle(index)">
+                                        <i class="bi bi-trash me-1"></i><span class="d-md-none">Remove Vehicle</span>
                                     </button>
                                 </div>
                             </div>
