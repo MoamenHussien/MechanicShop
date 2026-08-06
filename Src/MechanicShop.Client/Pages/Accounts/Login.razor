@@ -1,75 +1,149 @@
-﻿@page "/login" 
+@page "/login"
+@using MechanicShop.Client.Components
 
-
-<div class="d-flex align-items-center justify-content-center">
+<div class="login-container">
     <AuthorizeView>
         <Authorized>
-            <div class="alert alert-success">
-                You're logged in as @context.User.Identity?.Name.
+            <div class="alert alert-success d-flex align-items-center gap-2 p-3 shadow-sm rounded-3">
+                <i class="bi bi-check-circle-fill fs-4 me-1"></i>
+                <div>
+                    <strong>Welcome!</strong> You are currently logged in as <code>@context.User.Identity?.Name</code>.
+                </div>
             </div>
         </Authorized>
         <NotAuthorized>
-            <div class="card shadow rounded w-100" style="max-width: 800px;">
-                <div class="row g-0">
-                    <div class="col-md-7 p-5">
-                        <EditForm Model="loginRequest" OnValidSubmit="HandleLogin" Context="loginFormContext">
-                            <DataAnnotationsValidator />
-
-                            <div class="mb-3">
-                                <label>Username <span class="text-danger">*</span></label>
-                                <div class="input-group">
-                                    <div class="input-group-text"><i class="bi bi-person-fill"></i></div>
-                                    <InputText class="form-control" @bind-Value="loginRequest.Email" placeholder="Enter Username" />
-                                </div>
-                                <ValidationMessage For="@(() => loginRequest.Email)" />
-                            </div>
-
-                            <div class="mb-3">
-                                <label>Password <span class="text-danger">*</span></label>
-                                <div class="input-group">
-                                    <div class="input-group-text"><i class="bi bi-lock-fill"></i></div>
-                                    <InputText type="password" class="form-control" @bind-Value="loginRequest.Password" placeholder="Enter Password" />
-                                </div>
-                                <ValidationMessage For="@(() => loginRequest.Password)" />
-                            </div>
-
-                            <div class="row mb-3">
-                                <div class="col-6">
-                                    <div class="form-check">
-                                        <InputCheckbox class="form-check-input" @bind-Value="loginRequest.RememberMe" id="remember" />
-                                        <label class="form-check-label" for="remember">Remember me</label>
-                                    </div>
-                                </div>
-                                <div class="col-6 text-end">
-                                    <a href="#" class="text-primary">Forgot Password?</a>
-                                </div>
-                            </div>
-
-                            <button type="submit" class="btn btn-primary w-100">Login</button>
-                        </EditForm>
-
-                        @if (errors)
-                        {
-                            <div class="alert alert-danger mt-3">
-                                <ul class="mb-0">
-                                    @foreach (var error in errorList)
-                                    {
-                                        <li>@error</li>
-                                    }
-                                </ul>
-                            </div>
-                        }
+            <div class="login-card p-4 p-sm-5">
+                <!-- Card Header -->
+                <div class="text-center mb-4">
+                    <div class="d-inline-flex align-items-center justify-content-center p-3 rounded-circle bg-danger bg-opacity-10 border border-danger border-opacity-25 mb-3 shadow-sm" style="width: 76px; height: 76px;">
+                        <svg fill="#ff574A" width="56" height="56" viewBox="0 0 15 15" xmlns="http://www.w3.org/2000/svg" id="car-repair">
+                            <path d="M12.6,8.7,11.5,6.5a1.05,1.05,0,0,0-.9-.5H4.4a1.05,1.05,0,0,0-.9.5L2.4,8.7,1.16,9.852a.5.5,0,0,0-.16.367V14.5a.5.5,0,0,0,.5.5h2c.2,0,.5-.2.5-.4V14h7v.5c0,.2.2.5.4.5h2.1a.5.5,0,0,0,.5-.5V10.219a.5.5,0,0,0-.16-.367ZM4.5,7h6l1,2h-8ZM5,11.6c0,.2-.3.4-.5.4H2.4c-.2,0-.4-.3-.4-.5V10.4c.1-.3.3-.5.6-.4l2,.4c.2,0,.4.3.4.5Zm8-.1c0,.2-.2.5-.4.5H10.5c-.2,0-.5-.2-.5-.4v-.7c0-.2.2-.5.4-.5l2-.4c.3-.1.5.1.6.4ZM14,2V3a1.009,1.009,0,0,1-1.017,1H5.348A2.549,2.549,0,0,1,1,3.5H3.5v-2H1A2.549,2.549,0,0,1,5.348,1h7.635A1.009,1.009,0,0,1,14,2Z" />
+                        </svg>
                     </div>
-
-                    <div class="col-md-5 d-none d-md-flex align-items-center justify-content-center text-secondary">
-                        <i class="bi bi-lock-fill display-1"></i>
-
+                    <div class="d-flex align-items-center justify-content-center gap-1 mb-1">
+                        <h2 class="h3 text-white fw-bold mb-0">Mechanic</h2>
+                        <h2 class="h3 brand-red fw-bold mb-0">Shop</h2>
                     </div>
+                    <p class="text-muted small mb-0 text-nowrap">Sign in to manage your workshop</p>
                 </div>
+
+                <!-- Form -->
+                <EditForm Model="loginRequest" OnValidSubmit="HandleLogin" Context="loginFormContext">
+                    <DataAnnotationsValidator />
+
+                    <div class="mb-3">
+                        <label class="form-label text-muted small fw-semibold">Email / Username <span class="text-danger">*</span></label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-body-secondary border-secondary-subtle text-muted">
+                                <i class="bi bi-envelope-fill"></i>
+                            </span>
+                            <InputText class="form-control" @bind-Value="loginRequest.Email" placeholder="pm@localhost" />
+                        </div>
+                        <ValidationMessage For="@(() => loginRequest.Email)" class="text-danger small mt-1" />
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label text-muted small fw-semibold">Password <span class="text-danger">*</span></label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-body-secondary border-secondary-subtle text-muted">
+                                <i class="bi bi-lock-fill"></i>
+                            </span>
+                            <InputText type="password" class="form-control" @bind-Value="loginRequest.Password" placeholder="••••••••" />
+                        </div>
+                        <ValidationMessage For="@(() => loginRequest.Password)" class="text-danger small mt-1" />
+                    </div>
+
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <div class="form-check mb-0">
+                            <InputCheckbox class="form-check-input" @bind-Value="loginRequest.RememberMe" id="remember" />
+                            <label class="form-check-label text-muted small user-select-none" for="remember">
+                                Remember me
+                            </label>
+                        </div>
+                        <button type="button" class="btn btn-link p-0 text-danger small text-decoration-none hover-underline border-0 bg-transparent" @onclick="ShowDemoAccountModal">
+                            Forgot Password?
+                        </button>
+                    </div>
+
+                    <button type="submit" class="btn btn-login w-100 d-flex align-items-center justify-content-center gap-2" disabled="@isSubmitting">
+                        @if (isSubmitting)
+                        {
+                            <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                            <span>Signing in...</span>
+                        }
+                        else
+                        {
+                            <i class="bi bi-box-arrow-in-right fs-5"></i>
+                            <span>Sign In</span>
+                        }
+                    </button>
+                </EditForm>
+
+                @if (errors)
+                {
+                    <div class="alert alert-danger mt-4 mb-0 p-3 small">
+                        <div class="d-flex align-items-center gap-2 mb-1">
+                            <i class="bi bi-exclamation-triangle-fill fs-6"></i>
+                            <strong>Authentication Error</strong>
+                        </div>
+                        <ul class="mb-0 ps-3">
+                            @foreach (var error in errorList)
+                            {
+                                <li>@error</li>
+                            }
+                        </ul>
+                    </div>
+                }
             </div>
         </NotAuthorized>
     </AuthorizeView>
 </div>
+
+<TemplatedDialog Show="_showDemoModal" OnClose="HideDemoModal">
+    <Title>
+        <div class="d-flex align-items-center gap-2">
+            <i class="bi bi-key-fill text-danger fs-5 me-1"></i>
+            <span>Demo Accounts Help</span>
+        </div>
+    </Title>
+    <ChildContent>
+        <div class="p-1">
+            <p class="text-muted small mb-3">
+                Password reset is disabled for demonstration environments. Please use one of the pre-seeded demonstration accounts below:
+            </p>
+
+            <div class="card bg-body-tertiary border-secondary-subtle mb-3 p-3">
+                <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+                    <div>
+                        <div class="badge bg-danger mb-1">Manager Account</div>
+                        <div class="fw-bold text-white small">pm@localhost</div>
+                        <div class="text-muted extra-small">Full administrative, billing & scheduling access</div>
+                    </div>
+                    <button type="button" class="btn btn-outline-danger btn-sm" @onclick='() => AutoFill("pm@localhost", "pm@localhost")'>
+                        <i class="bi bi-box-arrow-in-right me-1"></i>Auto Fill
+                    </button>
+                </div>
+            </div>
+
+            <div class="card bg-body-tertiary border-secondary-subtle mb-3 p-3">
+                <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+                    <div>
+                        <div class="badge bg-primary mb-1">Labor Account</div>
+                        <div class="fw-bold text-white small">john.labor@localhost</div>
+                        <div class="text-muted extra-small">Assigned work order updates & personal schedule view</div>
+                    </div>
+                    <button type="button" class="btn btn-outline-primary btn-sm" @onclick='() => AutoFill("john.labor@localhost", "john.labor@localhost")'>
+                        <i class="bi bi-box-arrow-in-right me-1"></i>Auto Fill
+                    </button>
+                </div>
+            </div>
+
+            <div class="text-end pt-2">
+                <button type="button" class="btn btn-secondary btn-sm" @onclick="HideDemoModal">Close</button>
+            </div>
+        </div>
+    </ChildContent>
+</TemplatedDialog>
 
 @code {
     [Inject]
@@ -77,31 +151,52 @@
     [Inject]
     private NavigationManager navigationManager { get; set; } = default!;
 
-    private LoginRequest loginRequest = new ();
-
-    private bool success, errors;
+    private LoginRequest loginRequest = new();
+    private bool success, errors, isSubmitting, _showDemoModal;
     private string[] errorList = [];
+
+    private void ShowDemoAccountModal()
+    {
+        _showDemoModal = true;
+    }
+
+    private void HideDemoModal()
+    {
+        _showDemoModal = false;
+    }
+
+    private void AutoFill(string email, string password)
+    {
+        loginRequest.Email = email;
+        loginRequest.Password = password;
+        _showDemoModal = false;
+    }
 
     private async Task HandleLogin()
     {
         success = errors = false;
+        isSubmitting = true;
         errorList = [];
 
-
-        var result = await accountManagement.LoginAsync(loginRequest.Email, loginRequest.Password);
-
-        if (result.Succeeded)
+        try
         {
+            var result = await accountManagement.LoginAsync(loginRequest.Email, loginRequest.Password);
 
-            success = true;
-            errors = false;
-            navigationManager.NavigateTo("/");
+            if (result.Succeeded)
+            {
+                success = true;
+                errors = false;
+                navigationManager.NavigateTo("/");
+            }
+            else
+            {
+                errors = true;
+                errorList = result.ErrorList;
+            }
         }
-        else
+        finally
         {
-            errors = true;
-            errorList = result.ErrorList;
+            isSubmitting = false;
         }
     }
 }
-

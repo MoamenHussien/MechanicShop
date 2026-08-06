@@ -1,13 +1,17 @@
-﻿.dialog-container {
-    position: fixed; /* cover viewport reliably */
+.dialog-container {
+    position: fixed;
+    /* cover viewport reliably */
     top: 0;
     bottom: 0;
     left: 0;
     right: 0;
-    display: flex; /* activate flex centering */
-    justify-content: center; /* center horizontally */
-    align-items: center; /* center vertically */
-    background-color: rgba(0,0,0,0.5);
+    display: flex;
+    /* activate flex centering */
+    justify-content: center;
+    /* center horizontally */
+    align-items: center;
+    /* center vertically */
+    background-color: rgba(0, 0, 0, 0.5);
     z-index: 2000;
     animation: dialog-container-entry 0.2s;
 }
@@ -23,13 +27,14 @@
 }
 
 .dialog {
-    width: 900px;
-    max-height: calc(100% - 3rem);
-    box-shadow: 0 0 12px rgba(0,0,0,0.6);
+    width: min(900px, 94vw);
+    max-height: 90vh;
+    overflow-y: auto;
+    border-radius: 12px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
     display: flex;
     flex-direction: column;
     animation: dialog-entry 0.4s cubic-bezier(0.075, 0.820, 0.165, 1.000);
-    /* remove align-self, margin:auto, you don’t need them */
 }
 
 @keyframes dialog-entry {
@@ -48,14 +53,14 @@
     padding: 1.3rem 2rem;
 }
 
-    .dialog-title h2 {
-        color: white;
-        font-size: 1.4rem;
-        margin: 0;
-        font-family: 'Bahnschrift', Arial, Helvetica, sans-serif;
-        text-transform: uppercase;
-        line-height: 1.3rem;
-    }
+.dialog-title h2 {
+    color: white;
+    font-size: 1.4rem;
+    margin: 0;
+    font-family: 'Bahnschrift', Arial, Helvetica, sans-serif;
+    text-transform: uppercase;
+    line-height: 1.3rem;
+}
 
 .dialog-body {
     flex-grow: 1;
@@ -71,7 +76,7 @@
     padding: 0 1rem;
 }
 
-.dialog-body > div {
+.dialog-body>div {
     display: flex;
     margin-top: 1rem;
     align-items: center;
@@ -83,7 +88,8 @@
     margin: 0 1.5rem;
 }
 
-.dialog-body input, .dialog-body select {
+.dialog-body input,
+.dialog-body select {
     flex-grow: 1;
     width: unset;
 }
