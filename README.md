@@ -250,7 +250,7 @@ The deployment uses **SSH public/private key authentication** instead of passwor
 - Removes unused Docker resources.
 - Verifies the deployment using health checks.
 
-![CI/CD Pipeline](docs/images/ci.png)
+![CI/CD Pipeline](docs/images/ci-cd.png)
 
 ---
 

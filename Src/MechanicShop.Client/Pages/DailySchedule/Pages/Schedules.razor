@@ -47,15 +47,18 @@
             <div class="d-flex position-relative">
                 @if (GetNowLinePositionPixels() >= 0)
                 {
-                    <div id="nowLineTarget" style="position: absolute; top: @($"{GetNowLinePositionPixels()}px"); left: 0; right: 0; z-index: 10; pointer-events: none;">
-                        <div id="now-line" style="border-top: 2px dashed red; width: 100%; position: relative; opacity: 0.8;">
+                    <div id="nowLineTarget" style="@GetNowLineTopStyle()">
+                        <div id="now-line" style="border-top: 2px dashed #ff3333; width: 100%; position: relative; opacity: 0.95;">
                             <span style="
                             position: absolute;
                             top: -1.2rem;
                             right: 0.5rem;
                             font-size: 0.75rem;
-                            color: red;
-                            font-weight: bold;">
+                            color: #ff3333;
+                            font-weight: bold;
+                            background-color: rgba(15, 17, 24, 0.85);
+                            padding: 1px 5px;
+                            border-radius: 3px;">
                                 @DateTime.Now.ToString("HH:mm")
                             </span>
                         </div>
@@ -453,26 +456,33 @@
 
     private double GetNowLinePositionPixels()
     {
-        if (operateHours is null) return -1;
+        var localNow = DateTime.Now;
 
-        var isToday = _selectedDate.Year == DateTime.Today.Year &&
-                      _selectedDate.Month == DateTime.Today.Month &&
-                      _selectedDate.Day == DateTime.Today.Day;
+        var isToday = _selectedDate.Year == localNow.Year &&
+                      _selectedDate.Month == localNow.Month &&
+                      _selectedDate.Day == localNow.Day;
 
         if (!isToday) return -1;
 
-        var now = TimeOnly.FromDateTime(DateTime.Now);
-        var open = operateHours.OpeningTime;
-        var close = operateHours.ClosingTime;
+        var nowTime = TimeOnly.FromDateTime(localNow);
+        var open = operateHours?.OpeningTime ?? new TimeOnly(0, 0);
+        var close = operateHours?.ClosingTime ?? new TimeOnly(23, 59, 59);
 
         if (open >= close) return -1;
-        if (now < open || now > close) return -1;
+        if (nowTime < open || nowTime > close) return -1;
 
-        const double pixelsPer15Min = 60.0;
-        var minutesFromStart = (now - open).TotalMinutes;
-        var offsetPixels = (minutesFromStart / 15.0) * pixelsPer15Min;
+        var minutesFromStart = (nowTime - open).TotalMinutes;
+        var offsetPixels = minutesFromStart * 4.0;
 
         return offsetPixels >= 0 ? Math.Round(offsetPixels, 2) : -1;
+    }
+
+    private string GetNowLineTopStyle()
+    {
+        var pos = GetNowLinePositionPixels();
+        if (pos < 0) return "display: none;";
+        var topPx = pos.ToString("F2", System.Globalization.CultureInfo.InvariantCulture);
+        return $"position: absolute; top: {topPx}px; left: 0; right: 0; z-index: 10; pointer-events: none;";
     }
 
     private async Task ScrollToBottom()
