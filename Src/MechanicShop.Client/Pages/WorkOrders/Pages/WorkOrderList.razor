@@ -19,10 +19,12 @@
         <div class="card-body">
             <EditForm Model="filterRequest" OnValidSubmit="ApplyFilter">
                 <div class="row g-3 align-items-end">
-                    <div class="col-md-3">
-                        <InputText @bind-Value="filterRequest.SearchTerm" placeholder="Search…" class="form-control" />
+                    <div class="col-12 col-sm-6 col-md-3">
+                        <label class="form-label text-muted small fw-semibold">Search</label>
+                        <InputText @bind-Value="filterRequest.SearchTerm" placeholder="Search by customer, vehicle…" class="form-control" />
                     </div>
-                    <div class="col-md-2">
+                    <div class="col-12 col-sm-6 col-md-2">
+                        <label class="form-label text-muted small fw-semibold">Status</label>
                         <InputSelect @bind-Value="filterRequest.State" class="form-select">
                             <option value="">All Status</option>
                             @foreach (var st in Enum.GetValues<WorkOrderState>())
@@ -31,15 +33,17 @@
                             }
                         </InputSelect>
                     </div>
-                    <div class="col-md-2">
-                        <InputDate @bind-Value="filterRequest.StartDateFrom" class="form-control" placeholder="Start From" />
+                    <div class="col-12 col-sm-6 col-md-2">
+                        <label class="form-label text-muted small fw-semibold">From Date</label>
+                        <InputDate @bind-Value="filterRequest.StartDateFrom" class="form-control" />
                     </div>
-                    <div class="col-md-2">
-                        <InputDate @bind-Value="filterRequest.StartDateTo" class="form-control" placeholder="Start To" />
+                    <div class="col-12 col-sm-6 col-md-2">
+                        <label class="form-label text-muted small fw-semibold">To Date</label>
+                        <InputDate @bind-Value="filterRequest.StartDateTo" class="form-control" />
                     </div>
-                    <div class="col-md-3">
-                        <button type="submit" class="btn btn-primary me-1">Filter</button>
-                        <button type="button" class="btn btn-outline-secondary" @onclick="ResetFilter">Reset</button>
+                    <div class="col-12 col-md-3 d-flex align-items-end gap-2">
+                        <button type="submit" class="btn btn-primary flex-grow-1">Filter</button>
+                        <button type="button" class="btn btn-outline-secondary flex-grow-1" @onclick="ResetFilter">Reset</button>
                     </div>
                 </div>
             </EditForm>
@@ -64,25 +68,25 @@
     {
         <div class="card border">
             <div class="table-responsive">
-                <table class="table table-hover align-middle mb-0">
+                <table class="table table-hover align-middle mb-0" style="min-width: 900px;">
                     <thead class="table-dark">
                         <tr>
-                            <th style="width: 26%" @onclick="() => SortBy(nameof(WorkOrderListItemModel.Vehicle))">
+                            <th style="width: 24%" @onclick="() => SortBy(nameof(WorkOrderListItemModel.Vehicle))">
                                 Vehicle <i class="bi @GetSortIcon(nameof(WorkOrderListItemModel.Vehicle))"></i>
                             </th>
-                            <th class="text-start" style="width: 12%"
+                            <th class="text-start" style="width: 14%"
                                 @onclick="() => SortBy(nameof(WorkOrderListItemModel.Customer))">
                                 Customer <i class="bi @GetSortIcon(nameof(WorkOrderListItemModel.Customer))"></i>
                             </th>
-                            <th class="text-center" style="width: 6%"
+                            <th class="text-center" style="width: 8%"
                                 @onclick="() => SortBy(nameof(WorkOrderListItemModel.Spot))">
                                 Spot <i class="bi @GetSortIcon(nameof(WorkOrderListItemModel.Spot))"></i>
                             </th>
-                            <th class="text-center" style="width: 10%"
+                            <th class="text-center" style="width: 12%"
                                 @onclick="() => SortBy(nameof(WorkOrderListItemModel.Labor))">
                                 Labor <i class="bi @GetSortIcon(nameof(WorkOrderListItemModel.Labor))"></i>
                             </th>
-                            <th class="text-start" style="width: 20%">Repair Tasks</th>
+                            <th class="text-start" style="width: 18%">Repair Tasks</th>
                             <th class="text-center" style="width: 10%"
                                 @onclick="() => SortBy(nameof(WorkOrderListItemModel.State))">
                                 Status <i class="bi @GetSortIcon(nameof(WorkOrderListItemModel.State))"></i>
@@ -91,7 +95,7 @@
                                 @onclick="() => SortBy(nameof(WorkOrderListItemModel.StartAtUtc))">
                                 Time Slot <i class="bi @GetSortIcon(nameof(WorkOrderListItemModel.StartAtUtc))"></i>
                             </th>
-                            <th class="text-end" style="width: 6%">Actions</th>
+                            <th class="text-end" style="width: 4%">Actions</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -107,8 +111,10 @@
                                     </div>
                                 </td>
                                 <td class="text-start">@wo.Customer</td>
-                                <td class="d-none d-md-table-cell text-center">@wo.Spot</td>
-                                <td class="d-none d-md-table-cell text-center">@wo.Labor</td>
+                                <td class="text-center">
+                                    <span class="badge bg-secondary">@wo.Spot</span>
+                                </td>
+                                <td class="text-center">@wo.Labor</td>
                                 <td class="text-start text-wrap">
                                     @foreach (var task in wo.RepairTasks)
                                     {
