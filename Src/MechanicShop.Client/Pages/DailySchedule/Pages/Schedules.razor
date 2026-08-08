@@ -454,7 +454,12 @@
     private double GetNowLinePositionPixels()
     {
         if (operateHours is null) return -1;
-        if (_selectedDate.Date != DateTime.Today) return -1;
+
+        var isToday = _selectedDate.Year == DateTime.Today.Year &&
+                      _selectedDate.Month == DateTime.Today.Month &&
+                      _selectedDate.Day == DateTime.Today.Day;
+
+        if (!isToday) return -1;
 
         var now = TimeOnly.FromDateTime(DateTime.Now);
         var open = operateHours.OpeningTime;
@@ -467,11 +472,22 @@
         var minutesFromStart = (now - open).TotalMinutes;
         var offsetPixels = (minutesFromStart / 15.0) * pixelsPer15Min;
 
-        return Math.Round(offsetPixels, 2);
+        return offsetPixels >= 0 ? Math.Round(offsetPixels, 2) : -1;
     }
 
     private async Task ScrollToBottom()
     {
-        await _jsRuntime.InvokeVoidAsync("scrollToElement", "nowLineTarget");
+        if (GetNowLinePositionPixels() >= 0)
+        {
+            try
+            {
+                await Task.Delay(200);
+                await _jsRuntime.InvokeVoidAsync("scrollToElement", "nowLineTarget");
+            }
+            catch
+            {
+                // Silently ignore JS errors during initial render
+            }
+        }
     }
 }

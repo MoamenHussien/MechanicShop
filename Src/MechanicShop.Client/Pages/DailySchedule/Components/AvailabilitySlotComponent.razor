@@ -12,12 +12,12 @@
         </div>
     </div>
 
-    @if (!Slot.IsOccupied && Slot.IsAvailable)
+    @if (IsSlotClickable)
     {
         <div class="booking-overlay" @onclick="() => OnNewWorkOrderDialog.InvokeAsync(Slot)" style="cursor: pointer;">
         </div>
     }
-    else if (!Slot.IsOccupied && !Slot.IsAvailable)
+    else if (!Slot.IsOccupied)
     {
         <div class="booking-overlay" style="cursor: not-allowed;"></div>
     }
@@ -63,19 +63,14 @@
     [Parameter] public DateTimeOffset? EffectiveEndAt { get; set; }
 
     [Parameter, EditorRequired] public EventCallback<AvailabilitySlotModel> OnNewWorkOrderDialog { get; set; } = default!;
-    [Parameter, EditorRequired]
-    public EventCallback<AvailabilitySlotModel> OnEditWorkOrderLaborDialog { get; set; } =
-    default!;
-    [Parameter, EditorRequired]
-    public EventCallback<AvailabilitySlotModel> OnRelocateWorkOrderDialog { get; set; } =
-    default!;
-    [Parameter, EditorRequired]
-    public EventCallback<AvailabilitySlotModel> OnEditWorkOrderRepairTasksDialog { get; set; } =
-    default!;
-    [Parameter, EditorRequired]
-    public EventCallback<AvailabilitySlotModel> OnEditWorkOrderStateDialog { get; set; } =
-    default!;
+    [Parameter, EditorRequired] public EventCallback<AvailabilitySlotModel> OnEditWorkOrderLaborDialog { get; set; } = default!;
+    [Parameter, EditorRequired] public EventCallback<AvailabilitySlotModel> OnRelocateWorkOrderDialog { get; set; } = default!;
+    [Parameter, EditorRequired] public EventCallback<AvailabilitySlotModel> OnEditWorkOrderRepairTasksDialog { get; set; } = default!;
+    [Parameter, EditorRequired] public EventCallback<AvailabilitySlotModel> OnEditWorkOrderStateDialog { get; set; } = default!;
     [Parameter] public EventCallback<Guid> OnDeleteWorkOrder { get; set; } = default!;
+
+    private bool IsSlotInPast => Slot.StartAt < DateTimeOffset.Now;
+    private bool IsSlotClickable => !Slot.IsOccupied && Slot.IsAvailable && !IsSlotInPast;
 
     private DateTimeOffset GetEffectiveEndAt() => EffectiveEndAt ?? Slot.EndAt;
 
@@ -85,12 +80,11 @@
 
         baseClasses += Slot.IsOccupied ? "bg-secondary" : "bg-success";
 
-        if (!Slot.IsOccupied && !Slot.IsAvailable)
+        if (!Slot.IsOccupied && (!Slot.IsAvailable || IsSlotInPast))
             baseClasses += " unavailable";
 
         return baseClasses;
     }
-
 
     public string GetDynamicStyle()
     {

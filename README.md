@@ -1,18 +1,25 @@
 # MechanicShop — Auto Repair Workshop Management System
 
 [![.NET 10](https://img.shields.io/badge/.NET-10-512BD4.svg)](https://dotnet.microsoft.com/)
-[![Build & Test](https://img.shields.io/badge/build-passing-brightgreen.svg)](https://github.com/MoamenHussien/MechanicShop/actions/workflows/ci.yml)
+[![CI/CD](https://img.shields.io/badge/CI%2FCD-Passing-brightgreen.svg)](https://github.com/MoamenHussien/MechanicShop/actions/workflows/ci-cd.yml)
 [![Tests](https://img.shields.io/badge/tests-688%20passed-brightgreen.svg)](https://github.com/MoamenHussien/MechanicShop/actions)
 [![Warnings](https://img.shields.io/badge/warnings-0-success.svg)](https://github.com/MoamenHussien/MechanicShop/actions)
+![Docker](https://img.shields.io/badge/Docker-Compose-2496ED?logo=docker&logoColor=white)
 
-MechanicShop is an ASP.NET Core backend for a full auto repair workshop: customer and vehicle management, technician scheduling, work order lifecycles, billing and PDF invoicing, real-time notifications, and observability.
+MechanicShop is a production-style ASP.NET Core backend for managing an automotive repair workshop, featuring customer and vehicle management, technician scheduling, work order lifecycles, billing with PDF invoicing, real-time notifications, and a complete observability stack.
 
-**🚀 Live Demo :** 
+## 🚀 Live Demo
 
-🌐 https://your-app.onrender.com
+| Service | URL |
+|----------|-----|
+| 🌐 **Application** | https://mechanicshop.duckdns.org/ |
+| 📊 **Seq Dashboard** | https://mechanicshop.duckdns.org/seq |
+| ❤️ **Readiness Health Check** | https://mechanicshop.duckdns.org/health/ready |
+| 💚 **Liveness Health Check** | https://mechanicshop.duckdns.org/health/live |
 
-> ℹ️ Hosted on an Ubuntu VPS using Docker, Docker Compose, and HTTPS.
+> ℹ️ Hosted on an Ubuntu VPS and automatically deployed via GitHub Actions using Docker Compose, Nginx Reverse Proxy, and Let's Encrypt (HTTPS). The deployment includes SQL Server, Redis, and Seq for logging and observability.
 
+> ✅ Every deployment is automatically built, tested, security scanned, and deployed to the VPS through a GitHub Actions CI/CD pipeline.
 ---
 
 ## Project Overview
@@ -34,13 +41,18 @@ The solution follows Clean Architecture with strict dependency direction: `Domai
 |---|---|---|---|
 | `MechanicShop.Domain` | Domain Core | Entities (`WorkOrder`, `Vehicle`, `Customer`), domain events, `Result<T>` structs | None |
 | `MechanicShop.Contracts` | Contracts | Shared request/response DTOs | None |
-| `MechanicShop.Application` | Application | MediatR commands/queries, validation & caching pipeline behaviors | `Domain`, `Contracts` |
+| `MechanicShop.Application` | Application | MediatR commands/queries, validation & caching pipeline behaviors | `Domain` |
 | `MechanicShop.Infrastructure` | Infrastructure | EF Core `AppDbContext`, Identity, HybridCache, SignalR, background jobs | `Application`, `Domain` |
 | `MechanicShop.Api` | Web API Host | Controllers, middleware, Scalar UI, health checks, OpenTelemetry | `Infrastructure`, `Application` |
 | `MechanicShop.Client` | Blazor WASM UI | Standalone client, `CustomAuthenticationStateProvider`, SignalR client | `Contracts`, SignalR Client |
 | `Tests/*` | Test Suite | 688 unit, subcutaneous, and integration tests via `Testcontainers.MsSql` | Target projects, Testcontainers |
 
 ---
+
+### CI/CD Pipeline
+
+![CI/CD Pipeline](docs/images/ci-cd-pipeline.png)
+
 
 ## Features
 
@@ -114,7 +126,13 @@ xUnit v2.9, FluentAssertions, NSubstitute, `Testcontainers.MsSql`, `WebApplicati
 Docker (non-root `app` user), Docker Compose v2
 
 **CI/CD**
-GitHub Actions
+
+- GitHub Actions
+- SSH
+- Docker Compose
+- Ubuntu VPS
+- Nginx
+- Let's Encrypt (HTTPS)
 
 **API Tooling**
 Microsoft OpenAPI, Scalar API Reference UI
@@ -161,17 +179,20 @@ Microsoft OpenAPI, Scalar API Reference UI
    | Jaeger Tracing UI | `http://localhost:16686` |
    | Health Probe | `http://localhost:5001/health/ready` |
 
-### Seeded Accounts (local development only)
+---
 
-The application applies migrations and seeds these accounts on startup:
+### Demo Accounts
+
+The following accounts are automatically seeded during application startup for demonstration purposes.
+
+Password reset is intentionally disabled in the live demo environment. Selecting **Forgot Password?** opens the built-in **Demo Accounts** dialog, where you can view the available credentials and use **Auto-Fill** to sign in instantly.
 
 | Role | Email | Password | Access |
-|---|---|---|---|
-| Manager | `pm@localhost` | `pm@localhost` | Full administrative access, billing, labor assignment |
-| Labor | `john.labor@localhost` | `john.labor@localhost` | Assigned work order updates, personal schedule view |
+|------|-------|----------|--------|
+| 🔴 **Manager** | `pm@localhost` | `pm@localhost` | Full administrative access, billing, scheduling, and labor management |
+| 🔵 **Labor** | `john.labor@localhost` | `john.labor@localhost` | Assigned work orders, personal schedule, and task updates |
 
-These credentials are intended for local development and demonstration environments only. They must never be reused in any production environment.
-
+> ⚠️ These accounts are provided exclusively for the public demo and are automatically recreated at startup. They must **never** be used in any production environment.
 
 ---
 
@@ -205,16 +226,31 @@ All 133 API integration tests run against real, isolated SQL Server containers s
 
 ---
 
-## Continuous Integration
+## Continuous Integration & Continuous Deployment (CI/CD)
 
-GitHub Actions ([`.github/workflows/ci.yml`](.github/workflows/ci.yml)) runs on every commit:
+GitHub Actions automates the complete CI/CD pipeline using [`.github/workflows/ci-cd.yml`](.github/workflows/ci-cd.yml).
 
-![CI Pipeline Execution](docs/images/ci.png)
+For every push, the pipeline automatically:
 
-1. **Format Gate** — `dotnet format --verify-no-changes`
-2. **Security Audit** — NuGet package vulnerability scan
-3. **Build & Test** — Release build, all 688 tests with coverage
-4. **Docker Scan** — builds the container image and runs the Trivy vulnerability scanner
+1. Verifies formatting and analyzer rules (`dotnet format --verify-no-changes`).
+2. Audits NuGet package vulnerabilities.
+3. Builds the solution in **Release** configuration.
+4. Executes the complete automated test suite (688 tests).
+5. Builds the Docker image.
+6. Performs a security scan using **Trivy**.
+7. Automatically deploys the latest version to the Ubuntu VPS via SSH (**production-deployment** branch only).
+
+> 🚀 Deployments are triggered only for the `chore/production-deployment` branch to prevent accidental production releases.
+
+The deployment uses **SSH public/private key authentication** instead of passwords and executes a custom deployment script (`deploy-mechanicshop`) on the VPS, which performs:
+
+- Pulls the latest source code.
+- Rebuilds Docker Compose services.
+- Restarts application containers.
+- Removes unused Docker resources.
+- Verifies the deployment using health checks.
+
+![CI/CD Pipeline](docs/images/ci.png)
 
 ---
 
@@ -272,4 +308,5 @@ Additional screenshots are available in [`docs/images/`](docs/images/).
 
 ## Author
 
-**Moamen** — Backend Engineer (.NET / ASP.NET Core)
+**Moamen Hussien** — Backend Engineer (.NET / ASP.NET Core)
+**[LinkedIn](https://www.linkedin.com/in/moamenhussien/)**
