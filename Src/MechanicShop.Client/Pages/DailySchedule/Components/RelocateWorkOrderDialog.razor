@@ -1,4 +1,4 @@
-﻿<div class="bg-body p-1">
+<div class="bg-body p-1">
     <EditForm Model="@relocationModel" OnValidSubmit="Save">
         <div class="my-4">
 
@@ -70,8 +70,8 @@
 
     protected override void OnInitialized()
     {
-        _localDate = StartAt.LocalDateTime.Date;
-        _localTime = StartAt.LocalDateTime.TimeOfDay;
+        _localDate = StartAt.DateTime.Date;
+        _localTime = StartAt.DateTime.TimeOfDay;
 
         relocationModel = new RelocateWorkOrderRequest
         {
@@ -86,8 +86,7 @@
     private async Task Save()
     {
         var local = _localDate + _localTime;
-        var offset = TimeZoneInfo.Local.GetUtcOffset(local);
-        relocationModel!.NewStartAtUtc = new DateTimeOffset(local, offset);
+        relocationModel!.NewStartAtUtc = new DateTimeOffset(DateTime.SpecifyKind(local, DateTimeKind.Unspecified), StartAt.Offset);
 
         var result = await _serviceApi.RelocateWorkOrderAsync(WorkOrderId, relocationModel);
 
