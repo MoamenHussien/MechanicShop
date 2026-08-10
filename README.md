@@ -187,6 +187,8 @@ The following accounts are automatically seeded during application startup for d
 
 Password reset is intentionally disabled in the live demo environment. Selecting **Forgot Password?** opens the built-in **Demo Accounts** dialog, where you can view the available credentials and use **Auto-Fill** to sign in instantly.
 
+![Demo Accounts](docs/images/Forgot-Password.png)
+
 | Role | Email | Password | Access |
 |------|-------|----------|--------|
 | 🔴 **Manager** | `pm@localhost` | `pm@localhost` | Full administrative access, billing, scheduling, and labor management |

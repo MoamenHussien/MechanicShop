@@ -62,14 +62,15 @@ public class GetDailyScheduleQueryHandler(IAppDbContext context, TimeProvider ti
                 {
                     if (hash.Add(workOrderInThisTime.Id))
                     {
-                        var startLocal = TimeZoneInfo.ConvertTimeFromUtc(workOrderInThisTime.StartAtUtc.DateTime, request.TimeZone);
-                        var endLocal = TimeZoneInfo.ConvertTimeFromUtc(workOrderInThisTime.EndAtUtc.DateTime, request.TimeZone);
+                        var duration = workOrderInThisTime.EndAtUtc - workOrderInThisTime.StartAtUtc;
+                        var slotStart = startRangeLocal;
+                        var slotEnd = slotStart + duration;
                         spotDto.Slots.Add(new AvailabilitySlotDto
                         {
                             WorkOrderId = workOrderInThisTime.Id,
                             Spot = spotEn,
-                            StartAt = new DateTimeOffset(startLocal, request.TimeZone.GetUtcOffset(startLocal)),
-                            EndAt = new DateTimeOffset(endLocal, request.TimeZone.GetUtcOffset(endLocal)),
+                            StartAt = new DateTimeOffset(slotStart, request.TimeZone.GetUtcOffset(slotStart)),
+                            EndAt = new DateTimeOffset(slotEnd, request.TimeZone.GetUtcOffset(slotEnd)),
                             Vehicle = workOrderInThisTime.Vehicle?.VehicleModel?.VehicleMake?.Make + " | " + workOrderInThisTime.Vehicle?.LicensePlate,
                             Labor = workOrderInThisTime.Labor.ToDto(),
                             IsOccupied = true,
