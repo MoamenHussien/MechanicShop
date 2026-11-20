@@ -55,4 +55,6 @@ app.MapRazorComponents<App>().AllowAnonymous()
 
 app.MapHub<WorkOrderHub>("/hubs/workorders");
 
+await app.InitialiseDatabaseAsync();
+
 app.Run();
