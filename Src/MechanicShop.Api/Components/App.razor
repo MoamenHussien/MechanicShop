@@ -1,17 +1,18 @@
 <!DOCTYPE html>
-<html lang="en" data-bs-theme="dark">
+<html lang="en" data-bs-theme="light">
 
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <base href="/" />
-    <link rel="stylesheet" href="@Assets["app.css"]" />
-    <link rel="stylesheet" href="@Assets["MechanicShop.client.styles.css"]" />
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
         integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="@Assets["app.css"]" />
+    <link rel="stylesheet" href="@Assets["MechanicShop.Client.styles.css"]" />
+    <meta name="description" content="Manage your workshop in one place. Customer records, technician schedules, work orders and invoicing with MechanicShop." />
     <ImportMap />
-    <link rel="icon" type="image/png" href="favicon.png" />
+    <link rel="icon" type="image/svg+xml" href="favicon.svg" />
     <HeadOutlet @rendermode="InteractiveWebAssembly" />
 </head>
 
@@ -27,10 +28,18 @@
         window.scrollToElement = (elementId) => {
             const element = document.getElementById(elementId);
             if (element) {
-                element.scrollIntoView({ behavior: 'smooth', block: 'center', inline: 'nearest' });
+                element.scrollIntoView({ behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'instant' : 'smooth', block: 'center', inline: 'nearest' });
             }
         };
+        window.downloadFileFromBase64 = (fileName, base64) => {
+            const link = document.createElement('a');
+            link.href = 'data:application/pdf;base64,' + base64;
+            link.download = fileName;
+            link.click();
+            link.remove();
+        };
     </script>
+    <script src="@Assets["ui.js"]"></script>
 </body>
 
 </html>

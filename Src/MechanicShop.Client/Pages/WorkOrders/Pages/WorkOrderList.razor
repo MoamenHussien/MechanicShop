@@ -2,13 +2,14 @@
 @page "/workorders/Page/{Page:int}"
 
 @attribute [Authorize]
+<PageTitle>Work orders | MechanicShop</PageTitle>
 
 <div class="container-fluid py-4">
     <!-- Header Section -->
     <div class="d-flex flex-column flex-sm-row justify-content-between align-items-sm-center gap-3 mb-4">
         <div>
             <h1 class="h3 mb-1 text-body-emphasis">
-                <i class="bi bi-clipboard-text me-2 brand-red"></i>WorkOrders
+                <i class="bi bi-clipboard-check me-2 brand-red" aria-hidden="true"></i>Work orders
             </h1>
             <p class="text-muted mb-0">Manage work orders and track service progress</p>
         </div>
@@ -20,12 +21,12 @@
             <EditForm Model="filterRequest" OnValidSubmit="ApplyFilter">
                 <div class="row g-3 align-items-end">
                     <div class="col-12 col-sm-6 col-md-3">
-                        <label class="form-label text-muted small fw-semibold">Search</label>
-                        <InputText @bind-Value="filterRequest.SearchTerm" placeholder="Search by customer, vehicle…" class="form-control" />
+                        <label for="workorder-search" class="form-label text-muted small fw-semibold">Search</label>
+                        <InputText id="workorder-search" @bind-Value="filterRequest.SearchTerm" placeholder="Search by customer, vehicle…" class="form-control" />
                     </div>
                     <div class="col-12 col-sm-6 col-md-2">
-                        <label class="form-label text-muted small fw-semibold">Status</label>
-                        <InputSelect @bind-Value="filterRequest.State" class="form-select">
+                        <label for="workorder-status" class="form-label text-muted small fw-semibold">Status</label>
+                        <InputSelect id="workorder-status" @bind-Value="filterRequest.State" class="form-select">
                             <option value="">All Status</option>
                             @foreach (var st in Enum.GetValues<WorkOrderState>())
                             {
@@ -34,12 +35,12 @@
                         </InputSelect>
                     </div>
                     <div class="col-12 col-sm-6 col-md-2">
-                        <label class="form-label text-muted small fw-semibold">From Date</label>
-                        <InputDate @bind-Value="filterRequest.StartDateFrom" class="form-control" />
+                        <label for="workorder-from" class="form-label text-muted small fw-semibold">From date</label>
+                        <InputDate id="workorder-from" @bind-Value="filterRequest.StartDateFrom" class="form-control" />
                     </div>
                     <div class="col-12 col-sm-6 col-md-2">
-                        <label class="form-label text-muted small fw-semibold">To Date</label>
-                        <InputDate @bind-Value="filterRequest.StartDateTo" class="form-control" />
+                        <label for="workorder-to" class="form-label text-muted small fw-semibold">To date</label>
+                        <InputDate id="workorder-to" @bind-Value="filterRequest.StartDateTo" class="form-control" />
                     </div>
                     <div class="col-12 col-md-3 d-flex align-items-end gap-2">
                         <button type="submit" class="btn btn-primary flex-grow-1">Filter</button>
@@ -61,7 +62,7 @@
     else if (!pagedResult.Items.Any())
     {
         <div class="alert alert-info" role="alert">
-            <i class="bi bi-info-circle me-2"></i>No work orders found matching your criteria.
+            <i class="bi bi-info-circle me-2" aria-hidden="true"></i>No work orders found matching your criteria.
         </div>
     }
     else
@@ -69,32 +70,32 @@
         <div class="card border">
             <div class="table-responsive">
                 <table class="table table-hover align-middle mb-0" style="min-width: 900px;">
-                    <thead class="table-dark">
+                    <thead class="table-light">
                         <tr>
-                            <th style="width: 24%" @onclick="() => SortBy(nameof(WorkOrderListItemModel.Vehicle))">
-                                Vehicle <i class="bi @GetSortIcon(nameof(WorkOrderListItemModel.Vehicle))"></i>
-                            </th>
+                            <th style="width: 24%" ><button type="button" class="table-sort" @onclick="() => SortBy(nameof(WorkOrderListItemModel.Vehicle))">
+                                Vehicle <i class="bi @GetSortIcon(nameof(WorkOrderListItemModel.Vehicle))" aria-hidden="true"></i>
+                            </button></th>
                             <th class="text-start" style="width: 14%"
-                                @onclick="() => SortBy(nameof(WorkOrderListItemModel.Customer))">
-                                Customer <i class="bi @GetSortIcon(nameof(WorkOrderListItemModel.Customer))"></i>
-                            </th>
+                                ><button type="button" class="table-sort" @onclick="() => SortBy(nameof(WorkOrderListItemModel.Customer))">
+                                Customer <i class="bi @GetSortIcon(nameof(WorkOrderListItemModel.Customer))" aria-hidden="true"></i>
+                            </button></th>
                             <th class="text-center" style="width: 8%"
-                                @onclick="() => SortBy(nameof(WorkOrderListItemModel.Spot))">
-                                Spot <i class="bi @GetSortIcon(nameof(WorkOrderListItemModel.Spot))"></i>
-                            </th>
+                                ><button type="button" class="table-sort" @onclick="() => SortBy(nameof(WorkOrderListItemModel.Spot))">
+                                Spot <i class="bi @GetSortIcon(nameof(WorkOrderListItemModel.Spot))" aria-hidden="true"></i>
+                            </button></th>
                             <th class="text-center" style="width: 12%"
-                                @onclick="() => SortBy(nameof(WorkOrderListItemModel.Labor))">
-                                Labor <i class="bi @GetSortIcon(nameof(WorkOrderListItemModel.Labor))"></i>
-                            </th>
+                                ><button type="button" class="table-sort" @onclick="() => SortBy(nameof(WorkOrderListItemModel.Labor))">
+                                Technician <i class="bi @GetSortIcon(nameof(WorkOrderListItemModel.Labor))" aria-hidden="true"></i>
+                            </button></th>
                             <th class="text-start" style="width: 18%">Repair Tasks</th>
                             <th class="text-center" style="width: 10%"
-                                @onclick="() => SortBy(nameof(WorkOrderListItemModel.State))">
-                                Status <i class="bi @GetSortIcon(nameof(WorkOrderListItemModel.State))"></i>
-                            </th>
+                                ><button type="button" class="table-sort" @onclick="() => SortBy(nameof(WorkOrderListItemModel.State))">
+                                Status <i class="bi @GetSortIcon(nameof(WorkOrderListItemModel.State))" aria-hidden="true"></i>
+                            </button></th>
                             <th class="text-end" style="width: 10%"
-                                @onclick="() => SortBy(nameof(WorkOrderListItemModel.StartAtUtc))">
-                                Time Slot <i class="bi @GetSortIcon(nameof(WorkOrderListItemModel.StartAtUtc))"></i>
-                            </th>
+                                ><button type="button" class="table-sort" @onclick="() => SortBy(nameof(WorkOrderListItemModel.StartAtUtc))">
+                                Time Slot <i class="bi @GetSortIcon(nameof(WorkOrderListItemModel.StartAtUtc))" aria-hidden="true"></i>
+                            </button></th>
                             <th class="text-end" style="width: 4%">Actions</th>
                         </tr>
                     </thead>
@@ -129,7 +130,7 @@
                                     <div class="d-inline-flex gap-1">
                                         <a class="btn btn-sm btn-outline-info" href="/workorder-details/@wo.WorkOrderId"
                                             title="Details">
-                                            <i class="bi bi-info-circle"></i>
+                                            <i class="bi bi-info-circle" aria-hidden="true"></i>
                                         </a>
                                         <AuthorizeView Roles="Manager">
                                             <Authorized>
@@ -139,7 +140,7 @@
                                                     {
                                                         <a class="btn btn-sm btn-outline-secondary" href="/invoice/@wo.InvoiceId"
                                                             title="View Invoice">
-                                                            <i class="bi bi-file-earmark-text"></i>
+                                                            <i class="bi bi-file-earmark-text" aria-hidden="true"></i>
                                                         </a>
                                                     }
                                                     else
@@ -154,7 +155,7 @@
                                                         {
                                                             <button class="btn btn-sm btn-primary"
                                                                 @onclick="() => CreateInvoice(wo)" title="Create Invoice" disabled="@(creatingInvoiceId.HasValue)">
-                                                                <i class="bi bi-plus-circle"></i>
+                                                                <i class="bi bi-plus-circle" aria-hidden="true"></i>
                                                             </button>
                                                         }
                                                     }
@@ -170,7 +171,7 @@
             </div>
             <div class="card-footer bg-transparent border-top p-3">
                 <Paginator TotalItems="pagedResult.TotalCount" ItemsPerPage="pagedResult.PageSize"
-                    CurrentPageNumber="pagedResult.PageNumber" NavUrl="workorders/page/" />
+                    CurrentPageNumber="pageRequest.Page" NavUrl="workorders/page/" />
             </div>
         </div>
     }

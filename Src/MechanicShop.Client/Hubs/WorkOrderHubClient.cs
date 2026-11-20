@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using Microsoft.AspNetCore.SignalR.Client;
 
@@ -27,7 +27,7 @@ public sealed class WorkOrderHubClient : IAsyncDisposable
             return;
         }
 
-        _hubConnection.On("WorkOrdersChanged", async () =>
+        _hubConnection.On("WorkOrderChanged", async () =>
         {
             if (!_isDisposed)
             {

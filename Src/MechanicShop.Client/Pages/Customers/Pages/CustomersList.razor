@@ -1,18 +1,19 @@
 @page "/customers"
 @using MechanicShop.Client.Models
 @attribute [Authorize]
+<PageTitle>Customers | MechanicShop</PageTitle>
 
 <div class="container-fluid py-4">
     <!-- Header Section -->
     <div class="d-flex flex-column flex-sm-row justify-content-between align-items-sm-center gap-3 mb-4">
         <div>
             <h1 class="h3 mb-1 text-body-emphasis">
-                <i class="bi bi-people me-2 brand-red"></i>Customers
+                <i class="bi bi-people me-2 brand-red" aria-hidden="true"></i>Customers
             </h1>
             <p class="text-muted mb-0">Manage customers and their vehicles</p>
         </div>
         <button class="btn btn-primary btn-md-lg align-self-start align-self-sm-auto" @onclick="ShowCreateModal">
-            <i class="bi bi-plus-lg me-1"></i>
+            <i class="bi bi-plus-lg me-1" aria-hidden="true"></i>
             New Customer
         </button>
     </div>
@@ -24,14 +25,14 @@
                 <div class="col-12 col-md-6">
                     <div class="input-group">
                         <span class="input-group-text bg-transparent border-end-0">
-                            <i class="bi bi-search text-muted"></i>
+                            <i class="bi bi-search text-muted" aria-hidden="true"></i>
                         </span>
-                        <input type="text" class="form-control border-start-0 ps-0" placeholder="Search customers..."
+                        <input type="text" class="form-control border-start-0 ps-0" placeholder="Search customers..." aria-label="Search customers"
                                @bind="searchTerm" @oninput="OnSearchChanged">
                     </div>
                 </div>
                 <div class="col-12 col-sm-7 col-md-3">
-                    <select class="form-select" @bind="sortBy" @bind:after="ApplyFilters">
+                    <select class="form-select" aria-label="Sort customers by" @bind="sortBy" @bind:after="ApplyFilters">
                         <option value="name">Sort by Name</option>
                         <option value="email">Sort by Email</option>
                         <option value="phone">Sort by Phone</option>
@@ -40,15 +41,15 @@
                 </div>
                 <div class="col-12 col-sm-5 col-md-3">
                     <div class="btn-group w-100" role="group">
-                        <input type="radio" class="btn-check" id="asc" @onchange="() => SetSortDirection(true)"
+                        <input type="radio" class="btn-check" id="asc" aria-label="Sort ascending" @onchange="() => SetSortDirection(true)"
                                checked="@sortAscending">
                         <label class="btn btn-outline-secondary" for="asc">
-                            <i class="bi bi-sort-up"></i>
+                            <i class="bi bi-sort-up" aria-hidden="true"></i>
                         </label>
-                        <input type="radio" class="btn-check" id="desc" @onchange="() => SetSortDirection(false)"
+                        <input type="radio" class="btn-check" id="desc" aria-label="Sort descending" @onchange="() => SetSortDirection(false)"
                                checked="@(!sortAscending)">
                         <label class="btn btn-outline-secondary" for="desc">
-                            <i class="bi bi-sort-down"></i>
+                            <i class="bi bi-sort-down" aria-hidden="true"></i>
                         </label>
                     </div>
                 </div>
@@ -58,7 +59,15 @@
 
     <!-- Customers List -->
     <div class="row g-4">
-        @if (filteredCustomers.Any())
+        @if (_isLoading)
+        {
+            <div class="col-12 py-5 text-center text-muted" role="status"><span class="spinner-border spinner-border-sm me-2" aria-hidden="true"></span>Loading customers...</div>
+        }
+        else if (_pageLoadError is not null)
+        {
+            <div class="col-12"><div class="alert alert-warning" role="alert">@_pageLoadError <button type="button" class="btn btn-outline-secondary ms-2" @onclick="ReloadCustomers">Try again</button></div></div>
+        }
+        else if (filteredCustomers.Any())
         {
             @foreach (var customer in filteredCustomers)
             {
@@ -67,21 +76,21 @@
                         <div
                             class="card-header bg-transparent border-bottom-0 d-flex justify-content-between align-items-start">
                             <div class="flex-grow-1">
-                                <h5 class="card-title mb-1 text-truncate">@customer.Name</h5>
+                                <h2 class="card-title mb-1 text-truncate">@customer.Name</h2>
                                 <div class="d-flex align-items-center text-muted small">
-                                    <i class="bi bi-envelope me-1"></i>
+                                    <i class="bi bi-envelope me-1" aria-hidden="true"></i>
                                     @customer.Email
                                 </div>
                             </div>
                             <div class="dropdown">
-                                <button class="btn btn-link text-muted p-1" data-bs-toggle="dropdown">
-                                    <i class="bi bi-three-dots-vertical"></i>
+                                <button class="btn btn-link text-muted p-1" data-bs-toggle="dropdown" aria-label="More actions">
+                                    <i class="bi bi-three-dots-vertical" aria-hidden="true"></i>
                                 </button>
                                 <ul class="dropdown-menu dropdown-menu-end">
                                     <li>
                                         <a class="dropdown-item" href="#" @onclick="() => ShowEditModal(customer)"
                                            @onclick:preventDefault="true">
-                                            <i class="bi bi-pencil me-2"></i>Edit
+                                            <i class="bi bi-pencil me-2" aria-hidden="true"></i>Edit
                                         </a>
                                     </li>
                                     <li>
@@ -90,7 +99,7 @@
                                     <li>
                                         <a class="dropdown-item text-danger" href="#" @onclick="() => ShowDeleteModal(customer)"
                                            @onclick:preventDefault="true">
-                                            <i class="bi bi-trash me-2"></i>Delete
+                                            <i class="bi bi-trash me-2" aria-hidden="true"></i>Delete
                                         </a>
                                     </li>
                                 </ul>
@@ -100,7 +109,7 @@
                             <div class="row g-3 mb-3">
                                 <div class="col-12">
                                     <div class="d-flex align-items-center">
-                                        <i class="bi bi-phone me-2 text-muted"></i>
+                                        <i class="bi bi-phone me-2 text-muted" aria-hidden="true"></i>
                                         <span>@customer.PhoneNumber</span>
                                     </div>
                                 </div>
@@ -145,15 +154,15 @@
             <div class="col-12">
                 <div class="text-center py-5">
                     <div class="mb-3">
-                        <i class="bi bi-search display-1 text-muted opacity-50"></i>
+                        <i class="bi bi-search display-1 text-muted opacity-50" aria-hidden="true"></i>
                     </div>
-                    <h4 class="text-muted">No customers found</h4>
+                    <h2 class="h4 text-muted">No customers found</h2>
                     <p class="text-muted">@(string.IsNullOrEmpty(searchTerm) ? "Start by creating your first customer." :
                              "Try adjusting your search criteria.")</p>
                         @if (string.IsNullOrEmpty(searchTerm))
                         {
                             <button class="btn btn-primary" @onclick="ShowCreateModal">
-                                <i class="bi bi-plus-lg me-1"></i>Create Customer
+                                <i class="bi bi-plus-lg me-1" aria-hidden="true"></i>Create Customer
                             </button>
                         }
                     </div>
@@ -175,12 +184,12 @@
                     </div>
                     <div class="col-md-6">
                         <label class="form-label">Phone Number <span class="text-danger">*</span></label>
-                        <InputText class="form-control" @bind-Value="newCustomerRequest.PhoneNumber" />
+                        <InputText aria-label="Phone Number" class="form-control" @bind-Value="newCustomerRequest.PhoneNumber" />
                         <ValidationMessage For="@(() => newCustomerRequest.PhoneNumber)" class="text-danger small" />
                     </div>
                     <div class="col-md-6">
                         <label class="form-label">Email <span class="text-danger">*</span></label>
-                        <InputText class="form-control" @bind-Value="newCustomerRequest.Email" type="email" />
+                        <InputText aria-label="Email" class="form-control" @bind-Value="newCustomerRequest.Email" type="email" />
                         <ValidationMessage For="@(() => newCustomerRequest.Email)" class="text-danger small" />
                     </div>
                 </div>
@@ -189,7 +198,7 @@
                     <div class="d-flex justify-content-between align-items-center mb-3">
                         <h6 class="mb-0">Vehicles</h6>
                         <button type="button" class="btn btn-outline-primary btn-sm" @onclick="AddVehicle">
-                            <i class="bi bi-plus me-1"></i>Add Vehicle
+                            <i class="bi bi-plus me-1" aria-hidden="true"></i>Add Vehicle
                         </button>
                     </div>
 
@@ -244,20 +253,20 @@
                                 </div>
                                 <div class="col-6 col-md-2">
                                     <label class="form-label d-md-none small text-muted">Year</label>
-                                    <InputNumber class="form-control" @bind-Value="newCustomerRequest.Vehicles[index].Year" min="1900"
+                                    <InputNumber aria-label="Year" class="form-control" @bind-Value="newCustomerRequest.Vehicles[index].Year" min="1900"
                                                  max="@DateTime.Now.Year" />
                                     <ValidationMessage For="@(() => newCustomerRequest.Vehicles[index].Year)"
                                                        class="text-danger small" />
                                 </div>
                                 <div class="col-6 col-md-3">
                                     <label class="form-label d-md-none small text-muted">License Plate</label>
-                                    <InputText class="form-control" @bind-Value="newCustomerRequest.Vehicles[index].LicensePlate" />
+                                    <InputText aria-label="License Plate" class="form-control" @bind-Value="newCustomerRequest.Vehicles[index].LicensePlate" />
                                     <ValidationMessage For="@(() => newCustomerRequest.Vehicles[index].LicensePlate)"
                                                        class="text-danger small" />
                                 </div>
                                 <div class="col-12 col-md-1 d-flex justify-content-end align-items-center">
                                     <button type="button" class="btn btn-outline-danger btn-sm w-100 w-md-auto mt-2 mt-md-0" @onclick="() => RemoveVehicle(index)">
-                                        <i class="bi bi-trash me-1"></i><span class="d-md-none">Remove Vehicle</span>
+                                        <i class="bi bi-trash me-1" aria-hidden="true"></i><span class="d-md-none">Remove Vehicle</span>
                                     </button>
                                 </div>
                             </div>
@@ -267,7 +276,7 @@
 
                 <div class="modal-footer mt-3">
                     <button type="submit" class="btn btn-primary">
-                        <i class="bi bi-plus-lg me-1"></i>
+                        <i class="bi bi-plus-lg me-1" aria-hidden="true"></i>
                         Create Customer
                     </button>
                     <button type="button" class="btn btn-secondary" @onclick="HideDialog">Cancel</button>
@@ -288,17 +297,17 @@
                 <div class="row g-3">
                     <div class="col-12">
                         <label class="form-label">Customer Name <span class="text-danger">*</span></label>
-                        <InputText class="form-control" @bind-Value="updateCustomerRequest.Name" />
+                        <InputText aria-label="Customer Name" class="form-control" @bind-Value="updateCustomerRequest.Name" />
                         <ValidationMessage For="@(() => updateCustomerRequest.Name)" class="text-danger small" />
                     </div>
                     <div class="col-md-6">
                         <label class="form-label">Phone Number <span class="text-danger">*</span></label>
-                        <InputText class="form-control" @bind-Value="updateCustomerRequest.PhoneNumber" />
+                        <InputText aria-label="Phone Number" class="form-control" @bind-Value="updateCustomerRequest.PhoneNumber" />
                         <ValidationMessage For="@(() => updateCustomerRequest.PhoneNumber)" class="text-danger small" />
                     </div>
                     <div class="col-md-6">
                         <label class="form-label">Email <span class="text-danger">*</span></label>
-                        <InputText class="form-control" @bind-Value="updateCustomerRequest.Email" type="email" />
+                        <InputText aria-label="Email" class="form-control" @bind-Value="updateCustomerRequest.Email" type="email" />
                         <ValidationMessage For="@(() => updateCustomerRequest.Email)" class="text-danger small" />
                     </div>
                 </div>
@@ -359,33 +368,33 @@
                                 </div>
                                 <div class="col-6 col-md-2">
                                     <label class="form-label d-md-none small text-muted">Year</label>
-                                    <InputNumber class="form-control" @bind-Value="updateCustomerRequest.Vehicles[index].Year"
+                                    <InputNumber aria-label="Year" class="form-control" @bind-Value="updateCustomerRequest.Vehicles[index].Year"
                                                  min="1900" max="@DateTime.Now.Year" />
                                     <ValidationMessage For="@(() => updateCustomerRequest.Vehicles[index].Year)"
                                                        class="text-danger small" />
                                 </div>
                                 <div class="col-6 col-md-3">
                                     <label class="form-label d-md-none small text-muted">License Plate</label>
-                                    <InputText class="form-control" @bind-Value="updateCustomerRequest.Vehicles[index].LicensePlate" />
+                                    <InputText aria-label="License Plate" class="form-control" @bind-Value="updateCustomerRequest.Vehicles[index].LicensePlate" />
                                     <ValidationMessage For="@(() => updateCustomerRequest.Vehicles[index].LicensePlate)"
                                                        class="text-danger small" />
                                 </div>
                                 <div class="col-12 col-md-1 d-flex justify-content-end align-items-center">
                                     <button type="button" class="btn btn-outline-danger btn-sm w-100 w-md-auto mt-2 mt-md-0" @onclick="() => RemoveVehicle(index)">
-                                        <i class="bi bi-trash me-1"></i><span class="d-md-none">Remove Vehicle</span>
+                                        <i class="bi bi-trash me-1" aria-hidden="true"></i><span class="d-md-none">Remove Vehicle</span>
                                     </button>
                                 </div>
                             </div>
                         }
                     }
                     <button type="button" class="btn btn-outline-primary btn-sm" @onclick="AddVehicle">
-                        <i class="bi bi-plus me-1"></i>Add Vehicle
+                        <i class="bi bi-plus me-1" aria-hidden="true"></i>Add Vehicle
                     </button>
                 </div>
 
                 <div class="modal-footer mt-3 d-flex gap-2 mt-3 pt-2">
                     <button type="submit" class="btn btn-primary me-1">
-                        <i class="bi bi-check-lg me-1"></i>
+                        <i class="bi bi-check-lg me-1" aria-hidden="true"></i>
                         Update Customer
                     </button>
                     <button type="button" class="btn btn-secondary me-1" @onclick="HideDialog">Cancel</button>
@@ -426,12 +435,22 @@
     private RenderFragment? _dialogTitle;
 
     private string? errorMessage;
+    private bool _isLoading = true;
+    private string? _pageLoadError;
 
     protected override async Task OnInitializedAsync()
     {
-        await LoadCustomers();
+        await ReloadCustomers();
         await LoadVehicleMakes();
+    }
+
+    private async Task ReloadCustomers()
+    {
+        _isLoading = true;
+        _pageLoadError = null;
+        await LoadCustomers();
         ApplyFilters();
+        _isLoading = false;
     }
 
     private async Task LoadCustomers()
@@ -441,6 +460,11 @@
         if (customerResult.IsSuccess)
         {
             customers = customerResult.Data!;
+            _pageLoadError = null;
+        }
+        else
+        {
+            _pageLoadError = "Customers couldn't be loaded. Please try again.";
         }
     }
 

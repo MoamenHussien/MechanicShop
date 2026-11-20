@@ -1,0 +1,33 @@
+.detail-page-heading { display: flex; justify-content: space-between; align-items: center; gap: 20px; margin-bottom: 28px; }
+.back-to-list { display: inline-flex; gap: 8px; font-size: 12px; font-weight: 600; text-decoration: none; padding: 8px 0; margin-bottom: 12px; }
+.detail-page-heading h1 { font-size: 30px; margin: 0 0 10px; }
+.detail-page-heading p { margin: 0; color: var(--muted); font-size: 13px; }
+.workorder-summary { display: grid; grid-template-columns: 1fr 1.6fr; gap: 20px; margin-bottom: 28px; }
+.vehicle-summary, .job-summary, .service-breakdown, .cost-summary { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 24px; }
+.vehicle-summary { background: var(--navy-soft); }
+.vehicle-icon { font-size: 60px; color: var(--ink); margin: 0 0 12px; }
+.vehicle-summary h2 { font-size: 22px; font-weight: 650; letter-spacing: -.6px; margin-bottom: 12px; }
+.vehicle-summary > p { display: flex; align-items: center; gap: 12px; color: var(--muted); font-size: 13px; }
+.license-plate { background: var(--surface); border: 1px solid var(--line-strong); border-radius: 4px; padding: 5px 10px; font-size: 12px; font-weight: 650; color: var(--ink); letter-spacing: 1px; }
+.vehicle-summary-footer { display: flex; justify-content: space-between; border-top: 1px solid var(--line-strong); padding-top: 16px; margin-top: 24px; font-size: 11px; color: var(--accent); gap: 12px; }
+.summary-heading { display: flex; justify-content: space-between; align-items: center; gap: 16px; margin-bottom: 24px; }
+.summary-heading h2, .service-breakdown > h2, .cost-summary h2 { font-size: 16px; font-weight: 650; margin: 0; }
+.job-facts { display: grid; grid-template-columns: 1fr 1fr; gap: 28px 20px; margin: 0; }
+.job-facts dt { font-size: 12px; font-weight: 400; color: var(--muted); margin-bottom: 8px; }
+.job-facts dd { font-size: 14px; font-weight: 600; margin: 0; }
+.workorder-breakdown { display: grid; grid-template-columns: 1fr 300px; gap: 20px; align-items: start; }
+.service-breakdown > h2 { margin-bottom: 24px; }
+.service-item + .service-item { border-top: 1px solid var(--line); margin-top: 24px; padding-top: 24px; }
+.service-item-heading { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 18px; flex-wrap: wrap; }
+.service-item-heading h3 { font-size: 14px; font-weight: 650; margin: 0; }
+.service-item-heading i { color: var(--accent); margin-right: 8px; }
+.service-item ::deep .table { min-width: 400px; }
+.cost-summary dl { margin: 24px 0 16px; }
+.cost-summary dl > div { display: flex; justify-content: space-between; align-items: center; padding: 12px 0; gap: 16px; }
+.cost-summary dt { font-size: 13px; font-weight: 400; color: var(--muted); }
+.cost-summary dd { font-size: 14px; font-weight: 600; margin: 0; }
+.cost-summary .grand-total { margin-top: 12px; border-top: 1px solid var(--line); padding-top: 20px; }
+.grand-total dd { font-size: 24px; color: var(--accent); }
+.cost-summary p { color: var(--muted); font-size: 11px; line-height: 1.7; margin: 0; }
+@media (max-width: 1199.98px) { .workorder-breakdown { grid-template-columns: 1fr; } }
+@media (max-width: 767.98px) { .detail-page-heading { flex-direction: column; align-items: start; } .workorder-summary { grid-template-columns: 1fr; } .vehicle-summary, .job-summary, .service-breakdown, .cost-summary { padding: 20px; } }

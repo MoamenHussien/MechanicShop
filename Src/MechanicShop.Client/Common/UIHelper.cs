@@ -24,7 +24,7 @@ public static class UIHelper
         {
             "Oil Change" => (MarkupString)"<span class='badge mx-1 text-bg-warning'><i class='bi bi-droplet'></i> Oil Change</span>",
             "Brake Replacement" => (MarkupString)"<span class='badge mx-1 text-bg-danger'><i class='bi bi-exclamation-triangle'></i> Brake Replacement</span>",
-            "Tire Rotation" => (MarkupString)"<span class='badge mx-1 bg-info text-text-dark'><i class='bi bi-arrow-repeat'></i> Tire Rotation</span>",
+            "Tire Rotation" => (MarkupString)"<span class='badge mx-1 bg-info'><i class='bi bi-arrow-repeat'></i> Tire Rotation</span>",
             "Battery Replacement" => (MarkupString)"<span class='badge mx-1 text-bg-primary'><i class='bi bi-battery'></i> Battery Replacement</span>",
             "Wheel Alignment" => (MarkupString)"<span class='badge mx-1 text-bg-success'><i class='bi bi-compass'></i> Wheel Alignment</span>",
             "Air Conditioning Recharge" => (MarkupString)"<span class='badge mx-1 text-bg-secondary'><i class='bi bi-wind'></i> Air Conditioning Recharge</span>",

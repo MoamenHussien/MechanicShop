@@ -11,11 +11,11 @@
                             <div class="card-body d-flex flex-column justify-content-between">
                                 <div class="d-flex align-items-center justify-content-between mb-2">
                                     <h5 class="card-title mb-0">
-                                        <i class="bi bi-person-arms-up me-2"></i> @labor.Name
+                                        <i class="bi bi-person-arms-up me-2" aria-hidden="true"></i> @labor.Name
                                     </h5>
                                     @if (_selectedLabor.LaborId == labor.LaborId)
                                     {
-                                        <i class="bi bi-check-circle-fill text-success"></i>
+                                        <i class="bi bi-check-circle-fill text-success" aria-hidden="true"></i>
                                     }
                                 </div>
                             </div>
@@ -36,10 +36,10 @@
     </div>
     <div class="d-flex justify-content-end gap-3">
         <button class="btn btn-outline-secondary" @onclick="Cancel">
-            <i class="bi bi-x-circle me-2"></i>Cancel
+            <i class="bi bi-x-circle me-2" aria-hidden="true"></i>Cancel
         </button>
         <button class="btn btn-primary" @onclick="Save" disabled="@(_selectedLabor == null || _selectedLabor.LaborId == Guid.Empty)">
-            <i class="bi bi-save me-2"></i>Save
+            <i class="bi bi-save me-2" aria-hidden="true"></i>Save
         </button>
     </div>
     @if (errorMessage != null)
@@ -83,7 +83,7 @@
 
         if (updateWorkOrderLaborResult.IsSuccess)
         {
-            await OnChange.InvokeAsync(); 
+            await OnChange.InvokeAsync();
         }
         else
         {

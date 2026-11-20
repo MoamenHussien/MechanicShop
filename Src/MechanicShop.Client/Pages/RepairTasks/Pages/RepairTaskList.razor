@@ -1,17 +1,18 @@
 @page "/repair-tasks"
 @attribute [Authorize]
+<PageTitle>Services & parts | MechanicShop</PageTitle>
 <div class="container-fluid py-4">
     <!-- Header Section -->
     <div class="d-flex flex-column flex-sm-row justify-content-between align-items-sm-center gap-3 mb-4">
         <div>
             <h1 class="h3 mb-1 text-body-emphasis">
-                <i class="bi bi-tools me-2 brand-red"></i>Repair Tasks
+                <i class="bi bi-tools me-2 brand-red" aria-hidden="true"></i>Services & parts
             </h1>
             <p class="text-muted mb-0">Manage repair tasks and track costs</p>
         </div>
         <button class="btn btn-primary btn-md-lg align-self-start align-self-sm-auto" @onclick="ShowCreateModal">
-            <i class="bi bi-plus-lg me-1"></i>
-            New Task
+            <i class="bi bi-plus-lg me-1" aria-hidden="true"></i>
+            New service
         </button>
     </div>
 
@@ -22,14 +23,14 @@
                 <div class="col-12 col-md-6">
                     <div class="input-group">
                         <span class="input-group-text bg-transparent border-end-0">
-                            <i class="bi bi-search text-muted"></i>
+                            <i class="bi bi-search text-muted" aria-hidden="true"></i>
                         </span>
-                        <input type="text" class="form-control border-start-0 ps-0" placeholder="Search repair tasks..."
+                        <input type="text" class="form-control border-start-0 ps-0" placeholder="Search services..." aria-label="Search services"
                             @bind="searchTerm" @oninput="OnSearchChanged">
                     </div>
                 </div>
                 <div class="col-12 col-sm-7 col-md-3">
-                    <select class="form-select" @bind="sortBy" @bind:after="ApplyFilters">
+                    <select class="form-select" aria-label="Sort services by" @bind="sortBy" @bind:after="ApplyFilters">
                         <option value="name">Sort by Name</option>
                         <option value="cost">Sort by Total Cost</option>
                         <option value="duration">Sort by Duration</option>
@@ -38,15 +39,15 @@
                 </div>
                 <div class="col-12 col-sm-5 col-md-3">
                     <div class="btn-group w-100" role="group">
-                        <input type="radio" class="btn-check" id="asc" @onchange="() => SetSortDirection(true)"
+                        <input type="radio" class="btn-check" id="asc" aria-label="Sort ascending" @onchange="() => SetSortDirection(true)"
                             checked="@sortAscending">
                         <label class="btn btn-outline-secondary" for="asc">
-                            <i class="bi bi-sort-up"></i>
+                            <i class="bi bi-sort-up" aria-hidden="true"></i>
                         </label>
-                        <input type="radio" class="btn-check" id="desc" @onchange="() => SetSortDirection(false)"
+                        <input type="radio" class="btn-check" id="desc" aria-label="Sort descending" @onchange="() => SetSortDirection(false)"
                             checked="@(!sortAscending)">
                         <label class="btn btn-outline-secondary" for="desc">
-                            <i class="bi bi-sort-down"></i>
+                            <i class="bi bi-sort-down" aria-hidden="true"></i>
                         </label>
                     </div>
                 </div>
@@ -56,7 +57,15 @@
 
     <!-- Repair Tasks List -->
     <div class="row g-4">
-        @if (filteredTasks.Any())
+        @if (_isLoading)
+        {
+            <div class="col-12 py-5 text-center text-muted" role="status"><span class="spinner-border spinner-border-sm me-2" aria-hidden="true"></span>Loading services...</div>
+        }
+        else if (_pageLoadError is not null)
+        {
+            <div class="col-12"><div class="alert alert-warning" role="alert">@_pageLoadError <button type="button" class="btn btn-outline-secondary ms-2" @onclick="ReloadServices">Try again</button></div></div>
+        }
+        else if (filteredTasks.Any())
         {
             @foreach (var task in filteredTasks)
             {
@@ -65,21 +74,21 @@
                         <div
                             class="card-header bg-transparent border-bottom-0 d-flex justify-content-between align-items-start">
                             <div class="flex-grow-1">
-                                <h5 class="card-title mb-1 text-truncate">@task.Name</h5>
+                                <h2 class="card-title mb-1 text-truncate">@task.Name</h2>
                                 <div class="d-flex align-items-center text-muted small">
-                                    <i class="bi bi-clock me-1"></i>
+                                    <i class="bi bi-clock me-1" aria-hidden="true"></i>
                                     @TimeSpan.FromMinutes((int)task.EstimatedDurationInMins).ToString(@"h\h\ m\m")
                                 </div>
                             </div>
                             <div class="dropdown">
-                                <button class="btn btn-link text-muted p-1" data-bs-toggle="dropdown">
-                                    <i class="bi bi-three-dots-vertical"></i>
+                                <button class="btn btn-link text-muted p-1" data-bs-toggle="dropdown" aria-label="More actions">
+                                    <i class="bi bi-three-dots-vertical" aria-hidden="true"></i>
                                 </button>
                                 <ul class="dropdown-menu dropdown-menu-end">
                                     <li>
                                         <a class="dropdown-item" href="#" @onclick="() => ShowEditModal(task)"
                                             @onclick:preventDefault="true">
-                                            <i class="bi bi-pencil me-2"></i>Edit
+                                            <i class="bi bi-pencil me-2" aria-hidden="true"></i>Edit
                                         </a>
                                     </li>
                                     <li>
@@ -88,7 +97,7 @@
                                     <li>
                                         <a class="dropdown-item text-danger" href="#" @onclick="() => ShowDeleteModal(task)"
                                             @onclick:preventDefault="true">
-                                            <i class="bi bi-trash me-2"></i>Delete
+                                            <i class="bi bi-trash me-2" aria-hidden="true"></i>Delete
                                         </a>
                                     </li>
                                 </ul>
@@ -154,15 +163,15 @@
             <div class="col-12">
                 <div class="text-center py-5">
                     <div class="mb-3">
-                        <i class="bi bi-search display-1 text-muted opacity-50"></i>
+                        <i class="bi bi-search display-1 text-muted opacity-50" aria-hidden="true"></i>
                     </div>
-                    <h4 class="text-muted">No repair tasks found</h4>
+                    <h2 class="h4 text-muted">No repair tasks found</h2>
                     <p class="text-muted">@(string.IsNullOrEmpty(searchTerm) ? "Start by creating your first repair task." :
                                             "Try adjusting your search criteria.")</p>
                     @if (string.IsNullOrEmpty(searchTerm))
                     {
                         <button class="btn btn-primary" @onclick="ShowCreateModal">
-                            <i class="bi bi-plus-lg me-1"></i>Create Repair Task
+                            <i class="bi bi-plus-lg me-1" aria-hidden="true"></i>Create Repair Task
                         </button>
                     }
                 </div>
@@ -207,7 +216,7 @@
                 <div class="d-flex justify-content-between align-items-center mb-3">
                     <h6 class="mb-0">Parts Required <span class="text-danger">*</span></h6>
                     <button type="button" class="btn btn-outline-primary btn-sm" @onclick="AddPart">
-                        <i class="bi bi-plus me-1"></i>Add Part
+                        <i class="bi bi-plus me-1" aria-hidden="true"></i>Add Part
                     </button>
                 </div>
 
@@ -252,7 +261,7 @@
                             <div class="col-12 col-md-1 d-flex justify-content-end align-items-center">
                                 <button type="button" class="btn btn-outline-danger btn-sm w-100 w-md-auto mt-2 mt-md-0" @onclick="() => RemovePart(index)"
                                     disabled="@(newTaskRequest.Parts.Count <= 1)" title="Remove part">
-                                    <i class="bi bi-trash me-1"></i><span class="d-md-none">Remove Part</span>
+                                    <i class="bi bi-trash me-1" aria-hidden="true"></i><span class="d-md-none">Remove Part</span>
                                 </button>
                             </div>
                         </div>
@@ -264,7 +273,7 @@
 
             <div class="modal-footer mt-4 pt-3 border-top">
                 <button type="submit" class="btn btn-primary">
-                    <i class="bi bi-plus-lg me-1"></i>
+                    <i class="bi bi-plus-lg me-1" aria-hidden="true"></i>
                     Create Task
                 </button>
                 <button type="button" class="btn btn-secondary" @onclick="HideDialog">Cancel</button>
@@ -278,7 +287,7 @@
             <div class="row g-3">
                 <div class="col-12">
                     <label class="form-label">Task Name <span class="text-danger">*</span></label>
-                    <InputText class="form-control" @bind-Value="updateTaskRequest.Name" />
+                    <InputText aria-label="Task Name" class="form-control" @bind-Value="updateTaskRequest.Name" />
                     <ValidationMessage For="@(() => updateTaskRequest.Name)" class="text-danger small" />
                 </div>
                 <div class="col-md-6">
@@ -306,7 +315,7 @@
                 <div class="d-flex justify-content-between align-items-center mb-3">
                     <h6 class="mb-0">Parts Required <span class="text-danger">*</span></h6>
                     <button type="button" class="btn btn-outline-primary btn-sm" @onclick="AddPart">
-                        <i class="bi bi-plus me-1"></i>Add Part
+                        <i class="bi bi-plus me-1" aria-hidden="true"></i>Add Part
                     </button>
                 </div>
 
@@ -353,7 +362,7 @@
                                 <button type="button" class="btn btn-outline-danger btn-sm w-100 w-md-auto mt-2 mt-md-0"
                                     @onclick="() => RemovePartFromUpdate(index)" disabled="@(updateTaskRequest.Parts.Count <= 1)"
                                     title="Remove part">
-                                    <i class="bi bi-trash me-1"></i><span class="d-md-none">Remove Part</span>
+                                    <i class="bi bi-trash me-1" aria-hidden="true"></i><span class="d-md-none">Remove Part</span>
                                 </button>
                             </div>
                         </div>
@@ -365,7 +374,7 @@
 
             <div class="modal-footer mt-4 pt-3 border-top">
                 <button type="submit" class="btn btn-primary">
-                    <i class="bi bi-check-lg me-1"></i>
+                    <i class="bi bi-check-lg me-1" aria-hidden="true"></i>
                     Update Task
                 </button>
                 <button type="button" class="btn btn-secondary" @onclick="HideDialog">Cancel</button>
@@ -399,11 +408,21 @@
     private RenderFragment? _dialogTitle;
 
     private string? errorMessage;
+    private bool _isLoading = true;
+    private string? _pageLoadError;
 
     protected override async Task OnInitializedAsync()
     {
+        await ReloadServices();
+    }
+
+    private async Task ReloadServices()
+    {
+        _isLoading = true;
+        _pageLoadError = null;
         await LoadRepairTasks();
         ApplyFilters();
+        _isLoading = false;
     }
 
     private async Task LoadRepairTasks()
@@ -412,6 +431,11 @@
         if (repairTaskResult.IsSuccess)
         {
             repairTasks = repairTaskResult.Data!;
+            _pageLoadError = null;
+        }
+        else
+        {
+            _pageLoadError = "Services couldn't be loaded. Please try again.";
         }
     }
 

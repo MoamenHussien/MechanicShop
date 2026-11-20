@@ -1,170 +1,53 @@
 @implements IAsyncDisposable
 
-<div class="mb-4">
-    <div class="row g-3 align-items-center">
-        <div class="col-12 col-md-4 col-lg-3">
-            <h1 class="h3 mb-0 text-body-emphasis border-start border-4 border-danger ps-2 text-truncate">
-                <i class="bi bi-speedometer2 me-2 brand-red"></i>Dashboard
-            </h1>
-        </div>
-        <div class="col-12 col-sm-8 col-md-6 col-lg-5">
-            <DatePickerComponent SelectedDate="_selectedDate"
-                                 SelectedDateChanged="OnDashboardDateChanged" />
-        </div>
-    </div>
+<div class="dashboard-heading">
+    <div><p class="page-context">Workshop overview</p><h1>The day, at a glance.</h1><p class="text-muted mb-0">A clear view of your jobs, people and performance.</p></div>
+    <div class="dashboard-date"><DatePickerComponent SelectedDate="_selectedDate" SelectedDateChanged="OnDashboardDateChanged" /></div>
 </div>
 
-<div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 row-cols-xl-5 g-4 mb-4">
-    <div class="col">
-        <div class="card card-total">
-            <div class="card-body">
-                <h5 class="card-title"><i class="bi bi-list-ol"></i> Total Orders</h5>
-                <p class="card-text">@data?.Total</p>
-            </div>
-        </div>
-    </div>
-    <div class="col">
-        <div class="card card-Scheduled bg-warning bg-opacity-25">
-            <div class="card-body">
-                <h5 class="card-title"><i class="bi bi-hourglass-split"></i> Scheduled</h5>
-                <p class="card-text">@data?.Scheduled</p>
-            </div>
-        </div>
-    </div>
-    <div class="col">
-        <div class="card card-in-progress bg-info bg-opacity-25">
-            <div class="card-body">
-                <h5 class="card-title"><i class="bi bi-gear-fill"></i> In Progress</h5>
-                <p class="card-text">@data?.InProgress</p>
-            </div>
-        </div>
-    </div>
-    <div class="col">
-        <div class="card card-completed bg-success bg-opacity-25">
-            <div class="card-body">
-                <h5 class="card-title"><i class="bi bi-check-circle-fill"></i> Completed</h5>
-                <p class="card-text">@data?.Completed</p>
-            </div>
-        </div>
-    </div>
-    <div class="col">
-        <div class="card card-cancelled bg-danger bg-opacity-25">
-            <div class="card-body">
-                <h5 class="card-title"><i class="bi bi-x-circle-fill"></i> Cancelled</h5>
-                <p class="card-text">@data?.Cancelled</p>
-            </div>
-        </div>
-    </div>
-</div>
+<div class="dashboard-actions"><a href="schedules" class="btn btn-primary"><i class="bi bi-plus-lg" aria-hidden="true"></i> Schedule a job</a><a href="workorders" class="btn btn-outline-secondary">View work orders <i class="bi bi-arrow-up-right ms-1" aria-hidden="true"></i></a></div>
 
-<div class="row row-cols-1 row-cols-md-2 row-cols-lg-4 g-4 mb-4">
-    <div class="col">
-        <div class="card card-revenue bg-secondary bg-opacity-25">
-            <div class="card-body">
-                <h5 class="card-title"><i class="bi bi-currency-dollar"></i> Total Revenue</h5>
-                <p class="card-text">@FormatCurrency(data?.TotalRevenue ?? 0)</p>
-            </div>
-        </div>
-    </div>
-    <div class="col">
-        <div class="card card-cost bg-secondary bg-opacity-25">
-            <div class="card-body">
-                <h5 class="card-title"><i class="bi bi-hammer"></i> Total Parts Cost</h5>
-                <p class="card-text">@FormatCurrency(data?.TotalPartsCost ?? 0)</p>
-            </div>
-        </div>
-    </div>
-    <div class="col">
-        <div class="card card-cost bg-secondary bg-opacity-25">
-            <div class="card-body">
-                <h5 class="card-title"><i class="bi bi-person-fill-gear"></i> Total Labor Cost</h5>
-                <p class="card-text">@FormatCurrency(data?.TotalLaborCost ?? 0)</p>
-            </div>
-        </div>
-    </div>
-    <div class="col">
-        <div class="card card-profit bg-secondary bg-opacity-25">
-            <div class="card-body">
-                <h5 class="card-title"><i class="bi bi-cash-stack"></i> Net Profit</h5>
-                <p class="card-text">@FormatCurrency(data?.NetProfit ?? 0)</p>
-            </div>
-        </div>
-    </div>
-</div>
+@if (_isLoading && data is null)
+{
+    <div class="dashboard-loading" role="status"><span class="spinner-border spinner-border-sm" aria-hidden="true"></span> Loading workshop overview...</div>
+}
+@if (_loadError is not null)
+{
+    <div class="alert alert-warning" role="alert">@_loadError</div>
+}
 
-<div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4 mb-4">
-    <div class="col">
-        <div class="card card-vehicles bg-secondary bg-opacity-25">
-            <div class="card-body">
-                <h5 class="card-title"><i class="bi bi-car-front-fill"></i> Unique Vehicles</h5>
-                <p class="card-text">@data?.UniqueVehicles</p>
-            </div>
-        </div>
+<section class="order-metrics" aria-label="Work order status" aria-busy="@_isLoading.ToString().ToLowerInvariant()">
+    <article class="stat-card stat-total"><span class="stat-label"><i class="bi bi-clipboard-data" aria-hidden="true"></i> Total orders</span><strong>@(data?.Total.ToString() ?? "—")</strong><span class="stat-footnote">For the selected day</span></article>
+    <article class="stat-card"><span class="stat-label"><span class="metric-dot scheduled-dot"></span> Scheduled</span><strong>@(data?.Scheduled.ToString() ?? "—")</strong><span class="stat-footnote">Ready to get started</span></article>
+    <article class="stat-card"><span class="stat-label"><span class="metric-dot progress-dot"></span> In progress</span><strong>@(data?.InProgress.ToString() ?? "—")</strong><span class="stat-footnote">On the workshop floor</span></article>
+    <article class="stat-card"><span class="stat-label"><span class="metric-dot completed-dot"></span> Completed</span><strong>@(data?.Completed.ToString() ?? "—")</strong><span class="stat-footnote">Work wrapped up</span></article>
+    <article class="stat-card"><span class="stat-label"><span class="metric-dot cancelled-dot"></span> Cancelled</span><strong>@(data?.Cancelled.ToString() ?? "—")</strong><span class="stat-footnote">No longer scheduled</span></article>
+</section>
+
+<section class="finance-section" aria-labelledby="finance-heading">
+    <div class="dashboard-section-title"><h2 id="finance-heading">The numbers behind the work</h2><span>Financial overview</span></div>
+    <div class="finance-metrics">
+        <article class="finance-card revenue-card"><span><i class="bi bi-wallet2" aria-hidden="true"></i> Total revenue</span><strong>@(data is null ? "—" : FormatCurrency(data.TotalRevenue))</strong><small>Revenue from work orders</small></article>
+        <article class="finance-card"><span><i class="bi bi-graph-up-arrow" aria-hidden="true"></i> Net profit</span><strong>@(data is null ? "—" : FormatCurrency(data.NetProfit))</strong><small>Revenue after parts and labor</small></article>
+        <article class="finance-card"><span><i class="bi bi-box-seam" aria-hidden="true"></i> Parts cost</span><strong>@(data is null ? "—" : FormatCurrency(data.TotalPartsCost))</strong><small>Parts used across repair jobs</small></article>
+        <article class="finance-card"><span><i class="bi bi-person-gear" aria-hidden="true"></i> Labor cost</span><strong>@(data is null ? "—" : FormatCurrency(data.TotalLaborCost))</strong><small>Cost of technician time</small></article>
     </div>
-    <div class="col">
-        <div class="card card-customers bg-secondary bg-opacity-25">
-            <div class="card-body">
-                <h5 class="card-title"><i class="bi bi-person-lines-fill"></i> Unique Customers</h5>
-                <p class="card-text">@data?.UniqueCustomers</p>
-            </div>
-        </div>
-    </div>
-    <div class="col">
-        <div class="card card-rate bg-secondary bg-opacity-25">
-            <div class="card-body">
-                <h5 class="card-title"><i class="bi bi-graph-up-arrow"></i> Profit Margin</h5>
-                <p class="card-text">@string.Format("{0:F2}%", data?.ProfitMargin ?? 0)</p>
-            </div>
-        </div>
-    </div>
-    <div class="col">
-        <div class="card card-rate bg-secondary bg-opacity-25">
-            <div class="card-body">
-                <h5 class="card-title"><i class="bi bi-clipboard-data-fill"></i> Completion Rate</h5>
-                <p class="card-text">@string.Format("{0:F2}%", data?.CompletionRate ?? 0)</p>
-            </div>
-        </div>
-    </div>
-    <div class="col">
-        <div class="card card-average bg-secondary bg-opacity-25">
-            <div class="card-body">
-                <h5 class="card-title"><i class="bi bi-graph-down-arrow"></i> Avg. Revenue/Order</h5>
-                <p class="card-text">@FormatCurrency(data?.AverageRevenuePerOrder ?? 0)</p>
-            </div>
-        </div>
-    </div>
-    <div class="col">
-        <div class="card card-average bg-secondary bg-opacity-25">
-            <div class="card-body">
-                <h5 class="card-title"><i class="bi bi-speedometer2"></i> Orders Per Vehicle</h5>
-                <p class="card-text">@string.Format("{0:F2}", data?.OrdersPerVehicle ?? 0)</p>
-            </div>
-        </div>
-    </div>
-    <div class="col">
-        <div class="card card-rate bg-secondary bg-opacity-25">
-            <div class="card-body">
-                <h5 class="card-title"><i class="bi bi-pie-chart-fill"></i> Parts Cost Ratio</h5>
-                <p class="card-text">@string.Format("{0:F2}%", data?.PartsCostRatio ?? 0)</p>
-            </div>
-        </div>
-    </div>
-    <div class="col">
-        <div class="card card-rate bg-secondary bg-opacity-25">
-            <div class="card-body">
-                <h5 class="card-title"><i class="bi bi-person-badge-fill"></i> Labor Cost Ratio</h5>
-                <p class="card-text">@string.Format("{0:F2}%", data?.LaborCostRatio ?? 0)</p>
-            </div>
-        </div>
-    </div>
-    <div class="col">
-        <div class="card card-rate bg-secondary bg-opacity-25">
-            <div class="card-body">
-                <h5 class="card-title"><i class="bi bi-dash-circle-fill"></i> Cancellation Rate</h5>
-                <p class="card-text">@string.Format("{0:F2}%", data?.CancellationRate ?? 0)</p>
-            </div>
-        </div>
-    </div>
+</section>
+
+<div class="insight-panels">
+    <section class="insight-panel" aria-labelledby="activity-heading"><div class="dashboard-section-title"><h2 id="activity-heading"><i class="bi bi-activity" aria-hidden="true"></i> Workshop activity</h2></div><dl class="insight-list">
+        <div><dt>Unique vehicles</dt><dd>@(data?.UniqueVehicles.ToString() ?? "—")</dd></div>
+        <div><dt>Unique customers</dt><dd>@(data?.UniqueCustomers.ToString() ?? "—")</dd></div>
+        <div><dt>Completion rate</dt><dd>@(data is null ? "—" : string.Format("{0:F2}%", data.CompletionRate))</dd></div>
+        <div><dt>Orders per vehicle</dt><dd>@(data is null ? "—" : string.Format("{0:F2}", data.OrdersPerVehicle))</dd></div>
+        <div><dt>Cancellation rate</dt><dd>@(data is null ? "—" : string.Format("{0:F2}%", data.CancellationRate))</dd></div>
+    </dl></section>
+    <section class="insight-panel" aria-labelledby="performance-heading"><div class="dashboard-section-title"><h2 id="performance-heading"><i class="bi bi-pie-chart" aria-hidden="true"></i> Financial performance</h2></div><dl class="insight-list">
+        <div><dt>Profit margin</dt><dd>@(data is null ? "—" : string.Format("{0:F2}%", data.ProfitMargin))</dd></div>
+        <div><dt>Average revenue per order</dt><dd>@(data is null ? "—" : FormatCurrency(data.AverageRevenuePerOrder))</dd></div>
+        <div><dt>Parts cost ratio</dt><dd>@(data is null ? "—" : string.Format("{0:F2}%", data.PartsCostRatio))</dd></div>
+        <div><dt>Labor cost ratio</dt><dd>@(data is null ? "—" : string.Format("{0:F2}%", data.LaborCostRatio))</dd></div>
+    </dl><a href="workorders" class="insight-link">Go to work orders <i class="bi bi-arrow-up-right" aria-hidden="true"></i></a></section>
 </div>
 
 @code {
@@ -184,6 +67,8 @@
     private DateTime _selectedDate = DateTime.Today;
 
     private TodayWorkOrderStatsModel? data;
+    private bool _isLoading = true;
+    private string? _loadError;
 
     protected override async Task OnInitializedAsync()
     {
@@ -217,13 +102,20 @@
 
     private async Task RefreshDashboard()
     {
+        _isLoading = true;
+        _loadError = null;
         var statsData = await _serviceApi.GetTodayWorkOrderStatsAsync(DateOnly.FromDateTime(_selectedDate));
 
         if (statsData.IsSuccess)
         {
             data = statsData.Data;
-            StateHasChanged();
         }
+        else
+        {
+            _loadError = "The workshop overview couldn't be loaded. Choose the date again to retry.";
+        }
+        _isLoading = false;
+        StateHasChanged();
     }
 
     public async ValueTask DisposeAsync()
@@ -236,8 +128,8 @@
             }
             catch
             {
-                
+
             }
         }
     }
-} 
+}

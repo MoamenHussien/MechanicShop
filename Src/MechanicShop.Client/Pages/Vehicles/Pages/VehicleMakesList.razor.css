@@ -1,4 +1,1 @@
-.vehicle-make-name,
-.table tbody td {
-    color: #ffffff !important;
-}
+.vehicle-make-name, .table tbody td { color: var(--ink); }

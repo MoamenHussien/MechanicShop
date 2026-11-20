@@ -1,69 +1,77 @@
-.section-padding {
-    padding: 80px 0;
-}
-
-.section-title {
-    font-size: 2.5rem;
-    font-weight: 700;
-    margin-bottom: 50px;
-    text-align: center;
-}
-
-.feature-icon {
-    font-size: 3rem;
-    margin-bottom: 20px;
-}
-
-.card {
-    border-radius: 15px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
-    transition: transform 0.2s ease-in-out;
-    height: 100%; /* Ensure cards in a row have equal height */
-}
-
-    .card:hover {
-        transform: translateY(-5px);
-    }
-
-.card-body {
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-}
-
-.card-title {
-    font-size: 1.1rem;
-    font-weight: 600;
-    margin-bottom: 15px;
-    display: flex;
-    align-items: center;
-}
-
-    .card-title i {
-        margin-right: 10px;
-        font-size: 1.4rem;
-    }
-
-.card-text-dashboard { /* Renamed to avoid conflict */
-    font-size: 2.2rem;
-    font-weight: 700;
-    line-height: 1;
-}
-
+.landing { max-width: 1320px; margin: 0 auto; }
+.product-hero { display: grid; grid-template-columns: 1fr 1.05fr; gap: clamp(32px, 5vw, 80px); align-items: center; padding: 48px 0 64px; }
+.product-category { display: inline-flex; align-items: center; gap: 8px; color: var(--accent); font-size: 12px; font-weight: 600; margin-bottom: 24px; }
+.product-category i { font-size: 18px; }
+h1 { font-size: clamp(44px, 4.9vw, 70px); line-height: 1.04; letter-spacing: -3px; font-weight: 750; margin: 0 0 24px; }
+.hero-description { color: var(--muted); line-height: 1.8; font-size: 16px; max-width: 470px; margin-bottom: 28px; }
+.hero-actions { display: flex; gap: 20px; align-items: center; flex-wrap: wrap; }
+.hero-actions .btn { font-size: 14px; padding: 15px 20px; }
+.workflow-link { color: var(--ink); font-size: 13px; font-weight: 600; text-decoration: none; padding: 12px 0; }
+.workflow-link:hover { color: var(--accent); }
+.demo-note { color: var(--muted); font-size: 12px; margin: 20px 0 0; display: flex; align-items: center; gap: 8px; }
+.demo-note i { color: var(--accent); font-size: 16px; }
+.product-preview { background: var(--surface); border: 1px solid var(--line); border-radius: 16px; box-shadow: 0 18px 50px -25px #173d4d40; overflow: hidden; transform: rotate(-1deg); }
+.preview-bar { background: var(--ink); color: white; padding: 15px 20px; display: flex; align-items: center; justify-content: space-between; gap: 8px; font-size: 11px; }
+.preview-bar i { margin-right: 8px; }
+.preview-label { color: var(--nav-text); font-size: 10px; }
+.preview-content { padding: 24px; }
+.preview-heading { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 20px; }
+.preview-caption { font-size: 11px; color: var(--muted); }
+.preview-heading h2 { font-size: 23px; font-weight: 700; letter-spacing: -.6px; margin: 6px 0 0; }
+.preview-date { color: var(--muted); border: 1px solid var(--line); border-radius: 6px; font-size: 10px; padding: 8px; white-space: nowrap; }
+.bay-display { background: var(--accent-soft); border: 1px solid var(--accent-border); border-radius: 10px; padding: 16px; }
+.bay-tag { display: flex; align-items: center; gap: 6px; color: var(--accent); font-size: 11px; font-weight: 700; }
+.bay-tag > span:last-child { margin-left: auto; background: var(--surface); padding: 4px 8px; border-radius: 5px; font-size: 10px; }
+.status-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--accent); }
+.vehicle-drawing { color: var(--accent); width: 100%; height: auto; display: block; margin: -4px 0; }
+.vehicle-caption { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+.vehicle-caption strong, .vehicle-caption small { display: block; }
+.vehicle-caption strong { font-size: 12px; }
+.vehicle-caption small { font-size: 10px; margin-top: 4px; color: var(--muted); }
+.tech-avatar { color: var(--accent); font-size: 10px; display: inline-flex; align-items: center; gap: 5px; }
+.preview-jobs { margin-top: 14px; }
+.preview-jobs > div { display: flex; align-items: center; gap: 10px; padding: 12px 0; border-bottom: 1px solid var(--line); }
+.job-icon { color: var(--muted); background: var(--canvas); width: 32px; height: 32px; border-radius: 7px; display: grid; place-items: center; }
+.preview-jobs strong, .preview-jobs small { display: block; font-size: 11px; }
+.preview-jobs small { color: var(--muted); margin-top: 4px; font-size: 10px; }
+.preview-status { font-size: 10px; padding: 4px 8px; border-radius: 5px; margin-left: auto; }
+.scheduled { background: #fff4da; color: #805800; }
+.completed { background: #e7f4ed; color: #216743; }
+.preview-bottom { display: flex; justify-content: space-between; color: var(--muted); font-size: 10px; margin-top: 18px; }
+.preview-bottom i { color: var(--accent); margin-right: 5px; }
+.capability-strip { display: grid; grid-template-columns: repeat(4, 1fr); border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); padding: 24px 0; gap: 16px; }
+.capability-strip > span { display: flex; align-items: center; justify-content: center; gap: 10px; color: var(--muted); font-size: 12px; font-weight: 600; }
+.capability-strip i { font-size: 20px; color: var(--accent); }
+.workflow-section { padding: 80px 0; scroll-margin-top: var(--header-scroll-offset); }
+.section-intro { display: flex; align-items: end; justify-content: space-between; gap: 32px; margin-bottom: 36px; }
+.section-intro h2, .feature-heading h2 { font-size: clamp(30px, 3vw, 40px); line-height: 1.13; letter-spacing: -1.5px; font-weight: 700; margin: 0; }
+.section-intro > p { max-width: 350px; color: var(--muted); font-size: 14px; line-height: 1.8; margin: 0; }
+.workflow-steps { display: grid; grid-template-columns: repeat(3, 1fr); gap: 32px; }
+.workflow-steps article { border-top: 2px solid var(--line); padding-top: 24px; }
+.step-number { color: var(--accent); font-size: 13px; font-weight: 700; }
+.workflow-steps h3 { font-size: 23px; font-weight: 650; letter-spacing: -.5px; margin: 14px 0 12px; }
+.workflow-steps p { font-size: 14px; color: var(--muted); line-height: 1.8; max-width: 340px; }
+.step-detail { font-size: 11px; color: var(--accent); display: flex; align-items: center; gap: 8px; margin-top: 20px; }
+.features-section { scroll-margin-top: var(--header-scroll-offset); display: grid; grid-template-columns: 1fr 1fr; gap: 64px; background: var(--surface); border: 1px solid var(--line); border-radius: 16px; padding: 48px; margin-bottom: 40px; }
+.feature-mark { width: 44px; height: 44px; display: grid; place-items: center; color: var(--accent); background: var(--accent-soft); border-radius: 10px; margin-bottom: 24px; font-size: 24px; }
+.feature-heading p { font-size: 14px; color: var(--muted); line-height: 1.8; margin: 20px 0 24px; }
+.feature-list { display: flex; flex-direction: column; gap: 22px; }
+.feature-list article { display: flex; gap: 16px; }
+.feature-list article > i { color: var(--accent); font-size: 22px; margin-top: 3px; }
+.feature-list h3 { font-size: 15px; font-weight: 650; margin: 0 0 6px; }
+.feature-list p { font-size: 13px; color: var(--muted); line-height: 1.7; margin: 0; }
+@media (max-width: 1100px) { .product-hero { gap: 32px; } h1 { letter-spacing: -2px; } .hero-actions { gap: 12px; } .preview-content { padding: 18px; } }
 @media (max-width: 767.98px) {
-    .section-title {
-        font-size: 2rem;
-    }
-
-    .card-text-dashboard {
-        font-size: 1.8rem;
-    }
-
-    .card-title {
-        font-size: 1rem;
-    }
-
-        .card-title i {
-            font-size: 1.2rem;
-        }
+    .product-hero { grid-template-columns: 1fr; padding: 24px 0 40px; gap: 36px; }
+    .hero-copy { max-width: 540px; }
+    h1 { font-size: clamp(44px, 8vw, 62px); }
+    .product-preview { max-width: 580px; transform: none; }
+    .capability-strip { grid-template-columns: repeat(2, 1fr); gap: 20px 12px; }
+    .capability-strip > span { justify-content: start; font-size: 11px; gap: 8px; }
+    .section-intro { flex-direction: column; align-items: start; gap: 20px; }
+    .workflow-section { padding: 48px 0; }
+    .workflow-steps { grid-template-columns: 1fr; gap: 28px; }
+    .workflow-steps p { max-width: none; }
+    .features-section { grid-template-columns: 1fr; padding: 28px; gap: 36px; }
 }
+@media (max-width: 374.98px) { .product-category { font-size: 10px; } .preview-content { padding: 12px; } .preview-bar { padding: 12px; font-size: 10px; } .preview-date, .tech-avatar { display: none; } .capability-strip > span { font-size: 10px; } }

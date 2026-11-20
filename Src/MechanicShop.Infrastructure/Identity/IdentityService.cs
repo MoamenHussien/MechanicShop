@@ -283,6 +283,8 @@ public class IdentityService(IHttpContextAccessor httpContextAccessor, UserManag
         }
         catch (Exception ex)
         {
+            await transaction.RollbackAsync(ct);
+
             logger.LogError(ex, "Failed to update roles and claims for user {UserId}", userId);
 
             return Error.Failure("Identity.UpdateUserInfo", "An unexpected error occurred while updating the user.");

@@ -3,17 +3,18 @@
 @using MechanicShop.Client.Models
 @using MechanicShop.Client.Services
 @attribute [Authorize(Roles = "Manager")]
+<PageTitle>Vehicle catalog | MechanicShop</PageTitle>
 @inject ServiceApi ApiService
 
 <div class="container-fluid p-4">
     <!-- Header -->
     <div class="d-flex flex-column flex-sm-row justify-content-between align-items-sm-center gap-3 mb-4">
         <div>
-            <h1 class="h3 mb-1 text-body-emphasis"><i class="bi bi-car-front me-2 brand-red"></i>Vehicle Makes Management</h1>
+            <h1 class="h3 mb-1 text-body-emphasis"><i class="bi bi-car-front me-2 brand-red" aria-hidden="true"></i>Vehicle catalog</h1>
             <p class="text-muted mb-0">Manage vehicle makes and their associated models catalog</p>
         </div>
         <button class="btn btn-primary btn-md-lg align-self-start align-self-sm-auto" @onclick="ShowCreateDialog">
-            <i class="bi bi-plus-lg me-1"></i>Add Vehicle Make
+            <i class="bi bi-plus-lg me-1" aria-hidden="true"></i>Add Vehicle Make
         </button>
     </div>
 
@@ -21,8 +22,8 @@
     @if (!string.IsNullOrEmpty(pageErrorMessage))
     {
         <div class="alert alert-danger alert-dismissible fade show" role="alert">
-            <i class="bi bi-exclamation-triangle-fill me-2"></i>@pageErrorMessage
-            <button type="button" class="btn-close" @onclick="() => pageErrorMessage = null"></button>
+            <i class="bi bi-exclamation-triangle-fill me-2" aria-hidden="true"></i>@pageErrorMessage
+            <button type="button" class="btn-close" aria-label="Dismiss message" @onclick="() => pageErrorMessage = null"></button>
         </div>
     }
 
@@ -40,11 +41,11 @@
     {
         <div class="card border-0 shadow-sm text-center py-5">
             <div class="card-body">
-                <i class="bi bi-car-front display-4 text-secondary mb-3 d-block"></i>
+                <i class="bi bi-car-front display-4 text-secondary mb-3 d-block" aria-hidden="true"></i>
                 <h5 class="fw-semibold">No Vehicle Makes Found</h5>
                 <p class="text-secondary small mb-3">Get started by creating your first vehicle make and model entry.</p>
                 <button class="btn btn-primary btn-sm" @onclick="ShowCreateDialog">
-                    <i class="bi bi-plus-lg me-1"></i>Add Vehicle Make
+                    <i class="bi bi-plus-lg me-1" aria-hidden="true"></i>Add Vehicle Make
                 </button>
             </div>
         </div>
@@ -54,7 +55,7 @@
         <div class="card border-0 shadow-sm">
             <div class="table-responsive">
                 <table class="table table-hover align-middle mb-0">
-                    <thead class="table-dark">
+                    <thead class="table-light">
                         <tr>
                             <th scope="col" class="ps-4">Make Name</th>
                             <th scope="col" class="text-end pe-4">Actions</th>
@@ -65,11 +66,11 @@
                         {
                             <tr>
                                 <td class="ps-4 fw-semibold vehicle-make-name">
-                                    <i class="bi bi-tag-fill me-2 text-primary opacity-75"></i>@make.VehicleMake
+                                    <i class="bi bi-tag-fill me-2 text-primary opacity-75" aria-hidden="true"></i>@make.VehicleMake
                                 </td>
                                 <td class="text-end pe-4">
                                     <button class="btn btn-sm btn-outline-primary me-1" @onclick="() => ShowEditDialog(make)" title="Edit Make & Models">
-                                        <i class="bi bi-pencil me-1"></i>Edit
+                                        <i class="bi bi-pencil me-1" aria-hidden="true"></i>Edit
                                     </button>
                                 </td>
                             </tr>
@@ -88,7 +89,7 @@
     @if (!string.IsNullOrEmpty(dialogErrorMessage))
     {
         <div class="alert alert-danger alert-dismissible fade show py-2 px-3 small mb-3" role="alert">
-            <i class="bi bi-exclamation-triangle-fill me-1"></i>@dialogErrorMessage
+            <i class="bi bi-exclamation-triangle-fill me-1" aria-hidden="true"></i>@dialogErrorMessage
             <button type="button" class="btn-close py-2" @onclick="() => dialogErrorMessage = null"></button>
         </div>
     }
@@ -106,21 +107,21 @@
     {
         <div class="mb-3">
             <label class="form-label fw-semibold small">Vehicle Make Name <span class="text-danger">*</span></label>
-            <input type="text" class="form-control" placeholder="e.g. Toyota, Ford, BMW" @bind="formMakeName" disabled="@isSubmitting" />
+            <input aria-label="Vehicle Make Name" type="text" class="form-control" placeholder="e.g. Toyota, Ford, BMW" @bind="formMakeName" disabled="@isSubmitting" />
         </div>
 
         <div class="mb-3">
             <div class="d-flex justify-content-between align-items-center mb-2">
                 <label class="form-label fw-semibold small mb-0">Vehicle Models <span class="text-danger">*</span></label>
                 <button type="button" class="btn btn-sm btn-outline-success py-1 px-2" @onclick="AddModelRow" disabled="@isSubmitting">
-                    <i class="bi bi-plus-lg me-1"></i>Add Model
+                    <i class="bi bi-plus-lg me-1" aria-hidden="true"></i>Add Model
                 </button>
             </div>
 
             @if (formModels.Count == 0)
             {
                 <div class="alert alert-warning py-2 px-3 small mb-0" role="alert">
-                    <i class="bi bi-info-circle me-1"></i>At least one vehicle model is required.
+                    <i class="bi bi-info-circle me-1" aria-hidden="true"></i>At least one vehicle model is required.
                 </div>
             }
             else
@@ -149,7 +150,7 @@
             }
             else
             {
-                <i class="bi bi-check-lg me-1"></i>
+                <i class="bi bi-check-lg me-1" aria-hidden="true"></i>
                 <span>@(isEditMode ? "Save Changes" : "Create Make")</span>
             }
         </button>

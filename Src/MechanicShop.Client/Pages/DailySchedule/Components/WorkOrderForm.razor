@@ -62,12 +62,12 @@
                 <div class="col-6 row">
                     <div class="col-6">
                         <label class="form-label">Start Date</label>
-                        <InputDate @bind-Value="_localStartDate" class="form-control" />
+                        <InputDate aria-label="Repair task createWorkOrderRequest.RepairTaskIds)&quot; /&gt; Start Date" @bind-Value="_localStartDate" class="form-control" />
                     </div>
 
                     <div class="col-6">
                         <label class="form-label">Start Time</label>
-                        <InputSelect class="form-select" @bind-Value="_localStartTime">
+                        <InputSelect aria-label="Start Time" class="form-select" @bind-Value="_localStartTime">
                             @foreach (var time in TimeOptions)
                             {
                                 <option value="@time">@time.ToString(@"hh\:mm")</option>
@@ -94,10 +94,10 @@
         </div>
         <div class="d-flex justify-content-end gap-3">
             <button type="button" class="btn btn-outline-secondary" @onclick="Cancel">
-                <i class="bi bi-x-circle me-2"></i>Cancel
+                <i class="bi bi-x-circle me-2" aria-hidden="true"></i>Cancel
             </button>
             <button type="submit" class="btn btn-primary" disabled="@Disabled">
-                <i class="bi bi-save me-2"></i>Save
+                <i class="bi bi-save me-2" aria-hidden="true"></i>Save
             </button>
         </div>
     </EditForm>

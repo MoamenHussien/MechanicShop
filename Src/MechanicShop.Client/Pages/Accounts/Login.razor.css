@@ -1,53 +1,31 @@
-.login-container {
-    min-height: calc(100vh - 120px);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 1.5rem 1rem;
-}
-
-.login-card {
-    background: var(--bs-body-bg, #12151e);
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    border-radius: 1rem;
-    box-shadow: 0 1rem 3rem rgba(0, 0, 0, 0.5);
-    overflow: hidden;
-    width: 100%;
-    max-width: 440px;
-}
-
-.login-avatar-circle {
-    width: 64px;
-    height: 64px;
-    border-radius: 50%;
-    background: rgba(234, 56, 56, 0.12);
-    border: 2px solid rgba(234, 56, 56, 0.25);
-    box-shadow: 0 0 20px rgba(234, 56, 56, 0.15);
-}
-
-.form-control:focus,
-.form-check-input:focus {
-    box-shadow: 0 0 0 0.25rem rgba(234, 56, 56, 0.2);
-    border-color: #ea3838;
-}
-
-.btn-login {
-    background: linear-gradient(135deg, #ea3838 0%, #c82323 100%);
-    border: none;
-    color: #ffffff;
-    font-weight: 600;
-    padding: 0.75rem 1.5rem;
-    border-radius: 0.5rem;
-    transition: all 0.2s ease-in-out;
-}
-
-.btn-login:hover {
-    background: linear-gradient(135deg, #ff4444 0%, #d32f2f 100%);
-    box-shadow: 0 0.25rem 1rem rgba(234, 56, 56, 0.4);
-    transform: translateY(-1px);
-    color: #ffffff;
-}
-
-.btn-login:disabled {
-    opacity: 0.65;
-}
+.login-container { display: grid; grid-template-columns: 1fr 1fr; max-width: 1100px; min-height: 650px; margin: 20px auto 40px; background: var(--surface); border: 1px solid var(--line); border-radius: 20px; overflow: hidden; }
+.login-introduction { background: var(--ink); color: white; padding: clamp(28px, 4vw, 56px); display: flex; flex-direction: column; }
+.login-symbol { color: var(--nav-highlight); width: 48px; height: 48px; display: grid; place-items: center; border: 1px solid var(--nav-edge); border-radius: 12px; font-size: 26px; margin-bottom: 40px; }
+.login-introduction h2 { color: white; font-size: clamp(28px, 3vw, 40px); font-weight: 650; letter-spacing: -1.5px; line-height: 1.15; margin: 0 0 20px; }
+.login-introduction > p { color: var(--nav-text); font-size: 14px; line-height: 1.9; max-width: 340px; }
+.login-workflow { display: flex; flex-direction: column; gap: 28px; margin: 28px 0 40px; }
+.login-workflow > div { display: flex; gap: 16px; }
+.login-workflow i { color: var(--nav-highlight); font-size: 22px; }
+.login-workflow span { font-weight: 600; font-size: 14px; }
+.login-workflow small { display: block; font-weight: 400; font-size: 12px; color: var(--nav-text); margin-top: 6px; line-height: 1.6; }
+.login-intro-footer { color: var(--nav-text); font-size: 11px; margin-top: auto; border-top: 1px solid var(--nav-edge); padding-top: 20px; }
+.login-card { padding: clamp(24px, 4vw, 48px); min-width: 0; }
+.back-link { display: inline-flex; gap: 8px; align-items: center; padding: 4px 0 12px; margin-bottom: 24px; text-decoration: none; font-size: 12px; color: var(--muted); }
+.login-card h1 { font-size: 32px; font-weight: 700; letter-spacing: -1px; margin: 0 0 10px; }
+.login-subtitle { font-size: 14px; color: var(--muted); margin-bottom: 28px; }
+.login-card ::deep .demo-help { padding: 4px 0; font-size: 12px; min-height: 32px; text-decoration: none; }
+.demo-access { margin-top: 28px; border-top: 1px solid var(--line); padding-top: 22px; }
+.demo-access > span { color: var(--muted); font-size: 12px; }
+.demo-buttons { display: grid; gap: 8px; margin-top: 14px; }
+.demo-buttons button { display: flex; align-items: center; gap: 12px; border: 1px solid var(--line); background: var(--surface); color: var(--accent); padding: 12px; border-radius: 8px; text-align: left; }
+.demo-buttons button:hover { background: var(--accent-soft); border-color: var(--accent); }
+.demo-buttons button > i:first-child { font-size: 20px; }
+.demo-buttons button > i:last-child { margin-left: auto; }
+.demo-buttons span { color: var(--ink); font-size: 13px; font-weight: 600; }
+.demo-buttons small { display: block; font-size: 11px; color: var(--muted); font-weight: 400; margin-top: 3px; }
+.demo-access p { font-size: 11px; color: var(--muted); margin: 12px 0 0; }
+.signed-in-panel { grid-column: 1 / -1; padding: 64px 24px; text-align: center; align-self: center; }
+.signed-in-panel > i { font-size: 40px; color: var(--accent); }
+.signed-in-panel h1 { margin: 20px 0; font-size: 32px; }
+.signed-in-panel p { color: var(--muted); }
+@media (max-width: 767.98px) { .login-container { grid-template-columns: 1fr; max-width: 500px; margin: 0 auto 20px; min-height: 0; } .login-introduction { display: none; } .login-card { padding: 28px 24px; } .back-link { margin-bottom: 16px; } }
