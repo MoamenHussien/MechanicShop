@@ -3,6 +3,7 @@ using System.Security.Claims;
 using System.Text.Json.Serialization;
 using System.Threading.RateLimiting;
 using HealthChecks.UI.Client;
+using MechanicShop.Api.Infrastructure;
 using MechanicShop.Api.OpenApi.Transformers;
 using MechanicShop.Api.OutputCaching;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
@@ -26,7 +27,6 @@ public static class ApiDI
                 .AddApiDocumentation()
                 .AddExceptionHandling()
                 .AddControllersWithJsonOptions()
-                .AddValidation()
                 .AddConfiguredCors(configuration)
                 .AddIdentityInfrastructure()
                 .AddAppRateLimiting()
@@ -236,11 +236,6 @@ public static class ApiDI
         return services;
     }
 
-    private static IServiceCollection AddValidation(this IServiceCollection services)
-    {
-        return services;
-    }
-
     private static IServiceCollection AddIdentityInfrastructure(this IServiceCollection services)
     {
         services.AddScoped<IUser, CurrentUser>();
@@ -250,7 +245,7 @@ public static class ApiDI
 
     private static IServiceCollection AddConfiguredCors(this IServiceCollection services, IConfiguration configuration)
     {
-        var appSettings = configuration.GetSection("AppSettings").Get<AppSettings>()!;
+        var appSettings = configuration.GetSection(AppSettings.Name).Get<AppSettings>()!;
 
         services.AddCors(options => options.AddPolicy(
             appSettings.CorsPolicyName,
@@ -273,6 +268,8 @@ public static class ApiDI
 
         // 3. HTTPS redirection (before any other middleware that might generate URLs)
         // app.UseHttpsRedirection();
+
+        app.UseMiddleware<RequestLogContextMiddleware>();
 
         // 4. Serilog request logging (early to log all requests)
         app.UseSerilogRequestLogging();

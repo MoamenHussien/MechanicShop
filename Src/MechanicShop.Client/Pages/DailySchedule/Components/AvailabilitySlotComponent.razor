@@ -7,15 +7,14 @@
             @if (Slot.IsOccupied)
             {
                 <span class="badge text-sm">@Slot.Vehicle</span>
-                <span class="badge text-sm text-warning">@Slot.Labor?.Name</span>
+                <span class="badge text-sm">@Slot.Labor?.Name</span>
             }
         </div>
     </div>
 
     @if (IsSlotClickable)
     {
-        <div class="booking-overlay" @onclick="() => OnNewWorkOrderDialog.InvokeAsync(Slot)" style="cursor: pointer;">
-        </div>
+        <button type="button" class="booking-overlay booking-button" aria-label="@($"Book a job at {Slot.StartAt:HH:mm}")" @onclick="() => OnNewWorkOrderDialog.InvokeAsync(Slot)" style="cursor: pointer;"></button>
     }
     else if (!Slot.IsOccupied)
     {
@@ -27,30 +26,30 @@
         <div class="booking-overlay d-flex justify-content-end align-items-start">
             <button class="btn btn-sm btn-secondary me-1 px-1 p-0 fs-6" title="State"
                 @onclick="@(() => OnEditWorkOrderStateDialog.InvokeAsync(Slot))">
-                <i class="bi bi-activity"></i>
+                <i class="bi bi-activity" aria-hidden="true"></i>
             </button>
 
             @if (!Slot.WorkOrderLocked)
             {
                 <button class="btn btn-sm btn-secondary me-1 px-1 p-0 fs-6" title="Relocate"
                     @onclick="@(() => OnRelocateWorkOrderDialog.InvokeAsync(Slot))">
-                    <i class="bi bi-arrow-left-right"></i>
+                    <i class="bi bi-arrow-left-right" aria-hidden="true"></i>
                 </button>
                 <button class="btn btn-sm btn-secondary me-1 px-1 p-0 fs-6" title="Labor"
                     @onclick="@(() => OnEditWorkOrderLaborDialog.InvokeAsync(Slot))">
-                    <i class="bi bi-person-arms-up"></i>
+                    <i class="bi bi-person-arms-up" aria-hidden="true"></i>
                 </button>
                 <button class="btn btn-sm btn-secondary me-1 px-1 p-0 fs-6" title="Tasks"
                     @onclick="@(() => OnEditWorkOrderRepairTasksDialog.InvokeAsync(Slot))">
-                    <i class="bi bi-wrench-adjustable-circle"></i>
+                    <i class="bi bi-wrench-adjustable-circle" aria-hidden="true"></i>
                 </button>
                 <button class="btn btn-sm btn-secondary me-1 px-1 p-0 fs-6" title="Delete"
                     @onclick="@(() => ConfirmDeleteAsync(Slot))">
-                    <i class="bi bi-trash-fill"></i>
+                    <i class="bi bi-trash-fill" aria-hidden="true"></i>
                 </button>
             }
-            <NavLink href="@($"/workorder-details/{Slot.WorkOrderId}")" class="btn btn-sm btn-secondary me-1 px-1 p-0 fs-6">
-                <i class="bi bi-info"></i>
+            <NavLink href="@($"/workorder-details/{Slot.WorkOrderId}")" class="btn btn-sm btn-secondary me-1 px-1 p-0 fs-6" aria-label="View work order details">
+                <i class="bi bi-info" aria-hidden="true"></i>
             </NavLink>
         </div>
     }
@@ -92,7 +91,7 @@
         var duration = (endAt - Slot.StartAt).TotalMinutes;
         var height = duration * 4;
 
-        return $"height: {height}px; outline: 2px solid #212529; outline-offset: -1px; padding:0!important;";
+        return $"height: {height}px; outline: 2px solid var(--surface); outline-offset: -1px; padding:0!important;";
     }
 
     private async Task ConfirmDeleteAsync(AvailabilitySlotModel slot)

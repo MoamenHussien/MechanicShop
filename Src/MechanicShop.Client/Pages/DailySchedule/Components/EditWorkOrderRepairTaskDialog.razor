@@ -16,11 +16,11 @@
                                     <span class="fs-4">@GetTaskEmoji(task.Name)</span>
                                 </div>
                                 <div class="d-flex justify-content-between small text-nowrap gap-2 flex-wrap">
-                                    <span><i class="bi bi-clock-history me-1"></i>@task.EstimatedDurationInMins mins</span>
+                                    <span><i class="bi bi-clock-history me-1" aria-hidden="true"></i>@task.EstimatedDurationInMins mins</span>
                                     <span>|</span>
-                                    <span><i class="bi bi-cash-coin me-1"></i>$@task.TotalCost</span>
+                                    <span><i class="bi bi-cash-coin me-1" aria-hidden="true"></i>$@task.TotalCost</span>
                                     <span>|</span>
-                                    <span><i class="bi bi-gear-wide-connected me-1"></i>Parts: @task.Parts.Count</span>
+                                    <span><i class="bi bi-gear-wide-connected me-1" aria-hidden="true"></i>Parts: @task.Parts.Count</span>
                                 </div>
 
                             </div>
@@ -40,10 +40,10 @@
     </div>
     <div class="d-flex justify-content-end gap-3">
         <button class="btn btn-outline-secondary" @onclick="Cancel">
-            <i class="bi bi-x-circle me-2"></i>Cancel
+            <i class="bi bi-x-circle me-2" aria-hidden="true"></i>Cancel
         </button>
         <button class="btn btn-primary" @onclick="Save" disabled="@(!_selected.Any())">
-            <i class="bi bi-save me-2"></i>Save
+            <i class="bi bi-save me-2" aria-hidden="true"></i>Save
         </button>
     </div>
     @if (errorMessage != null)
@@ -54,7 +54,7 @@
     }
 </div>
 @code {
-    [Inject] private ServiceApi _serviceApi { get; set; } = default!; 
+    [Inject] private ServiceApi _serviceApi { get; set; } = default!;
 
     [Parameter, EditorRequired] public Guid WorkOrderId { get; set; }
 
@@ -90,7 +90,7 @@
 
     private async Task Save()
     {
-        var updateWorkOrderRepairTasksResult = await _serviceApi.UpdateWorkOrderRepairTasksAsync(WorkOrderId, 
+        var updateWorkOrderRepairTasksResult = await _serviceApi.UpdateWorkOrderRepairTasksAsync(WorkOrderId,
             new ModifyRepairTaskRequest { RepairTaskIds = _selected.ToArray() });
 
         if (updateWorkOrderRepairTasksResult.IsSuccess)
@@ -101,7 +101,7 @@
         else
         {
             errorMessage = updateWorkOrderRepairTasksResult.FirstErrorMessage;
-        } 
+        }
     }
 
     private async Task Cancel()
@@ -122,9 +122,9 @@
         if (name.Contains("belt", StringComparison.OrdinalIgnoreCase)) return "⛓️";
         if (name.Contains("transmission", StringComparison.OrdinalIgnoreCase)) return "🔁";
         if (name.Contains("conditioning", StringComparison.OrdinalIgnoreCase)) return "❄️";
-    
+
         return "🔧"; // default
     }
 
-    private bool IsSelected(Guid taskId) => _selected.Contains(taskId); 
+    private bool IsSelected(Guid taskId) => _selected.Contains(taskId);
 }

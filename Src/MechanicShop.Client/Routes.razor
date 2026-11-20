@@ -2,30 +2,31 @@
     <Router AppAssembly="@typeof(Program).Assembly">
         <Found Context="routeData">
             <AuthorizeRouteView RouteData="routeData" DefaultLayout="typeof(MainLayout)">
-                <NotAuthorized>
-                    <div class="container d-flex flex-column align-items-center justify-content-center">
-                        <div class="card shadow-lg border-danger text-center p-4">
-                            <div class="card-body">
-                                <i class="bi bi-shield-lock-fill text-danger fs-1 mb-3"></i>
-                                <h3 class="text-danger fw-bold">Access Denied</h3>
-                                <p class="text-muted">
-                                    You do not have permission to view this page. <br />
-                                    Please contact your administrator if you believe this is a mistake.
-                                </p>
-                                <a href="/" class="btn btn-primary mt-3">
-                                    <i class="bi bi-house-door"></i> Return to Home
-                                </a>
-                            </div>
-                        </div>
+                <NotAuthorized Context="authState">
+                    <PageTitle>Workspace access | MechanicShop</PageTitle>
+                    <div class="route-message">
+                        <i class="bi bi-shield-lock" aria-hidden="true"></i>
+                        @if (authState.User.Identity?.IsAuthenticated == true)
+                        {
+                            <h1>This page needs a different role.</h1>
+                            <p>Your account doesn't have access to this part of the workspace. Contact your workshop manager if you need access.</p>
+                            <a href="/" class="btn btn-primary">Back to your workspace</a>
+                        }
+                        else
+                        {
+                            <h1>Your workspace is one sign-in away.</h1>
+                            <p>Sign in to view this page. You can try a manager or technician demo account on the sign-in page.</p>
+                            <a href="login" class="btn btn-primary">Sign in</a>
+                        }
                     </div>
                 </NotAuthorized>
             </AuthorizeRouteView>
             <FocusOnNavigate RouteData="@routeData" Selector="h1" />
         </Found>
         <NotFound>
-            <PageTitle>Not found</PageTitle>
+            <PageTitle>Page not found | MechanicShop</PageTitle>
             <LayoutView Layout="@typeof(MainLayout)">
-                <p role="alert">Sorry, there's nothing at this address.</p>
+                <div class="route-message"><i class="bi bi-signpost" aria-hidden="true"></i><h1>Let's get you back on track.</h1><p>This page couldn't be found. Head back to the workspace to find what you need.</p><a href="/" class="btn btn-primary">Return home</a></div>
             </LayoutView>
         </NotFound>
     </Router>

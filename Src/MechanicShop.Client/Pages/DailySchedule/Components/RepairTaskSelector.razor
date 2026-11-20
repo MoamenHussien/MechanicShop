@@ -1,5 +1,5 @@
-﻿<div> 
-    <div class="d-flex gap-2 align-items-center mb-2"> 
+﻿<div>
+    <div class="d-flex gap-2 align-items-center mb-2">
         <select class="form-select" @bind="SelectedTaskId"  disabled="@ReadOnly">
             <option value="">-- Select Task --</option>
             @foreach (var task in AvailableTasks)
@@ -18,7 +18,7 @@
                 @task.Name
                 @if (!ReadOnly)
                 {
-                    <button type="button" class="btn-close btn-close-white btn-sm ms-2"
+                    <button type="button" class="btn-close  btn-sm ms-2"
                     aria-label="Remove"
                     @onclick="@(() => RemoveTask(task.RepairTaskId))">
                     </button>
@@ -61,7 +61,7 @@
             AllTasks = allTasksResults.Data!;
             FilterAvailableTasks();
         }
-         
+
     }
     protected override void OnParametersSet()
     {

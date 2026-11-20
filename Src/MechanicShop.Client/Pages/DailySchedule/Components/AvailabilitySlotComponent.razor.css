@@ -15,10 +15,18 @@
     pointer-events: none;
 }
 
-.booking-container:hover .booking-overlay {
+.booking-container:hover .booking-overlay,
+.booking-container:focus-within .booking-overlay {
     opacity: 1;
     pointer-events: auto;
 }
+
+.booking-container { border-radius: 6px; color: var(--ink); }
+.booking-container ::deep .badge { color: var(--ink); white-space: normal; text-align: start; }
+.booking-button { border: 0; border-radius: 6px; }
+.booking-button:focus-visible { outline-offset: -3px; opacity: 1; }
+.booking-container .booking-overlay .btn { min-width: 28px; min-height: 28px; }
+@media (hover: none) { .booking-overlay { opacity: 1; pointer-events: auto; background: transparent; } }
 
 .booking-container.unavailable {
     cursor: not-allowed !important;

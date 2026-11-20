@@ -9,11 +9,11 @@
                 <div class="row">
                     <div class="col-6">
                         <label class="form-label">New Date</label>
-                        <InputDate @bind-Value="_localDate" class="form-control" />
+                        <InputDate aria-label="New Date" @bind-Value="_localDate" class="form-control" />
                     </div>
                     <div class="col-6">
                         <label class="form-label">New Time</label>
-                        <InputSelect class="form-select" @bind-Value="_localTime">
+                        <InputSelect aria-label="New Time" class="form-select" @bind-Value="_localTime">
                             @foreach (var time in TimeOptions)
                             {
                                 <option value="@time">@time.ToString(@"hh\:mm")</option>
@@ -36,10 +36,10 @@
         </div>
         <div class="d-flex justify-content-end gap-3">
             <button type="button" class="btn btn-outline-secondary" @onclick="Cancel">
-                <i class="bi bi-x-circle me-2"></i>Cancel
+                <i class="bi bi-x-circle me-2" aria-hidden="true"></i>Cancel
             </button>
             <button class="btn btn-primary" type="submit">
-                <i class="bi bi-save me-2"></i>Save
+                <i class="bi bi-save me-2" aria-hidden="true"></i>Save
             </button>
         </div>
     </EditForm>
@@ -78,7 +78,7 @@
             NewStartAtUtc = StartAt, // temp
             NewSpot = CurrentSpot
         };
-    } 
+    }
 
     private static List<TimeSpan> TimeOptions =>
     Enumerable.Range(0, 96).Select(i => TimeSpan.FromMinutes(i * 15)).ToList();

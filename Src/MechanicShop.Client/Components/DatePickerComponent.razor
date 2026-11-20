@@ -1,16 +1,17 @@
 @using System.Globalization
 
 <div class="d-flex align-items-center gap-2">
-    <button type="button" class="btn btn-outline-info opacity-75" disabled="@IsLoading" @onclick="GoToPreviousDay">
-        <i class="bi bi-chevron-left"></i>
+    <button type="button" class="btn btn-outline-info" aria-label="Previous day" disabled="@IsLoading" @onclick="GoToPreviousDay">
+        <i class="bi bi-chevron-left" aria-hidden="true"></i>
     </button>
     <InputDate Type="InputDateType.Date"
                @bind-Value="SelectedDate"
                @bind-Value:after="OnDateInputChanged"
                class="form-control"
+               aria-label="Selected date"
                disabled="@IsLoading" />
-    <button type="button" class="btn btn-outline-info opacity-75" disabled="@IsLoading" @onclick="GoToNextDay">
-        <i class="bi bi-chevron-right"></i>
+    <button type="button" class="btn btn-outline-info" aria-label="Next day" disabled="@IsLoading" @onclick="GoToNextDay">
+        <i class="bi bi-chevron-right" aria-hidden="true"></i>
     </button>
 </div>
 

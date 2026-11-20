@@ -2,13 +2,14 @@
 @page "/schedules/{SelectedDate:datetime?}"
 
 @attribute [Authorize]
+<PageTitle>Workshop schedule | MechanicShop</PageTitle>
 
 
 <div class="mb-4">
     <div class="row g-3 align-items-center">
         <div class="col-12 col-md-4 col-lg-3">
             <h1 class="h3 mb-0 text-body-emphasis border-start border-4 border-danger ps-2 text-truncate">
-                <i class="bi bi-calendar2-range me-2 brand-red"></i>Daily Schedule
+                <i class="bi bi-calendar2-range me-2 brand-red" aria-hidden="true"></i>Workshop schedule
             </h1>
         </div>
         <div class="col-12 col-sm-7 col-md-5 col-lg-5">
@@ -17,8 +18,8 @@
                                  IsLoading="_isLoading" />
         </div>
         <div class="col-12 col-sm-5 col-md-3 col-lg-4">
-            <select @bind="_selectedLaborId" @bind:after="UpdateDaySchedule" class="form-select" disabled="@_isLoading">
-                <option value=""> -- Select Labor --</option>
+            <select aria-label="Filter by technician" @bind="_selectedLaborId" @bind:after="UpdateDaySchedule" class="form-select" disabled="@_isLoading">
+                <option value="">All technicians</option>
                 @if (_labors?.Any() == true)
                 {
                     foreach (var labor in _labors)
@@ -48,15 +49,15 @@
                 @if (GetNowLinePositionPixels() >= 0)
                 {
                     <div id="nowLineTarget" style="@GetNowLineTopStyle()">
-                        <div id="now-line" style="border-top: 2px dashed #ff3333; width: 100%; position: relative; opacity: 0.95;">
+                        <div id="now-line" style="border-top: 2px dashed var(--danger); width: 100%; position: relative; opacity: 0.95;">
                             <span style="
                             position: absolute;
                             top: -1.2rem;
                             right: 0.5rem;
                             font-size: 0.75rem;
-                            color: #ff3333;
+                            color: var(--danger);
                             font-weight: bold;
-                            background-color: rgba(15, 17, 24, 0.85);
+                            background-color: var(--surface);
                             padding: 1px 5px;
                             border-radius: 3px;">
                                 @DateTime.Now.ToString("HH:mm")
@@ -110,13 +111,13 @@
     [Inject] private IJSRuntime _jsRuntime { get; set; } = default!;
 
     [Parameter] public DateTime? SelectedDate { get; set; }
-    private DateTime _selectedDate; 
+    private DateTime _selectedDate;
 
     private ScheduleModel _schedule = new ();
     private List<LaborModel>? _labors;
     private Guid? _selectedLaborId;
     private AvailabilitySlotModel? SelectedSlot;
-    private TimeSpan _maxAllowedDuration; 
+    private TimeSpan _maxAllowedDuration;
     private RenderFragment? _activeDialogContent;
 
     private bool _isPM;
@@ -134,7 +135,7 @@
     private OperatingHoursResponse operateHours = default!;
 
     protected override async Task OnInitializedAsync()
-    { 
+    {
         _cts = new ();
 
         _ = StartRefreshing(_cts.Token);
@@ -153,7 +154,7 @@
         if (laborResult.IsSuccess)
         {
             _labors = laborResult.Data!;
-        } 
+        }
 
         var user = (await _authStateProvider.GetAuthenticationStateAsync()).User;
 
@@ -161,7 +162,7 @@
 
         _isPM = user.IsInRole("Manager");
 
-        await UpdateDaySchedule(); 
+        await UpdateDaySchedule();
     }
 
     private async Task StartRefreshing(CancellationToken token)
@@ -175,22 +176,22 @@
 
     private async Task UpdateDaySchedule()
     {
-        _isLoading = true; 
+        _isLoading = true;
 
-        StateHasChanged(); 
+        StateHasChanged();
 
         var scheduleResult = await _serviceApi.GetDailySchedule(DateOnly.FromDateTime(_selectedDate), _selectedLaborId);
 
         if (scheduleResult.IsSuccess)
         {
             _schedule = scheduleResult.Data!;
-        } 
+        }
 
         _isLoading = false;
 
         await ScrollToBottom();
         StateHasChanged();
-        
+
     }
 
     private async Task OnDateSelected(DateTime newDate)
@@ -225,7 +226,7 @@
     {
         HideDialog();
 
-        await UpdateDaySchedule(); 
+        await UpdateDaySchedule();
     }
 
     private void HideDialog()
@@ -286,13 +287,13 @@
         _dialogMeta = builder =>
       {
           builder.OpenElement(0, "div");
-          builder.AddAttribute(1, "class", "bg-body-tertiary text-light border border-secondary rounded-2 px-3 py-2 mb-3 small d-flex flex-wrap gap-4 align-items-center");
+          builder.AddAttribute(1, "class", "bg-body-tertiary text-body border border-secondary rounded-2 px-3 py-2 mb-3 small d-flex flex-wrap gap-4 align-items-center");
 
           builder.AddMarkupContent(2, $"<span>⏰ <strong>Time:</strong> {slot.StartAt:HH\\:mm} ➔ {effectiveEndAt:HH\\:mm}</span>");
 
           builder.CloseElement();
       };
-       
+
 
         ShowDialog(builder =>
         {
@@ -317,7 +318,7 @@
         _dialogMeta = builder =>
     {
         builder.OpenElement(0, "div");
-        builder.AddAttribute(1, "class", "bg-body-tertiary text-light border border-secondary rounded-2 px-3 py-2 mb-3 small d-flex flex-wrap gap-4 align-items-center");
+        builder.AddAttribute(1, "class", "bg-body-tertiary text-body border border-secondary rounded-2 px-3 py-2 mb-3 small d-flex flex-wrap gap-4 align-items-center");
 
         builder.AddMarkupContent(2, $"<span>🏷️ <strong>Workorder:</strong> {slot.WorkOrderId.ToString()?.Substring(0, 8)}</span>");
         builder.AddMarkupContent(2, $"<span>⏰ <strong>Time:</strong> {slot.StartAt:HH\\:mm} ➔ {effectiveEndAt:HH\\:mm}</span>");
@@ -348,7 +349,7 @@
         _dialogMeta = builder =>
     {
         builder.OpenElement(0, "div");
-        builder.AddAttribute(1, "class", "bg-body-tertiary text-light border border-secondary rounded-2 px-3 py-2 mb-3 small d-flex flex-wrap gap-4 align-items-center");
+        builder.AddAttribute(1, "class", "bg-body-tertiary text-body border border-secondary rounded-2 px-3 py-2 mb-3 small d-flex flex-wrap gap-4 align-items-center");
 
         builder.AddMarkupContent(2, $"<span>🏷️ <strong>Workorder:</strong> {slot.WorkOrderId.ToString()?.Substring(0, 8)}</span>");
         builder.AddMarkupContent(2, $"<span>⏰ <strong>Time:</strong> {slot.StartAt:HH\\:mm} ➔ {effectiveEndAt:HH\\:mm}</span>");
@@ -379,7 +380,7 @@
         _dialogMeta = builder =>
       {
           builder.OpenElement(0, "div");
-          builder.AddAttribute(1, "class", "bg-body-tertiary text-light border border-secondary rounded-2 px-3 py-2 mb-3 small d-flex flex-wrap gap-4 align-items-center");
+          builder.AddAttribute(1, "class", "bg-body-tertiary text-body border border-secondary rounded-2 px-3 py-2 mb-3 small d-flex flex-wrap gap-4 align-items-center");
 
           builder.AddMarkupContent(2, $"<span>🏷️ <strong>Workorder:</strong> {slot.WorkOrderId.ToString()?.Substring(0, 8)}</span>");
           builder.AddMarkupContent(2, $"<span>⏰ <strong>Time:</strong> {slot.StartAt:HH\\:mm} ➔ {effectiveEndAt:HH\\:mm}</span>");
@@ -427,7 +428,7 @@
         _dialogMeta = builder =>
       {
           builder.OpenElement(0, "div");
-          builder.AddAttribute(1, "class", "bg-body-tertiary text-light border border-secondary rounded-2 px-3 py-2 mb-3 small d-flex flex-wrap gap-4 align-items-center");
+          builder.AddAttribute(1, "class", "bg-body-tertiary text-body border border-secondary rounded-2 px-3 py-2 mb-3 small d-flex flex-wrap gap-4 align-items-center");
 
           builder.AddMarkupContent(2, $"<span>🏷️ <strong>Workorder:</strong> {slot.WorkOrderId.ToString()?.Substring(0, 8)}</span>");
           builder.AddMarkupContent(2, $"<span>⏰ <strong>Time:</strong> {slot.StartAt:HH\\:mm} ➔ {effectiveEndAt:HH\\:mm}</span>");

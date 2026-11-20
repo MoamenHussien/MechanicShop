@@ -34,8 +34,6 @@ if (app.Environment.IsDevelopment())
 
     app.MapScalarApiReference();
 
-    await app.InitialiseDatabaseAsync();
-
     app.UseWebAssemblyDebugging();
 }
 else

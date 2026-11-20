@@ -1,18 +1,18 @@
 ﻿@if (Show)
-{ 
+{
     <div class="dialog-container">
 
-        <div class="dialog bg-dark p-4">
+        <div class="dialog bg-body p-4" role="dialog" aria-modal="true" aria-labelledby="dialog-title">
             <div class="d-flex justify-content-between align-items-center mb-2">
                 @if (Title is not null)
                 {
-                    <h6 class="text-light m-0 fs-4">@Title</h6>
+                    <h2 id="dialog-title" class="text-body m-0 fs-4">@Title</h2>
                 }
-                <button class="btn-close btn-close-white" @onclick="() => OnClose.InvokeAsync()" aria-label="Close"></button>
+                <button class="btn-close " @onclick="() => OnClose.InvokeAsync()" aria-label="Close"></button>
             </div>
             @if (Meta is not null)
             {
-                <div class="text-light small lh-sm">
+                <div class="text-body small lh-sm">
                     @Meta
                 </div>
             }
@@ -25,6 +25,6 @@
     [Parameter] public RenderFragment? Title { get; set; }
     [Parameter] public RenderFragment? Meta { get; set; }
     [Parameter, EditorRequired] public RenderFragment? ChildContent { get; set; }
-    [Parameter, EditorRequired] public EventCallback OnClose { get; set; } 
+    [Parameter, EditorRequired] public EventCallback OnClose { get; set; }
     [Parameter] public bool Show { get; set; }
 }
